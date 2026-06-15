@@ -3,7 +3,7 @@ import { formatEventDate } from "@/lib/dates";
 import { matchStrength } from "@/services/matching";
 import { getImageForId } from "@/lib/images";
 import type { MatchResult, SearchFilters } from "@/services/types";
-import { MapPin, Calendar, Star, Sparkles } from "lucide-react";
+import { MapPin, Calendar, Star, Sparkles, Music } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface EventCardProps {
@@ -17,6 +17,13 @@ export default function EventCard({ result, filters, isSelected, onClick }: Even
   const { event, isExactMatch, score } = result;
   const { matched, total } = matchStrength(result, filters);
   const image = getImageForId(event.id);
+
+  const headliners = event.performers.filter((p) => p.isHeadliner).map((p) => p.name);
+  const artistNames = (headliners.length ? headliners : event.performers.map((p) => p.name));
+  const artistLabel =
+    artistNames.length > 2
+      ? `${artistNames.slice(0, 2).join(", ")} +${artistNames.length - 2} more`
+      : artistNames.join(", ");
 
   return (
     <div 
@@ -60,7 +67,14 @@ export default function EventCard({ result, filters, isSelected, onClick }: Even
 
       <div className="p-4 flex flex-col gap-2">
         <h3 className="text-xl font-bold leading-tight group-hover:text-primary transition-colors">{event.name}</h3>
-        
+
+        {artistLabel && (
+          <div className="flex items-center gap-1.5 text-sm font-medium text-white/80">
+            <Music className="w-3.5 h-3.5 text-primary shrink-0" />
+            <span className="truncate">{artistLabel}</span>
+          </div>
+        )}
+
         <div className="flex items-center text-sm text-muted-foreground gap-4">
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />

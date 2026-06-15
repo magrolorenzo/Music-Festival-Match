@@ -1,7 +1,15 @@
 import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Tooltip, useMap } from "react-leaflet";
 import L from "leaflet";
+import { formatEventDate } from "@/lib/dates";
 import type { MatchResult } from "@/services/types";
+
+function artistLabelFor(result: MatchResult): string {
+  const performers = result.event.performers;
+  const headliners = performers.filter((p) => p.isHeadliner).map((p) => p.name);
+  const names = headliners.length ? headliners : performers.map((p) => p.name);
+  return names.length > 2 ? `${names.slice(0, 2).join(", ")} +${names.length - 2} more` : names.join(", ");
+}
 
 interface LiveMapProps {
   results: MatchResult[];
@@ -21,9 +29,25 @@ function MapController({ selectedResult, results }: { selectedResult: MatchResul
         { duration: 1.5 }
       );
     } else if (results.length > 0) {
-      // Fit all
-      const bounds = L.latLngBounds(results.map(r => [r.event.location.latitude, r.event.location.longitude]));
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 6 });
+      // Fly to the geographic center of the top-ranked results (results are
+      // already sorted best-first). Spread of the top set drives the zoom.
+      const top = results.slice(0, Math.min(3, results.length));
+      const centerLat = top.reduce((s, r) => s + r.event.location.latitude, 0) / top.length;
+      const centerLng = top.reduce((s, r) => s + r.event.location.longitude, 0) / top.length;
+      const zoom =
+        top.length > 1
+          ? Math.min(
+              6,
+              map.getBoundsZoom(
+                L.latLngBounds(
+                  top.map((r) => [r.event.location.latitude, r.event.location.longitude]),
+                ),
+                false,
+                L.point(60, 60),
+              ),
+            )
+          : 6;
+      map.flyTo([centerLat, centerLng], zoom, { duration: 1.5 });
     }
   }, [selectedResult, results, map]);
 
@@ -65,7 +89,17 @@ export default function LiveMap({ results, selectedEventId, onSelect }: LiveMapP
               click: () => onSelect(result.event.id)
             }}
             zIndexOffset={isSelected ? 1000 : result.isExactMatch ? 500 : 100}
-          />
+          >
+            <Tooltip direction="top" offset={[0, -8]} opacity={1} className="livepulse-tooltip">
+              <div className="space-y-0.5">
+                <div className="font-bold text-sm text-white">{result.event.name}</div>
+                <div className="text-xs text-primary font-medium">{artistLabelFor(result)}</div>
+                <div className="text-[11px] text-white/60">
+                  {formatEventDate(result.event.startDate, result.event.endDate)} · {result.event.location.city}
+                </div>
+              </div>
+            </Tooltip>
+          </Marker>
         );
       })}
 

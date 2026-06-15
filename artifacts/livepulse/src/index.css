@@ -147,3 +147,17 @@
 .leaflet-popup-tip {
   display: none !important;
 }
+
+/* Dark themed marker tooltips */
+.leaflet-tooltip.livepulse-tooltip {
+  background: rgba(10, 10, 10, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  color: #fff;
+}
+.leaflet-tooltip.livepulse-tooltip::before {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}

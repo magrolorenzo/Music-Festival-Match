@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import type { SearchFilters, GenreKey, MoodKey, LocationFilter, PeriodKey } from "@/services/types";
 import { GENRES, MOODS, LOCATIONS, PERIODS, moodHue } from "@/lib/taxonomy";
@@ -11,10 +11,22 @@ interface LandingProps {
 
 export default function Landing({ filters: initialFilters, onSearch }: LandingProps) {
   const [filters, setFilters] = useState<SearchFilters>(initialFilters);
+  const [cycleIndex, setCycleIndex] = useState(0);
+
+  // When no mood is chosen, the hero backdrop autonomously cycles through the
+  // mood themes. Selecting a mood overrides the cycle with that mood's hue.
+  useEffect(() => {
+    if (filters.mood !== "any") return;
+    const id = setInterval(() => {
+      setCycleIndex((i) => (i + 1) % MOODS.length);
+    }, 3500);
+    return () => clearInterval(id);
+  }, [filters.mood]);
 
   const activeMoodHue = useMemo(() => {
-    return filters.mood !== "any" ? moodHue(filters.mood as MoodKey) : "18 100% 55%";
-  }, [filters.mood]);
+    if (filters.mood !== "any") return moodHue(filters.mood as MoodKey);
+    return MOODS[cycleIndex].hue;
+  }, [filters.mood, cycleIndex]);
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-6 relative">

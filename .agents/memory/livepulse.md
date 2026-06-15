@@ -8,15 +8,15 @@ description: Durable constraints/decisions for the LivePulse festival matchmaker
 A dark-themed, frontend-only music festival matchmaker (React + Vite, in `artifacts/livepulse`).
 
 ## Pinned "today"
-- The app's notion of "now" is pinned to a fixed date (`APP_TODAY` in `src/lib/dates.ts`), not the real clock.
-- **Why:** mock festivals are seeded for summer 2026; using the real date would push them out of the default period filters and the app would return empty results.
-- **How to apply:** when seeded events look "missing", check the period range math against the pinned date before suspecting matching logic. Don't move the pin without re-seeding the dataset.
+- The app's notion of "now" is a fixed pinned date, not the real clock.
+- **Why:** the mock festivals are seeded for a specific season; using the real date pushes them out of the default time-period filters and the app returns empty results.
+- **How to apply:** if seeded events look "missing", suspect the pinned-date vs period-range relationship before the matching logic. Don't move the pin without re-seeding the dataset.
 
 ## Data layer is a deliberate API seam
-- `src/services/{api,matching,search,types}.ts` is the single boundary between UI and data; it is intentionally shaped around real JamBase / Cyanite / Musixmatch schemas so a future live swap changes only the request transport inside each function, not the UI or models.
-- **How to apply:** keep UI components reading from the service layer, not the raw JSON. Going live should not require touching components.
+- The services layer is the single boundary between UI and data, intentionally shaped around the real partner schemas (JamBase events, Cyanite mood/audio analysis, Musixmatch quotes) so going live changes only the request transport, not the UI or data models.
+- **How to apply:** keep UI reading from the service layer, not the raw mock JSON. A live swap should not require touching components.
 
-## Taxonomy is a closed set; JSON is validated at runtime
-- Valid genre/mood keys live in `src/lib/taxonomy.ts` and `src/services/types.ts`. `validateEvents` in `api.ts` drops (and console-errors) any event whose performer carries a genre/mood key outside that set, because TypeScript cannot type-check imported JSON.
-- **Why:** an earlier data bug (a stray `"pop"` mood key) passed typecheck silently and fed invalid data into matching.
-- **How to apply:** when adding mock events, only use keys defined in the taxonomy; if events vanish, check the console for the validation warning.
+## Taxonomy is a closed set; imported JSON is validated at runtime
+- Genre/mood keys are a fixed taxonomy. The service layer validates the imported mock JSON at runtime and drops records whose keys fall outside that set.
+- **Why:** TypeScript cannot type-check imported JSON, so a stray invalid key once passed compilation and fed bad data into matching.
+- **How to apply:** only use keys defined in the taxonomy when adding events; if events silently vanish, check the console for the validation warning.
