@@ -1,0 +1,1 @@
+- [LivePulse design](livepulse.md) — frontend-only festival matchmaker; mock data layer mirrors partner API schemas; pinned "today" + taxonomy constraints.

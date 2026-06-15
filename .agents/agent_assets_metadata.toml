@@ -1,0 +1,38 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "DY4bBpgyR9ZtvWh3nFJwF"
+uri = "file://artifacts/livepulse/src/assets/fest_electronic.png"
+type = "image"
+title = "Electronic music festival main stage"
+
+[[generated]]
+id = "1F1VVOmv69T6JDzB_GlCI"
+uri = "file://artifacts/livepulse/src/assets/fest_rock.png"
+type = "image"
+title = "Rock festival live performance"
+
+[[generated]]
+id = "EiYZW6pvF_ib1lJm_7RD-"
+uri = "file://artifacts/livepulse/src/assets/fest_jazz.png"
+type = "image"
+title = "Jazz festival intimate stage"
+
+[[generated]]
+id = "8Xu4BHQ19-1ogPLtQHw4x"
+uri = "file://artifacts/livepulse/src/assets/artist_pop.png"
+type = "image"
+title = "Pop artist portrait dark mood"
+
+[[generated]]
+id = "5VTByQax-mwISW_m3pfIt"
+uri = "file://artifacts/livepulse/src/assets/artist_dj.png"
+type = "image"
+title = "Electronic DJ portrait"
+
+[[generated]]
+id = "Wwsm6X84P7UlEge1Ox2yL"
+uri = "file://artifacts/livepulse/src/assets/artist_rock.png"
+type = "image"
+title = "Rock vocalist portrait"
