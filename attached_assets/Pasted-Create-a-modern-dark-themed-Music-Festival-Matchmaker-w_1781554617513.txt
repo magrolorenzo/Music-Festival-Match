@@ -1,0 +1,62 @@
+Create a modern, dark-themed Music Festival Matchmaker web application called "LivePulse".
+The application must be a Single-Page Application (SPA) built entirely with Vue.js (Vue 3).
+
+The layout must be a clean, full-screen dashboard split into two main sections:
+1. A sidebar control panel (left) containing the search filters and the dynamic results list.
+2. A large, responsive 2D map (right) taking up the rest of the screen using the free and open-source Leaflet.js library (via Vue Leaflet), using "CartoDB Dark Matter" dark-themed map tiles.
+
+---
+
+1. INPUT FILTERS & SEARCH (Sidebar)
+   Create an intuitive filter interface with the following dropdowns:
+- Location (Europe, North America, Global) -> Linked to JamBase logic.
+- Music Genre (Rock, Pop, Electronic, Hip-Hop, Jazz) -> Linked to Cyanite logic.
+- Mood (Energetic, Chill, Emotional, Dark) -> Linked to Cyanite & Musixmatch logic.
+- Period (Current Month, Next 3 Months)
+  Include a prominent, glowing "Find Live Experiences" button to trigger the search.
+
+---
+
+2. API ARCHITECTURE & REAL SCHEMA MAPPING
+   Generate a clean abstraction layer in `services/api.js`. Currently, it must fetch from a local `festivals_mock.json` file, but the functions, query parameters, and data models must be strictly designed around the official partner APIs documentation schemas so that switching to live endpoints later will only require updating the base URL and API keys:
+
+- JamBase API (Location Filter):
+    * Official Reference: https://data.jambase.com/api/reference
+    * Function mapping: `fetchFestivals({ location, startDate, endDate })`
+    * Must simulate a GET request to `/events` using parameters like geoLatitude, geoLongitude, geoRadius.
+    * The data model must strictly use JamBase keys: `name`, `startDate`, `location` object (containing `name`, `latitude`, `longitude`), and `performers` array.
+
+- Cyanite API (Genre & Acoustic Mood Filter):
+    * Official Reference: https://api-docs.cyanite.ai/docs/create-integration
+    * Function mapping: `fetchMusicAnalysis(artistId)`
+    * Structure the mock service to simulate a GraphQL POST query requesting `musicGenres` (e.g., Electronic, Rock) and `audioValence` / emotional attributes (e.g., Energetic, Chill).
+
+- Musixmatch Pro API (Emotional Mood & Lyrics):
+    * Official Reference: https://docs.musixmatch.com/overview
+    * Function mapping: `getTrackLyrics(trackName, artistName)`
+    * Structure the data models around track/lyrics endpoints. The payload must simulate Musixmatch responses using keys like `lyrics_body` (for a snippet of synced lyrics) and `script_tracking_url`.
+
+---
+
+3. DATA STRUCTURE (festivals_mock.json)
+   Create a local `festivals_mock.json` file representing 5-6 real major music festivals (e.g., Tomorrowland, Glastonbury, Coachella). The nesting of this JSON must perfectly match the combined payloads of JamBase, Cyanite, and Musixmatch detailed above. Each festival entry must include:
+- Official JamBase fields (Name, description, venue, real latitude/longitude floats).
+- Lineup: Array of top 3 headliner artists.
+- Embedded Partner Tags: Explicit genre and mood fields mapping directly to the sidebar filters, a mock Songstats popularity trend (e.g., "+24%"), and a sample synced lyrics snippet placeholder from Musixmatch.
+
+---
+
+4. SPA INTERACTIVE 2D MAP
+   Initialize the Leaflet map centered on a global view with the CartoDB Dark Matter tile layer.
+- On application load, display custom glowing marker pins for all festivals on the map.
+- When the user applies filters and clicks "Find Live Experiences", the SPA must filter the list and map markers in real-time without reloading the page.
+- When filters are executed, programmatically trigger a smooth map panning and zoom effect (`map.flyTo`) focusing on the geographic center of the highest-matching festival results.
+
+---
+
+5. RESULTS & DETAIL VIEW
+- Display the filtered results as polished cards in the sidebar below the filters.
+- Clicking a festival card or a map marker pin must seamlessly open a detailed "Festival Deep Dive Panel" within the SPA (either as a sliding panel or replacing the current sidebar state).
+- The detail view must cleanly present: Full festival metadata, lineup, a dynamic AI-style justification text explaining why this specific festival matches their exact Genre/Mood selection (derived from Cyanite/Musixmatch mock analysis data), and a styled widget displaying the Musixmatch synchronized scrolling lyrics placeholder.
+
+The entire web app must operate as a highly responsive, premium dark-themed UI tailored for the music industry, featuring fluid CSS transitions, neon accents (purple/cyan), and clean typography. No external authentication is required for this phase.
