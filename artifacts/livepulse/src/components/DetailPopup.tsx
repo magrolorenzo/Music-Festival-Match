@@ -21,9 +21,9 @@ interface DetailPopupProps {
   onClose: () => void;
 }
 
-function PerformerCard({ performer, preferredMood }: { performer: Performer, preferredMood: MoodKey | "any" }) {
+function PerformerCard({ performer, preferredMood }: { performer: Performer, preferredMood?: MoodKey }) {
   const image = getImageForId(performer.id);
-  const quote = pickArtistQuote(performer, preferredMood !== "any" ? preferredMood : undefined);
+  const quote = pickArtistQuote(performer, preferredMood);
 
   return (
     <div className="w-full flex flex-col gap-6 bg-white/5 rounded-2xl p-6 border border-white/10">
@@ -142,7 +142,7 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
           </Button>
         </div>
 
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 min-h-0">
           {/* Hero */}
           <div className="h-64 md:h-80 relative overflow-hidden bg-muted">
             {image ? (
@@ -189,7 +189,7 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
               </h3>
               
               {displayPerformers.length === 1 ? (
-                <PerformerCard performer={displayPerformers[0]} preferredMood={filters.mood} />
+                <PerformerCard performer={displayPerformers[0]} preferredMood={filters.moods[0]} />
               ) : (
                 <Carousel
                   opts={{
@@ -200,7 +200,7 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
                   <CarouselContent>
                     {displayPerformers.map((performer) => (
                       <CarouselItem key={performer.id} className="md:basis-1/1 lg:basis-1/1">
-                        <PerformerCard performer={performer} preferredMood={filters.mood} />
+                        <PerformerCard performer={performer} preferredMood={filters.moods[0]} />
                       </CarouselItem>
                     ))}
                   </CarouselContent>

@@ -1,1 +1,1 @@
-- [LivePulse design](livepulse.md) — frontend-only festival matchmaker; mock data layer mirrors partner API schemas; pinned "today" + taxonomy constraints.
+- [react-day-picker date serialization](livepulse-date-tz.md) — calendar gives LOCAL Date objects; never round-trip through UTC/toISOString or days shift off-by-one.

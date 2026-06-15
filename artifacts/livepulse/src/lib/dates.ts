@@ -1,18 +1,33 @@
 // ============================================================================
-// Date helpers for the Period filter.
+// Date helpers for the calendar date filter.
 //
 // The mock dataset is seeded around summer 2026, so "today" is pinned to a
-// fixed reference date. This keeps the Current Month / Next 3 Months filters
-// deterministic regardless of the real system clock. When live data is wired
-// in, replace APP_TODAY with `new Date()`.
+// fixed reference date. This keeps the default date window deterministic
+// regardless of the real system clock. When live data is wired in, replace
+// APP_TODAY with `new Date()`.
 // ============================================================================
 
-import type { PeriodKey } from "@/services/types";
+// Pinned to a fixed reference "today". Constructed from local calendar
+// components (not a UTC string) so it round-trips correctly with the calendar
+// picker, which operates on local-time Date objects.
+export const APP_TODAY = new Date(2026, 5, 15);
 
-export const APP_TODAY = new Date("2026-06-15T00:00:00Z");
+/**
+ * Formats a Date as a "YYYY-MM-DD" string using its LOCAL calendar fields.
+ * The calendar picker hands us local-time dates, so we must not go through UTC
+ * (which would shift the day for users west/east of UTC).
+ */
+export function toISODate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
-function toISODate(d: Date): string {
-  return d.toISOString().slice(0, 10);
+/** Parses a "YYYY-MM-DD" string into a LOCAL-time Date (midnight). */
+export function fromISODate(iso: string): Date {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d);
 }
 
 export interface DateRange {
@@ -20,25 +35,14 @@ export interface DateRange {
   endDate: string;
 }
 
-/** Resolves a Period filter into an inclusive ISO date range. */
-export function periodToRange(period: PeriodKey): DateRange {
+/**
+ * The default search window: from today through the last day of the third
+ * month ahead (inclusive). e.g. on Jun 15 this spans Jun 15 -> Sep 30.
+ */
+export function defaultDateRange(): DateRange {
   const today = APP_TODAY;
-  if (period === "current-month") {
-    const start = new Date(
-      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1),
-    );
-    const end = new Date(
-      Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0),
-    );
-    return { startDate: toISODate(start), endDate: toISODate(end) };
-  }
-  // next-3-months: from today through the last day of the third month ahead
-  // (inclusive). e.g. on Jun 15 this spans Jun 15 -> Sep 30.
-  const start = today;
-  const end = new Date(
-    Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 4, 0),
-  );
-  return { startDate: toISODate(start), endDate: toISODate(end) };
+  const end = new Date(today.getFullYear(), today.getMonth() + 4, 0);
+  return { startDate: toISODate(today), endDate: toISODate(end) };
 }
 
 const MONTHS = [

@@ -5,6 +5,12 @@ import { getImageForId } from "@/lib/images";
 import type { MatchResult, SearchFilters } from "@/services/types";
 import { MapPin, Calendar, Star, Sparkles, Music } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface EventCardProps {
   result: MatchResult;
@@ -60,9 +66,23 @@ export default function EventCard({ result, filters, isSelected, onClick }: Even
           )}
         </div>
         
-        <div className="absolute bottom-3 right-3 text-xs font-bold px-2 py-1 rounded bg-black/60 backdrop-blur-md border border-white/10 flex items-center text-primary">
-          <Star className="w-3 h-3 mr-1 fill-primary" /> {score}
-        </div>
+        <TooltipProvider delayDuration={150}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div
+                data-testid={`score-${event.id}`}
+                className="absolute bottom-3 right-3 text-xs font-bold px-2 py-1 rounded bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1 text-primary cursor-help"
+              >
+                <Star className="w-3 h-3 fill-primary" />
+                <span>Match {score}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="left" className="max-w-[200px] text-center">
+              Match score — how well this event fits your selected genres and
+              moods, weighted by the lineup's popularity.
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       <div className="p-4 flex flex-col gap-2">

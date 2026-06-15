@@ -3,8 +3,8 @@ import type { SearchFilters, MoodKey, GenreKey } from "@/services/types";
 import { moodHue, moodEmoji, genreEmoji, GENRE_BY_KEY, MOOD_BY_KEY } from "@/lib/taxonomy";
 
 export default function Loading({ filters }: { filters: SearchFilters }) {
-  const mKey = filters.mood !== "any" ? (filters.mood as MoodKey) : "energetic";
-  const gKey = filters.genre !== "any" ? (filters.genre as GenreKey) : null;
+  const mKey: MoodKey = filters.moods[0] ?? "energetic";
+  const gKey: GenreKey | null = filters.genres[0] ?? null;
   const hue = moodHue(mKey);
   const mEmoji = moodEmoji(mKey);
   const gEmoji = gKey ? genreEmoji(gKey) : "✨";
@@ -45,7 +45,7 @@ export default function Loading({ filters }: { filters: SearchFilters }) {
           <h2 className="text-2xl font-bold tracking-wide">Pulsing the network...</h2>
           <p className="text-muted-foreground">
             Seeking {moodDef ? moodDef.vibe : "unforgettable nights"} 
-            {filters.location !== "global" ? ` in ${filters.location}` : ""}...
+            {filters.location ? ` near ${filters.location.query}` : ""}...
           </p>
         </div>
       </div>

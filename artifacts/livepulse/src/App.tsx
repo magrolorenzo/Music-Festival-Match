@@ -1,18 +1,25 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { runSearch, type SearchResponse } from "@/services/search";
-import type { SearchFilters, MoodKey } from "@/services/types";
+import type { SearchFilters } from "@/services/types";
+import { defaultDateRange } from "@/lib/dates";
 import Landing from "@/components/Landing";
 import Loading from "@/components/Loading";
 import Results from "@/components/Results";
 
 export default function App() {
   const [appState, setAppState] = useState<"landing" | "loading" | "results">("landing");
-  const [filters, setFilters] = useState<SearchFilters>({
-    location: "global",
-    genre: "any",
-    mood: "any",
-    period: "current-month"
+  const [filters, setFilters] = useState<SearchFilters>(() => {
+    const { startDate, endDate } = defaultDateRange();
+    return {
+      location: null,
+      radius: 100,
+      radiusUnit: "mi",
+      genres: [],
+      moods: [],
+      startDate,
+      endDate,
+    };
   });
   const [searchResponse, setSearchResponse] = useState<SearchResponse | null>(null);
 

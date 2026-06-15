@@ -18,8 +18,8 @@ import mockData from "@/data/festivals_mock.json";
 import type {
   LiveEvent,
   Performer,
-  LocationFilter,
-  RegionKey,
+  GeoLocation,
+  RadiusUnit,
   CyaniteAnalysis,
   MusixmatchQuote,
   MoodKey,
@@ -105,16 +105,77 @@ function delay<T>(value: T, ms = 650): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), ms));
 }
 
-// Region centroids used to model JamBase's geoLatitude / geoLongitude / geoRadius
-// query parameters. A real call would pass these straight through to /events.
-const REGION_GEO: Record<RegionKey, { lat: number; lon: number; radiusKm: number }> = {
-  europe: { lat: 50.0, lon: 10.0, radiusKm: 2500 },
-  "north-america": { lat: 39.5, lon: -98.35, radiusKm: 4500 },
-};
+const KM_PER_MILE = 1.60934;
+const EARTH_RADIUS_KM = 6371;
+
+/** Converts a radius in mi/km to kilometres. */
+export function radiusToKm(radius: number, unit: RadiusUnit): number {
+  return unit === "mi" ? radius * KM_PER_MILE : radius;
+}
+
+/** Great-circle distance in kilometres between two lat/lon points. */
+export function haversineKm(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return EARTH_RADIUS_KM * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/**
+ * Geocodes free-text place names ("Europe", "Verona, Italy") to coordinates
+ * using OpenStreetMap's Nominatim service — keyless and usable directly from
+ * the browser, keeping LivePulse frontend-only. Returns null when the place
+ * cannot be resolved, and throws on network failure so callers can surface it.
+ *
+ * LIVE SWAP: a production build would proxy this through the backend with a
+ * proper User-Agent and rate limiting per Nominatim's usage policy.
+ */
+export async function geocodeLocation(
+  query: string,
+): Promise<GeoLocation | null> {
+  const trimmed = query.trim();
+  if (!trimmed) return null;
+
+  const url = new URL("https://nominatim.openstreetmap.org/search");
+  url.searchParams.set("q", trimmed);
+  url.searchParams.set("format", "json");
+  url.searchParams.set("limit", "1");
+
+  const res = await fetch(url.toString(), {
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) {
+    throw new Error(`Geocoding failed (${res.status})`);
+  }
+  const hits = (await res.json()) as Array<{
+    lat: string;
+    lon: string;
+    display_name: string;
+  }>;
+  if (!Array.isArray(hits) || hits.length === 0) return null;
+
+  const [hit] = hits;
+  return {
+    query: trimmed,
+    label: hit.display_name,
+    latitude: Number(hit.lat),
+    longitude: Number(hit.lon),
+  };
+}
 
 export interface FetchFestivalsParams {
-  /** App location filter; "global" means no geo restriction. */
-  location: LocationFilter;
+  /** Resolved search center; null means no geo restriction (global). */
+  location: GeoLocation | null;
+  /** Radius around the search center, in kilometres. Ignored when global. */
+  radiusKm: number;
   /** ISO date (inclusive). Maps to JamBase eventDateFrom. */
   startDate: string;
   /** ISO date (inclusive). Maps to JamBase eventDateTo. */
@@ -123,18 +184,17 @@ export interface FetchFestivalsParams {
 
 /**
  * JamBase `/events` — returns live events within a date window and (optionally)
- * a geo radius.
+ * a geo radius around a resolved location.
  *
  * LIVE SWAP: replace the mock filter below with:
- *   const geo = location === "global" ? {} : REGION_GEO[location];
  *   const url = new URL(`${API_CONFIG.jambase.baseUrl}/events`);
  *   url.searchParams.set("apikey", API_CONFIG.jambase.apiKey);
  *   url.searchParams.set("eventDateFrom", startDate);
  *   url.searchParams.set("eventDateTo", endDate);
- *   if (geo) {
- *     url.searchParams.set("geoLatitude", String(geo.lat));
- *     url.searchParams.set("geoLongitude", String(geo.lon));
- *     url.searchParams.set("geoRadiusAmount", String(geo.radiusKm));
+ *   if (location) {
+ *     url.searchParams.set("geoLatitude", String(location.latitude));
+ *     url.searchParams.set("geoLongitude", String(location.longitude));
+ *     url.searchParams.set("geoRadiusAmount", String(radiusKm));
  *     url.searchParams.set("geoRadiusUnits", "km");
  *   }
  *   const res = await fetch(url); ... map res.events -> LiveEvent[]
@@ -142,15 +202,22 @@ export interface FetchFestivalsParams {
 export async function fetchFestivals(
   params: FetchFestivalsParams,
 ): Promise<LiveEvent[]> {
-  const { location, startDate, endDate } = params;
+  const { location, radiusKm, startDate, endDate } = params;
   const from = new Date(startDate).getTime();
   const to = new Date(endDate).getTime();
 
   const filtered = events.filter((event) => {
-    const inRegion = location === "global" || event.region === location;
+    const inRadius =
+      !location ||
+      haversineKm(
+        location.latitude,
+        location.longitude,
+        event.location.latitude,
+        event.location.longitude,
+      ) <= radiusKm;
     const ts = new Date(event.startDate).getTime();
     const inWindow = ts >= from && ts <= to;
-    return inRegion && inWindow;
+    return inRadius && inWindow;
   });
 
   return delay(filtered);
@@ -237,5 +304,3 @@ function findPerformerByName(name: string): Performer | undefined {
   }
   return undefined;
 }
-
-export { REGION_GEO };

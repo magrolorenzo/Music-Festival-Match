@@ -34,17 +34,19 @@ function eventPeakPopularity(event: LiveEvent): number {
 /** Performers contributing to the active genre/mood filters, best-first. */
 function rankMatchingPerformers(
   event: LiveEvent,
-  genre: GenreKey | "any",
-  mood: MoodKey | "any",
+  genres: GenreKey[],
+  moods: MoodKey[],
 ): Performer[] {
   const scored = event.performers.map((p) => {
-    const genreHit = genre !== "any" && p.cyanite.genreKeys.includes(genre);
-    const moodHit = mood !== "any" && p.cyanite.moodKeys.includes(mood);
+    const genreHits = genres.filter((g) =>
+      p.cyanite.genreKeys.includes(g),
+    ).length;
+    const moodHits = moods.filter((m) =>
+      p.cyanite.moodKeys.includes(m),
+    ).length;
     const relevance =
-      (genreHit ? 2 : 0) +
-      (moodHit ? 2 : 0) +
-      p.songstats.popularityScore / 100;
-    return { p, relevance, anyHit: genreHit || moodHit };
+      genreHits * 2 + moodHits * 2 + p.songstats.popularityScore / 100;
+    return { p, relevance, anyHit: genreHits > 0 || moodHits > 0 };
   });
 
   const hits = scored.filter((s) => s.anyHit);
@@ -57,7 +59,7 @@ export function scoreEvent(
   event: LiveEvent,
   filters: SearchFilters,
 ): MatchResult {
-  const { genre, mood } = filters;
+  const { genres, moods } = filters;
   const reasons: MatchReason[] = [];
 
   let score = 0;
@@ -67,21 +69,30 @@ export function scoreEvent(
   const matchedGenreKeys: GenreKey[] = [];
   const matchedMoodKeys: MoodKey[] = [];
 
-  if (genre !== "any") {
-    if (event.genreKeys.includes(genre)) {
-      score += WEIGHTS.genre;
-      matchedGenreKeys.push(genre);
-      reasons.push({ type: "genre", key: genre, label: genreLabel(genre) });
+  // Genre dimension: an event matches if it covers ANY selected genre; the
+  // more selected genres it covers, the higher its share of the genre weight.
+  if (genres.length > 0) {
+    const hits = genres.filter((g) => event.genreKeys.includes(g));
+    if (hits.length > 0) {
+      score += WEIGHTS.genre * (hits.length / genres.length);
+      for (const g of hits) {
+        matchedGenreKeys.push(g);
+        reasons.push({ type: "genre", key: g, label: genreLabel(g) });
+      }
     } else {
       genreSatisfied = false;
     }
   }
 
-  if (mood !== "any") {
-    if (event.moodKeys.includes(mood)) {
-      score += WEIGHTS.mood;
-      matchedMoodKeys.push(mood);
-      reasons.push({ type: "mood", key: mood, label: moodLabel(mood) });
+  // Mood dimension: same "any of, more is better" logic as genres.
+  if (moods.length > 0) {
+    const hits = moods.filter((m) => event.moodKeys.includes(m));
+    if (hits.length > 0) {
+      score += WEIGHTS.mood * (hits.length / moods.length);
+      for (const m of hits) {
+        matchedMoodKeys.push(m);
+        reasons.push({ type: "mood", key: m, label: moodLabel(m) });
+      }
     } else {
       moodSatisfied = false;
     }
@@ -100,7 +111,7 @@ export function scoreEvent(
     reasons,
     matchedGenreKeys,
     matchedMoodKeys,
-    matchingPerformers: rankMatchingPerformers(event, genre, mood),
+    matchingPerformers: rankMatchingPerformers(event, genres, moods),
   };
 }
 
@@ -134,11 +145,11 @@ export function matchStrength(result: MatchResult, filters: SearchFilters): {
 } {
   let total = 0;
   let matched = 0;
-  if (filters.genre !== "any") {
+  if (filters.genres.length > 0) {
     total += 1;
     if (result.matchedGenreKeys.length > 0) matched += 1;
   }
-  if (filters.mood !== "any") {
+  if (filters.moods.length > 0) {
     total += 1;
     if (result.matchedMoodKeys.length > 0) matched += 1;
   }

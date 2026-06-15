@@ -3,9 +3,8 @@
 // Combines the JamBase-style fetch with the local matching engine.
 // ============================================================================
 
-import { fetchFestivals } from "./api";
+import { fetchFestivals, radiusToKm } from "./api";
 import { rankEvents } from "./matching";
-import { periodToRange } from "@/lib/dates";
 import type { SearchFilters, MatchResult } from "./types";
 
 export interface SearchResponse {
@@ -15,15 +14,15 @@ export interface SearchResponse {
   partialCount: number;
 }
 
-/** Runs a full search: resolves the period window, fetches events, ranks them. */
+/** Runs a full search: fetches events in the geo + date window, ranks them. */
 export async function runSearch(
   filters: SearchFilters,
 ): Promise<SearchResponse> {
-  const { startDate, endDate } = periodToRange(filters.period);
   const events = await fetchFestivals({
     location: filters.location,
-    startDate,
-    endDate,
+    radiusKm: radiusToKm(filters.radius, filters.radiusUnit),
+    startDate: filters.startDate,
+    endDate: filters.endDate,
   });
   const results = rankEvents(events, filters);
   return {

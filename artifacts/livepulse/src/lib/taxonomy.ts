@@ -6,13 +6,7 @@
 // base palette. The design layer decides exactly how to use these.
 // ============================================================================
 
-import type {
-  GenreKey,
-  MoodKey,
-  LocationFilter,
-  PeriodKey,
-  RegionKey,
-} from "@/services/types";
+import type { GenreKey, MoodKey } from "@/services/types";
 
 export interface GenreDef {
   key: GenreKey;
@@ -69,35 +63,6 @@ export const MOODS: MoodDef[] = [
     hue: "258 65% 58%",
     vibe: "brooding, hypnotic after-dark intensity",
   },
-];
-
-export interface LocationDef {
-  key: LocationFilter;
-  label: string;
-  emoji: string;
-  region: RegionKey | null;
-}
-
-export const LOCATIONS: LocationDef[] = [
-  { key: "global", label: "Global", emoji: "🌍", region: null },
-  { key: "europe", label: "Europe", emoji: "🇪🇺", region: "europe" },
-  {
-    key: "north-america",
-    label: "North America",
-    emoji: "🗽",
-    region: "north-america",
-  },
-];
-
-export interface PeriodDef {
-  key: PeriodKey;
-  label: string;
-  emoji: string;
-}
-
-export const PERIODS: PeriodDef[] = [
-  { key: "current-month", label: "Current Month", emoji: "🗓️" },
-  { key: "next-3-months", label: "Next 3 Months", emoji: "🌤️" },
 ];
 
 // ----- Lookup helpers --------------------------------------------------------

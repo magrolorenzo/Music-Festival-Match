@@ -12,11 +12,25 @@
 // ============================================================================
 
 export type RegionKey = "europe" | "north-america";
-export type LocationFilter = "global" | RegionKey;
 
 export type GenreKey = "rock" | "pop" | "electronic" | "hip-hop" | "jazz";
 export type MoodKey = "energetic" | "chill" | "emotional" | "dark";
-export type PeriodKey = "current-month" | "next-3-months";
+
+/** Distance unit for the location search radius. */
+export type RadiusUnit = "km" | "mi";
+
+/**
+ * A free-text place the user searched, resolved to coordinates by the geocoder.
+ * Maps to JamBase's geoLatitude / geoLongitude query parameters when live.
+ */
+export interface GeoLocation {
+  /** The raw text the user typed, e.g. "Verona, Italy" or "Europe". */
+  query: string;
+  /** Human-readable name returned by the geocoder. */
+  label: string;
+  latitude: number;
+  longitude: number;
+}
 
 export type EventKind = "festival" | "concert";
 
@@ -105,10 +119,20 @@ export interface LiveEvent {
 // ----- Search / matching -----------------------------------------------------
 
 export interface SearchFilters {
-  location: LocationFilter;
-  genre: GenreKey | "any";
-  mood: MoodKey | "any";
-  period: PeriodKey;
+  /** Free-text resolved location; null means search everywhere (global). */
+  location: GeoLocation | null;
+  /** Search radius around the location. Ignored when location is null. */
+  radius: number;
+  /** Unit the radius value is expressed in. */
+  radiusUnit: RadiusUnit;
+  /** Selected genres; an empty list means "any genre". */
+  genres: GenreKey[];
+  /** Selected moods; an empty list means "any mood". */
+  moods: MoodKey[];
+  /** Inclusive ISO start date of the search window. */
+  startDate: string;
+  /** Inclusive ISO end date of the search window. */
+  endDate: string;
 }
 
 /** A single reason an event matched the filters. */
