@@ -25,7 +25,7 @@ function PerformerCard({ performer, preferredMood }: { performer: Performer, pre
   const quote = pickArtistQuote(performer, preferredMood);
 
   return (
-    <div className="w-full flex flex-col gap-6 bg-white/5 rounded-2xl p-6 border border-white/10">
+    <div className="w-full flex flex-col gap-6 bg-white/5 rounded-2xl p-6 border border-white/10 h-full">
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-xl overflow-hidden bg-muted relative">
           {image ? (
@@ -50,19 +50,19 @@ function PerformerCard({ performer, preferredMood }: { performer: Performer, pre
 
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-black/40 rounded-xl p-3 border border-white/5">
-              <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
+              <div className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" /> Trend
               </div>
               <div className="text-lg font-bold text-green-400">{performer.songstats.popularityTrend}</div>
             </div>
             <div className="bg-black/40 rounded-xl p-3 border border-white/5">
-              <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
+              <div className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
                 <Headphones className="w-3 h-3" /> Monthly
               </div>
               <div className="text-lg font-bold">{(performer.songstats.monthlyListeners / 1000000).toFixed(1)}M</div>
             </div>
             <div className="bg-black/40 rounded-xl p-3 border border-white/5">
-              <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
+              <div className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
                 <StarIcon className="w-3 h-3" /> Score
               </div>
               <div className="text-lg font-bold text-primary">{performer.songstats.popularityScore}</div>
@@ -191,7 +191,7 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
 
             {/* Lineup */}
             <div className="space-y-6">
-              <h3 className="text-2xl font-bold border-b border-white/10 pb-4">
+              <h3 className="shrink-0 text-2xl font-bold border-b border-white/10 pb-4">
                 The Lineup <span className="text-muted-foreground text-lg ml-2 font-normal">Pulse Matches</span>
               </h3>
               
@@ -202,21 +202,21 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
                   opts={{
                     align: "start",
                   }}
-                  className="w-full"
+                  className="w-full h-full"
                 >
-                  <CarouselContent>
+                  <CarouselContent className="h-full">
                     {displayPerformers.map((performer) => (
                       <CarouselItem
                         key={performer.id}
-                        className="basis-[88%] md:basis-[85%]"
+                        className="basis-[88%] md:basis-[85%] h-full flex"
                       >
                         <PerformerCard performer={performer} preferredMood={filters.moods[0]} />
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <div className="flex items-center justify-end gap-3 mt-6 pr-2">
-                    <CarouselPrevious className="static transform-none h-12 w-12 [&_svg]:size-6 bg-white/5 border-white/10 hover:bg-white/10 text-white" />
-                    <CarouselNext className="static transform-none h-12 w-12 [&_svg]:size-6 bg-white/5 border-white/10 hover:bg-white/10 text-white" />
+                  <div className="flex items-center justify-center gap-3 mt-6">
+                    <CarouselPrevious className="static transform-none h-10 w-10 [&_svg]:size-5 bg-white/5 border-white/10 hover:bg-white/10 text-white" />
+                    <CarouselNext className="static transform-none h-10 w-10 [&_svg]:size-5 bg-white/5 border-white/10 hover:bg-white/10 text-white" />
                   </div>
                 </Carousel>
               )}
