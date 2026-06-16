@@ -342,7 +342,7 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
       center={[40, -10]} 
       zoom={3} 
       style={{ width: "100%", height: "100%", background: "#0a0a0a" }}
-      zoomControl={false}
+      zoomControl={true}
       attributionControl={false}
     >
       <TileLayer
