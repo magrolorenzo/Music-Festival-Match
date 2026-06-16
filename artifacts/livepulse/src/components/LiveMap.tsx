@@ -454,7 +454,7 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
                 {openVenue.results.length === 1 ? "event" : "events"}
               </div>
             </div>
-            <div className="max-h-[280px] space-y-0.5 overflow-y-auto pr-0.5">
+            <div className="max-h-[280px] space-y-0.5 overflow-y-auto pr-0.5 livepulse-scroll">
               {openVenue.results.map((r) => (
                 <VenuePopupItem key={r.event.id} result={r} onSelect={onSelect} />
               ))}
