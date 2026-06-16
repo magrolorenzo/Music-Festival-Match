@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import type { DateRange as DayPickerRange } from "react-day-picker";
 import type {
@@ -37,7 +37,7 @@ interface LandingProps {
 }
 
 const RADIUS_MIN = 50;
-const RADIUS_MAX = 800;
+const RADIUS_MAX = 500;
 const RADIUS_STEP = 10;
 const SUGGEST_DEBOUNCE_MS = 300;
 
@@ -347,13 +347,26 @@ export default function Landing({
 
   return (
     <div className="w-full h-full overflow-y-auto relative">
-      {/* Mood reactive backdrop */}
+      {/* Mood reactive backdrop. The wrapper breathes (scale + opacity) while an
+          inner crossfade layer smoothly fades between gradient colors — CSS
+          can't transition gradient backgrounds, so we fade stacked layers. */}
       <motion.div
-        className="fixed inset-0 pointer-events-none blur-2xl transition-[background] duration-1000"
-        style={{ background: backdrop }}
+        className="fixed inset-0 pointer-events-none blur-2xl"
         animate={{ scale: [1, 1.08, 1], opacity: [0.45, 0.7, 0.45] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      />
+      >
+        <AnimatePresence>
+          <motion.div
+            key={backdrop}
+            className="absolute inset-0"
+            style={{ background: backdrop }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+          />
+        </AnimatePresence>
+      </motion.div>
 
       <div className="relative min-h-full flex flex-col items-center justify-center p-6">
       <div className="z-10 max-w-2xl w-full flex flex-col items-center text-center gap-8 py-10">
@@ -375,6 +388,8 @@ export default function Landing({
               <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 Where
               </label>
+              <div className="space-y-1.5">
+              <span className="text-xs text-muted-foreground">Location</span>
               <div className="relative" ref={locationBoxRef}>
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
                 <Input
@@ -436,6 +451,7 @@ export default function Landing({
                     )}
                   </div>
                 )}
+              </div>
               </div>
 
               {/* Radius slider + unit toggle */}
@@ -581,9 +597,9 @@ export default function Landing({
               <button
                 data-testid="filter-genre-any"
                 onClick={() => setGenres([])}
-                className={`text-xs ${
+                className={`text-xs rounded-full px-2.5 py-0.5 transition-colors ${
                   genres.length === 0
-                    ? "text-primary"
+                    ? "bg-primary/15 text-primary ring-1 ring-primary/40"
                     : "text-muted-foreground hover:text-white"
                 }`}
               >
@@ -623,7 +639,7 @@ export default function Landing({
                   onClick={() => setShowAllGenres((v) => !v)}
                   className="px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-muted-foreground hover:bg-white/10 transition-all duration-300"
                 >
-                  {showAllGenres ? "Less ▲" : `More +${hiddenGenreCount} ▾`}
+                  {showAllGenres ? "Less ▴" : `More +${hiddenGenreCount} ▾`}
                 </button>
               )}
             </div>
@@ -636,9 +652,9 @@ export default function Landing({
               <button
                 data-testid="filter-mood-any"
                 onClick={() => setMoods([])}
-                className={`text-xs ${
+                className={`text-xs rounded-full px-2.5 py-0.5 transition-colors ${
                   moods.length === 0
-                    ? "text-primary"
+                    ? "bg-primary/15 text-primary ring-1 ring-primary/40"
                     : "text-muted-foreground hover:text-white"
                 }`}
               >

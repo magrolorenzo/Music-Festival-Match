@@ -1,16 +1,20 @@
 // ============================================================================
 // Date helpers for the calendar date filter.
 //
-// The mock dataset is seeded around summer 2026, so "today" is pinned to a
-// fixed reference date. This keeps the default date window deterministic
-// regardless of the real system clock. When live data is wired in, replace
-// APP_TODAY with `new Date()`.
+// "Today" is the real current day (local midnight). The default search window
+// starts today, so the From field always opens on today's date.
 // ============================================================================
 
-// Pinned to a fixed reference "today". Constructed from local calendar
-// components (not a UTC string) so it round-trips correctly with the calendar
-// picker, which operates on local-time Date objects.
-export const APP_TODAY = new Date(2026, 5, 15);
+// The app's reference "today" — the real current day, normalised to local
+// midnight. Constructed from local calendar components (not a UTC string) so it
+// round-trips correctly with the calendar picker, which operates on local-time
+// Date objects.
+const NOW = new Date();
+export const APP_TODAY = new Date(
+  NOW.getFullYear(),
+  NOW.getMonth(),
+  NOW.getDate(),
+);
 
 /**
  * Formats a Date as a "YYYY-MM-DD" string using its LOCAL calendar fields.
