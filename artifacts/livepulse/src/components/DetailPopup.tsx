@@ -25,7 +25,15 @@ function PerformerCard({ performer, preferredMood }: { performer: Performer, pre
   const quote = pickArtistQuote(performer, preferredMood);
 
   return (
-    <div className="w-full flex flex-col gap-6 bg-white/5 rounded-2xl p-6 border border-white/10 h-full">
+    <div className="w-full flex flex-col gap-6 bg-white/5 rounded-2xl p-6 border border-white/10 h-full relative">
+      {/* Artist name at top of the card */}
+      <h4 className="text-3xl font-bold pr-20">{performer.name}</h4>
+
+      {/* Headliner badge fixed at top-right corner */}
+      {performer.isHeadliner && (
+        <Badge className="absolute top-6 right-6 bg-primary/20 text-primary hover:bg-primary/30 border-none z-10">Headliner</Badge>
+      )}
+
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-xl overflow-hidden bg-muted relative">
           {image ? (
@@ -39,15 +47,8 @@ function PerformerCard({ performer, preferredMood }: { performer: Performer, pre
             </div>
           )}
         </div>
-        
-        <div className="flex-1 space-y-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h4 className="text-3xl font-bold">{performer.name}</h4>
-              {performer.isHeadliner && <Badge className="bg-primary/20 text-primary hover:bg-primary/30 border-none">Headliner</Badge>}
-            </div>
-          </div>
 
+        <div className="flex-1 space-y-4">
           <div className="flex flex-col gap-3">
             <div className="bg-black/40 rounded-xl p-3 border border-white/5 flex items-center justify-between gap-3">
               <div className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1">
@@ -208,13 +209,13 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
                     {displayPerformers.map((performer) => (
                       <CarouselItem
                         key={performer.id}
-                        className="basis-[90%] md:basis-[55%] h-full flex"
+                        className="basis-[90%] md:basis-[50%] h-full flex"
                       >
                         <PerformerCard performer={performer} preferredMood={filters.moods[0]} />
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <div className="flex items-center justify-center gap-3 mt-6">
+                  <div className="flex items-center justify-center gap-3 mt-10">
                     <CarouselPrevious className="static transform-none h-10 w-10 [&_svg]:size-5 bg-white/5 border-white/10 hover:bg-white/10 text-white" />
                     <CarouselNext className="static transform-none h-10 w-10 [&_svg]:size-5 bg-white/5 border-white/10 hover:bg-white/10 text-white" />
                   </div>
