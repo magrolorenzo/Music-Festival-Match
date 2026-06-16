@@ -7,7 +7,6 @@ import DetailPopup from "./DetailPopup";
 import { radiusToKm } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, SlidersHorizontal, CalendarX } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "framer-motion";
 
 export default function Results({ response, onReset }: { response: SearchResponse, onReset: () => void }) {
@@ -47,7 +46,7 @@ export default function Results({ response, onReset }: { response: SearchRespons
           </div>
         </div>
 
-        <ScrollArea className="flex-1 [&_[data-radix-scroll-area-viewport]>div]:!block">
+        <div className="flex-1 overflow-y-auto livepulse-scroll">
           <div className="p-4 space-y-4">
             {orderedResults.length === 0 ? (
               <div
@@ -82,8 +81,8 @@ export default function Results({ response, onReset }: { response: SearchRespons
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
                 >
-                  <EventCard 
-                    result={result} 
+                  <EventCard
+                    result={result}
                     filters={response.filters}
                     isSelected={selectedEventId === result.event.id}
                     onClick={() => setSelectedEventId(result.event.id)}
@@ -94,7 +93,7 @@ export default function Results({ response, onReset }: { response: SearchRespons
               ))
             )}
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
       {/* Right Map Pane — on mobile this sits ABOVE the list (order-1) */}
