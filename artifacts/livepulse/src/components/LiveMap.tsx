@@ -33,9 +33,16 @@ interface LiveMapProps {
 const DOT_DEFAULT = "#ff4500";
 const DOT_HIGHLIGHT = "#ffb347";
 
-// Venue list: show this many events first, then reveal more in steps.
-const VENUE_INITIAL = 3;
-const VENUE_STEP = 3;
+// Below this Leaflet zoom we collapse venues into one pin per city; at or above
+// it (or right after clicking a city) we split into individual venue pins.
+const CITY_SPLIT_ZOOM = 12;
+
+function escapeHtml(value: string): string {
+  return value.replace(
+    /[&<>"']/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
+  );
+}
 
 /** A map marker = one venue (a coordinate) with all its events grouped under it. */
 interface VenueGroup {
@@ -65,6 +72,45 @@ function groupByVenue(results: MatchResult[]): VenueGroup[] {
     group.results.push(r);
   }
   return Array.from(groups.values());
+}
+
+/** A city cluster: all venues that share a city, shown as one pin until split. */
+interface CityGroup {
+  id: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  venues: VenueGroup[];
+  totalEvents: number;
+}
+
+/**
+ * Collapse venues into one entry per city, positioned at the venues' centroid,
+ * carrying the total event count for the city badge.
+ */
+function groupByCity(venues: VenueGroup[]): CityGroup[] {
+  const groups = new Map<string, VenueGroup[]>();
+  for (const v of venues) {
+    const key = v.city || v.id;
+    const list = groups.get(key);
+    if (list) list.push(v);
+    else groups.set(key, [v]);
+  }
+  return Array.from(groups.entries()).map(([key, vs]) => ({
+    id: key,
+    city: vs[0].city || vs[0].venueName,
+    latitude: vs.reduce((s, v) => s + v.latitude, 0) / vs.length,
+    longitude: vs.reduce((s, v) => s + v.longitude, 0) / vs.length,
+    venues: vs,
+    totalEvents: vs.reduce((s, v) => s + v.results.length, 0),
+  }));
+}
+
+/** Bounds enclosing every venue in a city — used to frame the city on click. */
+function boundsForVenues(venues: VenueGroup[]): L.LatLngBounds {
+  return L.latLngBounds(
+    venues.map((v) => [v.latitude, v.longitude] as [number, number]),
+  );
 }
 
 /**
@@ -119,12 +165,51 @@ function MapController({
     if (selectedResult) {
       map.flyTo(
         [selectedResult.event.location.latitude, selectedResult.event.location.longitude],
-        10,
+        13,
         { duration: 1.5 }
       );
     }
   }, [selectedResult, map]);
 
+  return null;
+}
+
+// Tracks the live zoom level so the parent can switch between city clusters
+// (zoomed out) and individual venue pins (zoomed in).
+function ZoomWatcher({ onZoom }: { onZoom: (zoom: number) => void }) {
+  const map = useMapEvent("zoomend", () => onZoom(map.getZoom()));
+  useEffect(() => {
+    onZoom(map.getZoom());
+  }, [map, onZoom]);
+  return null;
+}
+
+// Flies to a clicked city's bounds, zooming in past the split threshold so the
+// city's venues fan out into individual pins.
+function CityFocusController({
+  cities,
+  targetId,
+  onConsumed,
+}: {
+  cities: CityGroup[];
+  targetId: string | null;
+  onConsumed: () => void;
+}) {
+  const map = useMap();
+  useEffect(() => {
+    if (!targetId) return;
+    const target = cities.find((c) => c.id === targetId);
+    if (target) {
+      map.flyToBounds(boundsForVenues(target.venues), {
+        duration: 1.2,
+        padding: L.point(60, 60),
+        maxZoom: 15,
+      });
+    }
+    onConsumed();
+    // Only react to a fresh click target; cities/map/onConsumed stay stable.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetId]);
   return null;
 }
 
@@ -183,20 +268,29 @@ function VenuePopupItem({
 export default function LiveMap({ results, selectedEventId, hoveredEventId, onSelect, searchCenter }: LiveMapProps) {
   const selectedResult = results.find(r => r.event.id === selectedEventId) || null;
   const venues = useMemo(() => groupByVenue(results), [results]);
+  const cities = useMemo(() => groupByCity(venues), [venues]);
+
+  // Current zoom decides whether we show one pin per city or split venue pins.
+  const [zoom, setZoom] = useState(3);
+  const showCities = zoom < CITY_SPLIT_ZOOM;
+  // The city the user clicked, queued for the fly-and-split controller.
+  const [focusCityId, setFocusCityId] = useState<string | null>(null);
 
   // The venue whose event list is showing, whether it's a transient hover
   // preview or pinned open by a click.
   const [openVenueId, setOpenVenueId] = useState<string | null>(null);
   const [pinned, setPinned] = useState(false);
-  const [shownCount, setShownCount] = useState(VENUE_INITIAL);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const popupInstanceRef = useRef<L.Popup>(null);
   const popupDivRef = useRef<HTMLDivElement>(null);
 
-  // Reset the "show more" expansion whenever the open venue changes.
+  // Collapsing back to the city view closes any open venue popup.
   useEffect(() => {
-    setShownCount(VENUE_INITIAL);
-  }, [openVenueId]);
+    if (showCities) {
+      setOpenVenueId(null);
+      setPinned(false);
+    }
+  }, [showCities]);
 
   // If a new result set drops the currently open venue, close + unpin so the
   // popup doesn't get stuck (and hover previews aren't blocked by `pinned`).
@@ -214,21 +308,21 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
     };
   }, []);
 
-  // Refresh the Leaflet popup layout when its contents grow/shrink, otherwise
-  // newly revealed events are clipped and "Show more" appears to do nothing.
+  // Refresh the Leaflet popup layout when the open venue changes so its content
+  // isn't clipped on first open.
   useEffect(() => {
     popupInstanceRef.current?.update();
-  }, [shownCount, openVenueId]);
+  }, [openVenueId]);
 
   // Stop clicks/scrolls inside the popup from reaching (and closing on) the map.
-  // Re-applied whenever the popup content changes, because react-leaflet can
-  // recreate the content node and drop the listeners on each update.
+  // Re-applied when the popup opens, because react-leaflet can recreate the
+  // content node and drop the listeners.
   useEffect(() => {
     if (popupDivRef.current) {
       L.DomEvent.disableClickPropagation(popupDivRef.current);
       L.DomEvent.disableScrollPropagation(popupDivRef.current);
     }
-  }, [openVenueId, shownCount, pinned]);
+  }, [openVenueId, pinned]);
 
   const cancelClose = () => {
     if (closeTimer.current) {
@@ -242,7 +336,6 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
   };
 
   const openVenue = venues.find(v => v.id === openVenueId) || null;
-  const remaining = openVenue ? openVenue.results.length - shownCount : 0;
 
   return (
     <MapContainer 
@@ -256,54 +349,83 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
       />
 
-      {venues.map((venue) => {
-        const containsActive = venue.results.some(
-          (r) => r.event.id === selectedEventId || r.event.id === hoveredEventId,
-        );
-        const isOpen = openVenueId === venue.id;
-        const isHighlighted = containsActive || isOpen;
-        const color = isHighlighted ? DOT_HIGHLIGHT : DOT_DEFAULT;
-        const count = venue.results.length;
+      {showCities
+        ? cities.map((city) => {
+            const containsActive = city.venues.some((v) =>
+              v.results.some(
+                (r) =>
+                  r.event.id === selectedEventId || r.event.id === hoveredEventId,
+              ),
+            );
+            const color = containsActive ? DOT_HIGHLIGHT : DOT_DEFAULT;
+            const icon = L.divIcon({
+              className: "",
+              html: `<div class="city-marker ${
+                containsActive ? "is-active" : ""
+              }" data-testid="city-pin" style="--marker-color: ${color}"><span class="city-count">${
+                city.totalEvents
+              }</span><span class="city-label">${escapeHtml(city.city)}</span></div>`,
+              iconSize: [44, 44],
+              iconAnchor: [22, 22],
+            });
+            return (
+              <Marker
+                key={city.id}
+                position={[city.latitude, city.longitude]}
+                icon={icon}
+                zIndexOffset={containsActive ? 1000 : 200}
+                eventHandlers={{ click: () => setFocusCityId(city.id) }}
+              />
+            );
+          })
+        : venues.map((venue) => {
+            const containsActive = venue.results.some(
+              (r) => r.event.id === selectedEventId || r.event.id === hoveredEventId,
+            );
+            const isOpen = openVenueId === venue.id;
+            const isHighlighted = containsActive || isOpen;
+            const color = isHighlighted ? DOT_HIGHLIGHT : DOT_DEFAULT;
+            const count = venue.results.length;
 
-        const icon = L.divIcon({
-          className: "",
-          html: `<div class="venue-marker"><div class="glow-point ${isHighlighted ? "scale-125" : ""}" style="--marker-color: ${color}"></div>${
-            count > 1 ? `<span class="venue-count">${count}</span>` : ""
-          }</div>`,
-          iconSize: [16, 16],
-          iconAnchor: [8, 8],
-        });
+            const icon = L.divIcon({
+              className: "",
+              html: `<div class="venue-marker"><div class="glow-point ${isHighlighted ? "scale-125" : ""}" style="--marker-color: ${color}"></div>${
+                count > 1 ? `<span class="venue-count">${count}</span>` : ""
+              }</div>`,
+              iconSize: [16, 16],
+              iconAnchor: [8, 8],
+            });
 
-        return (
-          <Marker
-            key={venue.id}
-            position={[venue.latitude, venue.longitude]}
-            icon={icon}
-            zIndexOffset={isHighlighted ? 1000 : 100}
-            eventHandlers={{
-              mouseover: () => {
-                cancelClose();
-                if (!pinned) setOpenVenueId(venue.id);
-              },
-              mouseout: () => {
-                if (!pinned) scheduleClose();
-              },
-              click: () => {
-                cancelClose();
-                if (pinned && openVenueId === venue.id) {
-                  setPinned(false);
-                  setOpenVenueId(null);
-                } else {
-                  setPinned(true);
-                  setOpenVenueId(venue.id);
-                }
-              },
-            }}
-          />
-        );
-      })}
+            return (
+              <Marker
+                key={venue.id}
+                position={[venue.latitude, venue.longitude]}
+                icon={icon}
+                zIndexOffset={isHighlighted ? 1000 : 100}
+                eventHandlers={{
+                  mouseover: () => {
+                    cancelClose();
+                    if (!pinned) setOpenVenueId(venue.id);
+                  },
+                  mouseout: () => {
+                    if (!pinned) scheduleClose();
+                  },
+                  click: () => {
+                    cancelClose();
+                    if (pinned && openVenueId === venue.id) {
+                      setPinned(false);
+                      setOpenVenueId(null);
+                    } else {
+                      setPinned(true);
+                      setOpenVenueId(venue.id);
+                    }
+                  },
+                }}
+              />
+            );
+          })}
 
-      {openVenue && (
+      {!showCities && openVenue && (
         <Popup
           ref={popupInstanceRef}
           position={[openVenue.latitude, openVenue.longitude]}
@@ -332,21 +454,11 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
                 {openVenue.results.length === 1 ? "event" : "events"}
               </div>
             </div>
-            <div className="space-y-0.5">
-              {openVenue.results.slice(0, shownCount).map((r) => (
+            <div className="max-h-[280px] space-y-0.5 overflow-y-auto pr-0.5">
+              {openVenue.results.map((r) => (
                 <VenuePopupItem key={r.event.id} result={r} onSelect={onSelect} />
               ))}
             </div>
-            {remaining > 0 && (
-              <button
-                type="button"
-                data-testid="venue-show-more"
-                onClick={() => setShownCount((c) => c + VENUE_STEP)}
-                className="mt-1 w-full rounded-lg bg-white/5 py-1.5 text-xs font-semibold text-white/80 transition-colors hover:bg-white/10"
-              >
-                Show {Math.min(VENUE_STEP, remaining)} more
-              </button>
-            )}
           </div>
         </Popup>
       )}
@@ -360,6 +472,12 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
       />
 
       <MapController selectedResult={selectedResult} searchCenter={searchCenter} />
+      <ZoomWatcher onZoom={setZoom} />
+      <CityFocusController
+        cities={cities}
+        targetId={focusCityId}
+        onConsumed={() => setFocusCityId(null)}
+      />
     </MapContainer>
   );
 }

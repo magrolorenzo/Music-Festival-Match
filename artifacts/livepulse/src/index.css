@@ -167,6 +167,52 @@
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
 }
 
+/* City cluster marker: a count badge + city label, shown when zoomed out */
+.city-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  transition: transform 0.15s ease-out;
+}
+.city-marker:hover {
+  transform: scale(1.08);
+}
+.city-marker .city-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 9px;
+  border-radius: 9999px;
+  background: var(--marker-color, #ff4500);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  border: 2px solid #fff;
+  box-shadow: 0 0 14px var(--marker-color, #ff4500);
+  transition: transform 0.15s ease-out, box-shadow 0.2s ease-out;
+}
+.city-marker.is-active .city-count {
+  transform: scale(1.12);
+}
+.city-marker .city-label {
+  max-width: 130px;
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: rgba(10, 10, 10, 0.85);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 /* Custom leaflet popup overrides */
 .leaflet-popup-content-wrapper {
   background: transparent !important;

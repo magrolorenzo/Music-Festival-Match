@@ -4,3 +4,4 @@
 - [Songstats + Musixmatch chain](songstats-musixmatch.md) — artists/tracks 404s (use catalog); tracks/stats with_links gives Spotify id; Musixmatch mood endpoint 403 on key.
 - [Cached enrichment mood normalization](cached-enrichment-mood-normalization.md) — re-run mapMoods/coerceMood over DB-cached moods before the response schema; casting `as MoodKey` let stray "energetic" 500 /api/search.
 - [LivePulse map re-fly on hover](livepulse-map-refly.md) — MapController flyToBounds must key on primitive lat/lng/radius, not the searchCenter object (recreated each render → re-flies on hover).
+- [LivePulse map clustering](livepulse-map-clustering.md) — results map groups venues per city below zoom ~12, splits on click/zoom; user rejected venue "Show more" paging — don't reintroduce.
