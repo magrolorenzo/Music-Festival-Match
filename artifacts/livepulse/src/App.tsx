@@ -15,15 +15,22 @@ export default function App() {
   const handleSearch = async (newFilters: SearchFilters) => {
     setFilters(newFilters);
     setAppState("loading");
+    let response: SearchResponse;
     try {
-      const response = await runSearch(newFilters);
-      setSearchResponse(response);
-      setAppState("results");
+      response = await runSearch(newFilters);
     } catch (e) {
+      // runSearch already swallows live-service failures, but stay defensive:
+      // always land on the results page so the empty-state guidance shows.
       console.error(e);
-      // fallback
-      setAppState("landing");
+      response = {
+        filters: newFilters,
+        results: [],
+        exactCount: 0,
+        partialCount: 0,
+      };
     }
+    setSearchResponse(response);
+    setAppState("results");
   };
 
   const handleReset = () => {

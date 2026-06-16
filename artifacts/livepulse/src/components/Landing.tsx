@@ -374,7 +374,7 @@ export default function Landing({
                     }
                   }}
                   onKeyDown={handleLocationKeyDown}
-                  placeholder="Bologna, Emilia-Romagna, Italia"
+                  placeholder="try with Bologna ..."
                   autoComplete="off"
                   className="pl-9 pr-9 h-11 bg-white/5 border-white/10 rounded-xl"
                 />
