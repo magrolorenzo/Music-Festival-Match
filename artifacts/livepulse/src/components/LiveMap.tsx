@@ -90,11 +90,9 @@ function boundsForRadius(
 // then fly straight to a marker when the user selects an event.
 function MapController({
   selectedResult,
-  hoveredResult,
   searchCenter,
 }: {
   selectedResult: MatchResult | null;
-  hoveredResult: MatchResult | null;
   searchCenter: SearchCenter | null;
 }) {
   const map = useMap();
@@ -125,24 +123,18 @@ function MapController({
     }
   }, [selectedResult, map]);
 
-  // Card hover: fly to the hovered event's coordinates (gentler than select).
-  useEffect(() => {
-    if (hoveredResult) {
-      map.flyTo(
-        [hoveredResult.event.location.latitude, hoveredResult.event.location.longitude],
-        Math.max(map.getZoom(), 6),
-        { duration: 1.2 }
-      );
-    }
-  }, [hoveredResult, map]);
-
   return null;
 }
 
-// Clear a pinned venue popup when the user clicks empty map (marker/popup
-// clicks don't reach here — Leaflet stops their propagation).
+// Clear a pinned venue popup when the user clicks empty map. Marker clicks are
+// handled by the marker; clicks inside the popup are ignored explicitly (their
+// DOM propagation isn't reliably stopped through the react-leaflet portal).
 function MapBackgroundClick({ onClick }: { onClick: () => void }) {
-  useMapEvent("click", onClick);
+  useMapEvent("click", (e) => {
+    const target = e.originalEvent?.target as HTMLElement | null;
+    if (target?.closest(".leaflet-popup")) return;
+    onClick();
+  });
   return null;
 }
 
@@ -188,7 +180,6 @@ function VenuePopupItem({
 
 export default function LiveMap({ results, selectedEventId, hoveredEventId, onSelect, searchCenter }: LiveMapProps) {
   const selectedResult = results.find(r => r.event.id === selectedEventId) || null;
-  const hoveredResult = results.find(r => r.event.id === hoveredEventId) || null;
   const venues = useMemo(() => groupByVenue(results), [results]);
 
   // The venue whose event list is showing, whether it's a transient hover
@@ -197,7 +188,8 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
   const [pinned, setPinned] = useState(false);
   const [shownCount, setShownCount] = useState(VENUE_INITIAL);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const popupRef = useRef<HTMLDivElement>(null);
+  const popupInstanceRef = useRef<L.Popup>(null);
+  const popupDivRef = useRef<HTMLDivElement>(null);
 
   // Reset the "show more" expansion whenever the open venue changes.
   useEffect(() => {
@@ -220,11 +212,19 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
     };
   }, []);
 
-  // Keep clicks/scrolls inside the popup from reaching (and closing on) the map.
+  // Refresh the Leaflet popup layout when its contents grow/shrink, otherwise
+  // newly revealed events are clipped and "Show more" appears to do nothing.
   useEffect(() => {
-    if (popupRef.current) {
-      L.DomEvent.disableClickPropagation(popupRef.current);
-      L.DomEvent.disableScrollPropagation(popupRef.current);
+    popupInstanceRef.current?.update();
+  }, [shownCount, openVenueId]);
+
+  // Stop clicks/scrolls inside the popup from reaching (and closing on) the map.
+  // Re-applied whenever the popup content changes, because react-leaflet can
+  // recreate the content node and drop the listeners on each update.
+  useEffect(() => {
+    if (popupDivRef.current) {
+      L.DomEvent.disableClickPropagation(popupDivRef.current);
+      L.DomEvent.disableScrollPropagation(popupDivRef.current);
     }
   }, [openVenueId, shownCount, pinned]);
 
@@ -303,6 +303,7 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
 
       {openVenue && (
         <Popup
+          ref={popupInstanceRef}
           position={[openVenue.latitude, openVenue.longitude]}
           closeButton={false}
           autoClose={false}
@@ -312,7 +313,7 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
           className="livepulse-venue-popup"
         >
           <div
-            ref={popupRef}
+            ref={popupDivRef}
             data-testid="venue-popup"
             onMouseEnter={cancelClose}
             onMouseLeave={() => {
@@ -356,7 +357,7 @@ export default function LiveMap({ results, selectedEventId, hoveredEventId, onSe
         }}
       />
 
-      <MapController selectedResult={selectedResult} hoveredResult={hoveredResult} searchCenter={searchCenter} />
+      <MapController selectedResult={selectedResult} searchCenter={searchCenter} />
     </MapContainer>
   );
 }
