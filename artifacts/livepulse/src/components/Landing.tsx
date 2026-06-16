@@ -36,7 +36,7 @@ interface LandingProps {
   onSearch: (filters: SearchFilters) => void;
 }
 
-const RADIUS_MIN = 50;
+const RADIUS_MIN = 25;
 const RADIUS_MAX = 500;
 const RADIUS_STEP = 10;
 const SUGGEST_DEBOUNCE_MS = 300;
@@ -457,7 +457,7 @@ export default function Landing({
               {/* Radius slider + unit toggle */}
               <div className="space-y-2 pt-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Radius</span>
+                  <span className="text-xs text-muted-foreground">Distance</span>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold tabular-nums">
                       {radius} {radiusUnit}
