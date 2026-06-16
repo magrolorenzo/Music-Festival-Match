@@ -22,7 +22,7 @@ export interface SearchCenter {
 interface LiveMapProps {
   results: MatchResult[];
   selectedEventId: string | null;
-  /** Event currently hovered in the sidebar list; the map flies to it. */
+  /** Event currently hovered in the sidebar list; only recolors the matching marker (no map movement). */
   hoveredEventId: string | null;
   onSelect: (id: string) => void;
   /** The verified place the user searched; the map opens framed on this. */
@@ -98,19 +98,21 @@ function MapController({
   const map = useMap();
 
   // Initial framing: drive the view from the user's selected place + radius.
+  // Depend on the primitive lat/lng/radius values — NOT the searchCenter object
+  // reference — because the parent recreates that object on every render (e.g.
+  // when hover state changes), which would otherwise re-fly the map on hover.
+  const centerLat = searchCenter?.latitude ?? null;
+  const centerLng = searchCenter?.longitude ?? null;
+  const centerRadiusKm = searchCenter?.radiusKm ?? null;
   useEffect(() => {
-    if (!searchCenter) return;
-    const bounds = boundsForRadius(
-      searchCenter.latitude,
-      searchCenter.longitude,
-      searchCenter.radiusKm,
-    );
+    if (centerLat == null || centerLng == null || centerRadiusKm == null) return;
+    const bounds = boundsForRadius(centerLat, centerLng, centerRadiusKm);
     map.flyToBounds(bounds, {
       duration: 1.5,
       padding: L.point(48, 48),
       maxZoom: 11,
     });
-  }, [searchCenter, map]);
+  }, [centerLat, centerLng, centerRadiusKm, map]);
 
   // Marker selection: fly to the chosen event's exact coordinates.
   useEffect(() => {
