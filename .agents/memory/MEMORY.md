@@ -1,5 +1,5 @@
 - [react-day-picker date serialization](livepulse-date-tz.md) — calendar gives LOCAL Date objects; never round-trip through UTC/toISOString or days shift off-by-one.
-- [LivePulse When date filter](livepulse-when-filter.md) — two-step start→end picker; hold start in draft, commit range only on end-select so mid-flow close keeps prior range.
+- [LivePulse When date filter](livepulse-when-filter.md) — two separate From/To fields, each a single-month popover; To disabled before From; From-after-To advances To. User rejected range/two-step layouts.
 - [JamBase v3 events API](jambase-v3.md) — Bearer auth (jbd_ keys); eventDateFrom must be ≥ tomorrow or HTTP 400; clamp the from-date.
 - [Songstats + Musixmatch chain](songstats-musixmatch.md) — artists/tracks 404s (use catalog); tracks/stats with_links gives Spotify id; Musixmatch mood endpoint 403 on key.
 - [Cached enrichment mood normalization](cached-enrichment-mood-normalization.md) — re-run mapMoods/coerceMood over DB-cached moods before the response schema; casting `as MoodKey` let stray "energetic" 500 /api/search.

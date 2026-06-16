@@ -1,24 +1,23 @@
 ---
 name: LivePulse When date filter
-description: Two-step start/end date picker design constraints for the LivePulse "When" filter.
+description: Design of the LivePulse "When" date filter (two separate From/To fields).
 ---
 
 # LivePulse "When" date filter
 
-The "When" filter is a **two-step sequential** picker in a dropdown: step 1 picks a
-start date, step 2 picks an end date. Each step renders two months (current + next).
-It is NOT a single range calendar and NOT two side-by-side calendars (user explicitly
-rejected both).
+Current design (replaced an earlier two-step single picker): the "When" area has
+**two separate fields, "From" and "To"**, side by side. Each opens its own popover
+with a **single-month** calendar (`numberOfMonths={1}`). They are edited
+independently — there is no shared step/draft state.
 
-**Rule:** Hold the in-progress start in a separate draft state and only commit to the
-real range state when the end date is selected. Selecting a new start must NOT mutate
-the committed range.
-**Why:** If the start immediately overwrites the committed range (clearing the end),
-closing the popover mid-flow silently shrinks the search window to a single day — a
-data-loss bug caught in review. Draft-commit keeps the prior range intact on mid-flow
-close and on the back button (which keeps the draft start highlighted).
-**How to apply:** Any rework of this picker (or similar multi-step commit flows) should
-preserve the draft-then-commit pattern and reset draft/step state on open and on reset.
+Constraints:
+- From defaults to today, disabled before APP_TODAY.
+- To defaults to today + 15 days (`defaultDateRange()` in `lib/dates.ts`, via `defaultFilters()`).
+- To disables days before the chosen From.
+- Picking a From later than the current To advances To to match, so the range stays valid.
 
-Default window is today → today + 15 days (see `defaultDateRange()` in `lib/dates.ts`),
-sourced via `defaultFilters()`. Minimum selectable date is always APP_TODAY.
+**Why:** The user explicitly rejected the range calendar AND the two-step / two-month
+layouts; they want two plain From/To fields, one month at a time.
+**How to apply:** Keep `range` (DayPickerRange) as the single source of truth; both
+fields read/write it. handleReset/handleSubmit already fall back to APP_TODAY, so
+keep those guards if refactoring.

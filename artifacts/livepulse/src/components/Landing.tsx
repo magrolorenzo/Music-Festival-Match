@@ -29,14 +29,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Loader2,
-  MapPin,
-  CalendarDays,
-  Check,
-  RotateCcw,
-  ChevronLeft,
-} from "lucide-react";
+import { Loader2, MapPin, CalendarDays, Check, RotateCcw } from "lucide-react";
 
 interface LandingProps {
   filters: SearchFilters;
@@ -155,9 +148,8 @@ export default function Landing({
     from: fromISODate(initialFilters.startDate),
     to: fromISODate(initialFilters.endDate),
   });
-  const [dateOpen, setDateOpen] = useState(false);
-  const [dateStep, setDateStep] = useState<"start" | "end">("start");
-  const [draftStart, setDraftStart] = useState<Date | undefined>(undefined);
+  const [fromOpen, setFromOpen] = useState(false);
+  const [toOpen, setToOpen] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
 
   const [cycleIndex, setCycleIndex] = useState(0);
@@ -250,14 +242,10 @@ export default function Landing({
       return Array.from(next);
     });
 
-  const dateLabel = useMemo(() => {
-    if (!range?.from) return "Any dates";
-    const from = format(range.from, "MMM d");
-    if (!range.to || range.to.getTime() === range.from.getTime()) {
-      return `${from}, ${format(range.from, "yyyy")}`;
-    }
-    return `${from} – ${format(range.to, "MMM d, yyyy")}`;
-  }, [range]);
+  const fromLabel = range?.from
+    ? format(range.from, "MMM d, yyyy")
+    : "Pick a date";
+  const toLabel = range?.to ? format(range.to, "MMM d, yyyy") : "Pick a date";
 
   const selectPlace = (place: GeoLocation) => {
     setSelectedPlace(place);
@@ -319,9 +307,8 @@ export default function Landing({
     setMoods(d.moods);
     setShowAllGenres(false);
     setRange({ from: fromISODate(d.startDate), to: fromISODate(d.endDate) });
-    setDateOpen(false);
-    setDateStep("start");
-    setDraftStart(undefined);
+    setFromOpen(false);
+    setToOpen(false);
     setGeoError(null);
   };
 
@@ -490,90 +477,82 @@ export default function Landing({
               <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 When
               </label>
-              <Popover
-                open={dateOpen}
-                onOpenChange={(open) => {
-                  setDateOpen(open);
-                  if (open) {
-                    setDateStep("start");
-                    setDraftStart(undefined);
-                  }
-                }}
-              >
-                <PopoverTrigger asChild>
-                  <button
-                    data-testid="button-date-range"
-                    className="w-full h-11 px-3 flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 text-sm hover:bg-white/10 transition-colors"
-                  >
-                    <CalendarDays className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="truncate">{dateLabel}</span>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto max-w-[calc(100vw-2rem)] p-0 overflow-hidden"
-                  align="end"
-                  data-testid="popover-calendar"
-                >
-                  <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
-                    {dateStep === "end" && (
+              <div className="grid grid-cols-2 gap-2">
+                {/* From */}
+                <div className="space-y-1.5">
+                  <span className="text-xs text-muted-foreground">From</span>
+                  <Popover open={fromOpen} onOpenChange={setFromOpen}>
+                    <PopoverTrigger asChild>
                       <button
-                        type="button"
-                        onClick={() => setDateStep("start")}
-                        data-testid="button-date-back"
-                        className="shrink-0 w-8 h-8 -ml-1 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors"
-                        aria-label="Back to start date"
+                        data-testid="button-date-from"
+                        className="w-full h-11 px-3 flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 text-sm hover:bg-white/10 transition-colors"
                       >
-                        <ChevronLeft className="w-4 h-4" />
+                        <CalendarDays className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <span className="truncate">{fromLabel}</span>
                       </button>
-                    )}
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold">
-                        {dateStep === "start"
-                          ? "Pick a start date"
-                          : "Pick an end date"}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {dateStep === "start"
-                          ? "When does your search window begin?"
-                          : draftStart
-                            ? `Start · ${format(draftStart, "MMM d, yyyy")}`
-                            : "Choose the end of your window"}
-                      </p>
-                    </div>
-                  </div>
-                  {dateStep === "start" ? (
-                    <Calendar
-                      key="start"
-                      mode="single"
-                      selected={draftStart ?? range?.from}
-                      onSelect={(day) => {
-                        if (!day) return;
-                        setDraftStart(day);
-                        setDateStep("end");
-                      }}
-                      defaultMonth={draftStart ?? range?.from ?? APP_TODAY}
-                      numberOfMonths={2}
-                      disabled={{ before: APP_TODAY }}
-                    />
-                  ) : (
-                    <Calendar
-                      key="end"
-                      mode="single"
-                      selected={undefined}
-                      onSelect={(day) => {
-                        if (!day || !draftStart) return;
-                        setRange({ from: draftStart, to: day });
-                        setDateOpen(false);
-                      }}
-                      defaultMonth={draftStart ?? APP_TODAY}
-                      numberOfMonths={2}
-                      disabled={{ before: draftStart ?? APP_TODAY }}
-                    />
-                  )}
-                </PopoverContent>
-              </Popover>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto p-0 overflow-hidden"
+                      align="start"
+                      data-testid="popover-date-from"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={range?.from}
+                        onSelect={(day) => {
+                          if (!day) return;
+                          setRange((prev) => {
+                            const to =
+                              prev?.to && prev.to.getTime() < day.getTime()
+                                ? day
+                                : prev?.to;
+                            return { from: day, to };
+                          });
+                          setFromOpen(false);
+                        }}
+                        defaultMonth={range?.from ?? APP_TODAY}
+                        numberOfMonths={1}
+                        disabled={{ before: APP_TODAY }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                {/* To */}
+                <div className="space-y-1.5">
+                  <span className="text-xs text-muted-foreground">To</span>
+                  <Popover open={toOpen} onOpenChange={setToOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        data-testid="button-date-to"
+                        className="w-full h-11 px-3 flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 text-sm hover:bg-white/10 transition-colors"
+                      >
+                        <CalendarDays className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <span className="truncate">{toLabel}</span>
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto p-0 overflow-hidden"
+                      align="end"
+                      data-testid="popover-date-to"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={range?.to}
+                        onSelect={(day) => {
+                          if (!day) return;
+                          setRange((prev) => ({ from: prev?.from, to: day }));
+                          setToOpen(false);
+                        }}
+                        defaultMonth={range?.to ?? range?.from ?? APP_TODAY}
+                        numberOfMonths={1}
+                        disabled={{ before: range?.from ?? APP_TODAY }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
               <p className="text-xs text-muted-foreground">
-                Defaults from today. Pick a start and end day.
+                From defaults to today, To to 15 days later. Change either date.
               </p>
             </div>
           </div>
