@@ -15,6 +15,8 @@ export default function Results({ response, onReset }: { response: SearchRespons
   const selectedEvent = response.results.find(r => r.event.id === selectedEventId) || null;
 
   const { location, radius, radiusUnit } = response.filters;
+  const hasFilters =
+    response.filters.genres.length > 0 || response.filters.moods.length > 0;
   const searchCenter: SearchCenter | null = location
     ? {
         latitude: location.latitude,
@@ -33,7 +35,8 @@ export default function Results({ response, onReset }: { response: SearchRespons
             Back
           </Button>
           <div className="text-sm font-medium">
-            <span className="text-primary font-bold">{response.results.length}</span> matches
+            <span className="text-primary font-bold">{response.results.length}</span>{" "}
+            {hasFilters ? "matches" : "events"}
           </div>
         </div>
 
@@ -55,7 +58,11 @@ export default function Results({ response, onReset }: { response: SearchRespons
             {response.results.length === 0 ? (
               <div className="text-center p-8 text-muted-foreground">
                 <SlidersHorizontal className="w-8 h-8 mx-auto mb-3 opacity-50" />
-                <p>No exact matches found. Try loosening your filters.</p>
+                <p>
+                  {hasFilters
+                    ? "No exact matches found. Try loosening your filters."
+                    : "No events found in this area. Try a wider radius or different dates."}
+                </p>
               </div>
             ) : (
               response.results.map((result, i) => (

@@ -2,6 +2,13 @@ import { motion } from "framer-motion";
 import type { SearchFilters, MoodKey, GenreKey } from "@/services/types";
 import { moodHue, moodEmoji, genreEmoji, GENRE_BY_KEY, MOOD_BY_KEY } from "@/lib/taxonomy";
 
+/** Capitalizes each word (handles spaces, hyphens, commas, slashes). */
+function titleCase(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/(^|[\s\-,/])(\p{L})/gu, (_, sep, ch) => sep + ch.toUpperCase());
+}
+
 export default function Loading({ filters }: { filters: SearchFilters }) {
   const mKey: MoodKey = filters.moods[0] ?? "party";
   const gKey: GenreKey | null = filters.genres[0] ?? null;
@@ -10,6 +17,10 @@ export default function Loading({ filters }: { filters: SearchFilters }) {
   const gEmoji = gKey ? genreEmoji(gKey) : "✨";
   
   const moodDef = MOOD_BY_KEY[mKey];
+
+  const locationName = filters.location
+    ? titleCase(filters.location.query)
+    : null;
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden bg-background">
@@ -44,8 +55,16 @@ export default function Loading({ filters }: { filters: SearchFilters }) {
         <div className="text-center space-y-2">
           <h2 className="text-2xl font-bold tracking-wide">Pulsing the network...</h2>
           <p className="text-muted-foreground">
-            Seeking {moodDef ? moodDef.vibe : "unforgettable nights"} 
-            {filters.location ? ` near ${filters.location.query}` : ""}...
+            Seeking {moodDef ? moodDef.vibe : "unforgettable nights"}
+            {locationName ? (
+              <>
+                {" "}near{" "}
+                <span className="text-primary font-semibold">
+                  {locationName}
+                </span>
+              </>
+            ) : null}
+            ...
           </p>
         </div>
       </div>

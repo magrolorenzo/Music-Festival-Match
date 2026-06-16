@@ -225,3 +225,92 @@ export function moodEmoji(key: MoodKey): string {
 export function moodHue(key: MoodKey): string {
   return MOOD_BY_KEY[key]?.hue ?? "24 95% 55%";
 }
+
+// ----- Mood groups -----------------------------------------------------------
+//
+// The 20 moods are bucketed into four expressive "families". The picker shows
+// one card per family; choosing a card selects every mood inside it. Each card
+// (and the reactive backdrop) blends the accent hues of its member moods.
+
+export type MoodGroupKey = "bright" | "deep" | "wild" | "whole";
+
+export interface MoodGroupDef {
+  key: MoodGroupKey;
+  label: string;
+  emoji: string;
+  moods: MoodKey[];
+}
+
+export const MOOD_GROUPS: MoodGroupDef[] = [
+  {
+    key: "bright",
+    label: "Bright",
+    emoji: "☀️",
+    moods: ["joy", "celebration", "party", "hope", "empowerment", "inspiration"],
+  },
+  {
+    key: "deep",
+    label: "Deep",
+    emoji: "🌙",
+    moods: ["heartbreak", "angst", "despair", "reflection", "solitude", "nostalgia"],
+  },
+  {
+    key: "wild",
+    label: "Wild",
+    emoji: "🔥",
+    moods: ["adventure", "freedom", "anger", "social-commentary"],
+  },
+  {
+    key: "whole",
+    label: "Whole",
+    emoji: "✨",
+    moods: ["love", "peace", "spirituality", "nature"],
+  },
+];
+
+/**
+ * Punches up a stored mood hue ("H S% L%") into a vivid, optionally-translucent
+ * CSS color. Saturation is boosted so blended gradients read richer.
+ */
+export function moodAccent(hue: string, alpha = 1): string {
+  const [h, s, l] = hue.split(/\s+/);
+  const sat = Math.min(100, parseFloat(s) + 15);
+  return `hsl(${h} ${sat}% ${l} / ${alpha})`;
+}
+
+/** A diagonal gradient blending the accent colors of the given moods. */
+export function moodGroupGradient(keys: MoodKey[], alpha = 1): string {
+  if (keys.length === 0) return "transparent";
+  if (keys.length === 1) {
+    const c = moodAccent(moodHue(keys[0]), alpha);
+    return `linear-gradient(135deg, ${c}, ${c})`;
+  }
+  const stops = keys.map((k, i) => {
+    const pct = Math.round((i / (keys.length - 1)) * 100);
+    return `${moodAccent(moodHue(k), alpha)} ${pct}%`;
+  });
+  return `linear-gradient(135deg, ${stops.join(", ")})`;
+}
+
+const BACKDROP_POSITIONS = [
+  "22% 28%",
+  "78% 22%",
+  "28% 78%",
+  "74% 72%",
+  "50% 45%",
+  "62% 38%",
+];
+
+/**
+ * Reactive backdrop background: one soft radial glow per mood, scattered across
+ * the canvas so multiple selected moods blend into a richer, saturated wash.
+ */
+export function moodsRadialGradient(keys: MoodKey[]): string {
+  const list = keys.length > 0 ? keys : (["party"] as MoodKey[]);
+  return list
+    .map((k, i) => {
+      const pos = BACKDROP_POSITIONS[i % BACKDROP_POSITIONS.length];
+      return `radial-gradient(circle at ${pos}, ${moodAccent(moodHue(k), 1)} 0%, transparent 55%)`;
+    })
+    .join(", ");
+}

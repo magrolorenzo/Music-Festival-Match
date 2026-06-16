@@ -14,7 +14,7 @@ export default function App() {
     return {
       location: null,
       radius: 100,
-      radiusUnit: "mi",
+      radiusUnit: "km",
       genres: [],
       moods: [],
       startDate,

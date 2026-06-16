@@ -9,7 +9,14 @@ import type {
   RadiusUnit,
   GeoLocation,
 } from "@/services/types";
-import { GENRES, MOODS, moodHue } from "@/lib/taxonomy";
+import {
+  GENRES,
+  MOODS,
+  MOOD_GROUPS,
+  moodGroupGradient,
+  moodsRadialGradient,
+  type MoodGroupDef,
+} from "@/lib/taxonomy";
 import { fetchPlaces } from "@/services/places";
 import { APP_TODAY, fromISODate, toISODate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
@@ -37,41 +44,63 @@ function clampRadius(value: number): number {
   return Math.min(RADIUS_MAX, Math.max(RADIUS_MIN, value));
 }
 
-// ----- Mood grid: a multi-select grid of emoji + label mood chips -----------
+// ----- Mood groups: four color-blended cards; each selects a whole family ----
 
-function MoodGrid({
+function MoodGroupCards({
   selected,
-  onToggle,
+  onToggleGroup,
 }: {
   selected: MoodKey[];
-  onToggle: (m: MoodKey) => void;
+  onToggleGroup: (group: MoodGroupDef) => void;
 }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-      {MOODS.map((m) => {
-        const active = selected.includes(m.key);
+    <div className="grid grid-cols-2 gap-3">
+      {MOOD_GROUPS.map((group) => {
+        const selectedCount = group.moods.filter((m) =>
+          selected.includes(m),
+        ).length;
+        const active = selectedCount === group.moods.length;
+        const partial = selectedCount > 0 && !active;
+        const moodLabels = group.moods
+          .map((m) => MOODS.find((d) => d.key === m)?.label ?? m)
+          .join(" · ");
+
         return (
           <button
-            key={m.key}
+            key={group.key}
             type="button"
-            data-testid={`filter-mood-${m.key}`}
+            data-testid={`filter-mood-group-${group.key}`}
             aria-pressed={active}
-            onClick={() => onToggle(m.key)}
-            style={
+            onClick={() => onToggleGroup(group)}
+            style={{
+              backgroundImage: moodGroupGradient(
+                group.moods,
+                active ? 1 : partial ? 0.45 : 0.22,
+              ),
+              boxShadow: active
+                ? "0 0 28px -4px rgba(255,255,255,0.25)"
+                : undefined,
+            }}
+            className={`group relative flex flex-col items-start gap-1 p-4 rounded-2xl text-left overflow-hidden transition-all duration-300 ring-1 ${
               active
-                ? {
-                    backgroundColor: `hsl(${m.hue})`,
-                    color: "#fff",
-                    boxShadow: `0 0 15px hsl(${m.hue} / 0.4)`,
-                  }
-                : {}
-            }
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-left transition-all duration-300 ${
-              !active && "bg-white/5 text-muted-foreground hover:bg-white/10"
+                ? "ring-white/70 text-white"
+                : "ring-white/10 text-white/85 hover:ring-white/30"
             }`}
           >
-            <span className="text-base leading-none shrink-0">{m.emoji}</span>
-            <span className="truncate">{m.label}</span>
+            <div className="flex items-center gap-2 w-full">
+              <span className="text-xl leading-none shrink-0">
+                {group.emoji}
+              </span>
+              <span className="text-sm font-bold uppercase tracking-wider">
+                {group.label}
+              </span>
+              {active && (
+                <Check className="w-4 h-4 ml-auto shrink-0 drop-shadow" />
+              )}
+            </div>
+            <span className="text-[11px] leading-snug text-white/75">
+              {moodLabels}
+            </span>
           </button>
         );
       })}
@@ -177,7 +206,7 @@ export default function Landing({
   }, []);
 
   // When no mood is chosen, the hero backdrop autonomously cycles through the
-  // mood themes. Selecting moods locks the hue to the first selected mood.
+  // mood themes. Selecting moods blends their colors into the backdrop instead.
   useEffect(() => {
     if (moods.length > 0) return;
     const id = setInterval(() => {
@@ -186,9 +215,11 @@ export default function Landing({
     return () => clearInterval(id);
   }, [moods]);
 
-  const activeMoodHue = useMemo(() => {
-    if (moods.length > 0) return moodHue(moods[0]);
-    return MOODS[cycleIndex].hue;
+  // The backdrop blends every selected mood's color into a saturated wash; with
+  // nothing selected it gently cycles through the mood palette.
+  const backdrop = useMemo(() => {
+    if (moods.length > 0) return moodsRadialGradient(moods);
+    return moodsRadialGradient([MOODS[cycleIndex].key]);
   }, [moods, cycleIndex]);
 
   const toggleGenre = (g: GenreKey) =>
@@ -196,10 +227,17 @@ export default function Landing({
       prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g],
     );
 
-  const toggleMood = (m: MoodKey) =>
-    setMoods((prev) =>
-      prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m],
-    );
+  // A mood card selects/deselects its whole family at once.
+  const toggleMoodGroup = (group: MoodGroupDef) =>
+    setMoods((prev) => {
+      const allSelected = group.moods.every((m) => prev.includes(m));
+      if (allSelected) {
+        return prev.filter((m) => !group.moods.includes(m));
+      }
+      const next = new Set(prev);
+      group.moods.forEach((m) => next.add(m));
+      return Array.from(next);
+    });
 
   const dateLabel = useMemo(() => {
     if (!range?.from) return "Any dates";
@@ -277,17 +315,16 @@ export default function Landing({
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto flex flex-col items-center justify-center p-6 relative">
+    <div className="w-full h-full overflow-y-auto relative">
       {/* Mood reactive backdrop */}
       <motion.div
-        className="fixed inset-0 opacity-20 pointer-events-none transition-colors duration-1000"
-        style={{
-          background: `radial-gradient(circle at 50% 50%, hsl(${activeMoodHue}) 0%, transparent 60%)`,
-        }}
-        animate={{ scale: [1, 1.05, 1], opacity: [0.15, 0.25, 0.15] }}
+        className="fixed inset-0 opacity-25 pointer-events-none transition-[background] duration-1000"
+        style={{ background: backdrop }}
+        animate={{ scale: [1, 1.05, 1], opacity: [0.18, 0.3, 0.18] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
 
+      <div className="relative min-h-full flex flex-col items-center justify-center p-6">
       <div className="z-10 max-w-2xl w-full flex flex-col items-center text-center gap-8 py-10">
         <div className="space-y-4">
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight">
@@ -319,7 +356,7 @@ export default function Landing({
                     }
                   }}
                   onKeyDown={handleLocationKeyDown}
-                  placeholder='Search a city — try "Verona, Italy"'
+                  placeholder="Bologna, Emilia-Romagna, Italia"
                   autoComplete="off"
                   className="pl-9 pr-9 h-11 bg-white/5 border-white/10 rounded-xl"
                 />
@@ -508,7 +545,7 @@ export default function Landing({
             </div>
           </div>
 
-          {/* Mood — multi-select chip grid */}
+          {/* Mood — four color-blended family cards */}
           <div className="space-y-3 text-left">
             <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex justify-between">
               <span>Mood</span>
@@ -525,9 +562,9 @@ export default function Landing({
               </button>
             </label>
             <p className="text-xs text-muted-foreground -mt-1">
-              Tap to mix multiple moods.
+              Pick a vibe — each card selects a whole family of moods.
             </p>
-            <MoodGrid selected={moods} onToggle={toggleMood} />
+            <MoodGroupCards selected={moods} onToggleGroup={toggleMoodGroup} />
           </div>
         </div>
 
@@ -539,6 +576,7 @@ export default function Landing({
         >
           Find Live Experiences
         </Button>
+      </div>
       </div>
     </div>
   );
