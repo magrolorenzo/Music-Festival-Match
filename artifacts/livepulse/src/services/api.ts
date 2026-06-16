@@ -11,6 +11,7 @@
 // ============================================================================
 
 import mockData from "@/data/festivals_mock.json";
+import { GENRES, MOODS } from "@/lib/taxonomy";
 import type {
   LiveEvent,
   Performer,
@@ -20,19 +21,10 @@ import type {
   MoodKey,
 } from "./types";
 
-const VALID_GENRE_KEYS = new Set<string>([
-  "rock",
-  "pop",
-  "electronic",
-  "hip-hop",
-  "jazz",
-]);
-const VALID_MOOD_KEYS = new Set<string>([
-  "energetic",
-  "chill",
-  "emotional",
-  "dark",
-]);
+// Derived from the taxonomy so the mock validator can never drift from the
+// canonical genre/mood keys the rest of the app uses.
+const VALID_GENRE_KEYS = new Set<string>(GENRES.map((g) => g.key));
+const VALID_MOOD_KEYS = new Set<string>(MOODS.map((m) => m.key));
 
 /**
  * Runtime guard for the bundled mock dataset. TypeScript cannot verify the

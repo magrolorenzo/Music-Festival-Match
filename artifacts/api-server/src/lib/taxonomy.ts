@@ -4,14 +4,48 @@ import type { GenreKey, MoodKey } from "@workspace/api-zod";
 // Server-side taxonomy mapping.
 //
 // Partner APIs return free-form genre strings and lyric mood/emotion labels.
-// We normalize those onto the five genre keys and four mood keys the LivePulse
+// We normalize those onto the 16 genre keys and 20 mood keys the LivePulse
 // matching engine understands. Anything unrecognized is simply dropped, never
 // guessed, so the filters stay trustworthy.
+//
+// Order matters only for readability — every matching rule contributes its key,
+// so a string can map to several keys (e.g. "soul-funk" -> R&B/Soul).
 // ============================================================================
 
 const GENRE_RULES: Array<{ key: GenreKey; patterns: string[] }> = [
   {
-    key: "electronic",
+    key: "kpop",
+    patterns: ["k-pop", "kpop", "k pop"],
+  },
+  {
+    key: "pop",
+    patterns: ["pop", "boy band", "girl group", "top 40", "dance-pop", "synth-pop"],
+  },
+  {
+    key: "rock",
+    patterns: ["rock", "grunge", "garage rock", "psychedelic", "classic rock"],
+  },
+  {
+    key: "indie",
+    patterns: ["indie", "alternative", "alt-rock", "shoegaze", "lo-fi"],
+  },
+  {
+    key: "metal",
+    patterns: [
+      "metal",
+      "metalcore",
+      "thrash",
+      "death metal",
+      "doom",
+      "hardcore",
+    ],
+  },
+  {
+    key: "punk",
+    patterns: ["punk", "emo", "post-punk"],
+  },
+  {
+    key: "edm",
     patterns: [
       "electronic",
       "electronica",
@@ -31,94 +65,122 @@ const GENRE_RULES: Array<{ key: GenreKey; patterns: string[] }> = [
     ],
   },
   {
-    key: "hip-hop",
+    key: "hip-hop-rap",
     patterns: ["hip hop", "hip-hop", "hiphop", "rap", "trap", "grime", "drill"],
   },
   {
-    key: "jazz",
-    patterns: ["jazz", "blues", "soul", "funk", "swing", "bossa", "fusion"],
+    key: "rhythm-and-blues-soul",
+    patterns: ["r&b", "rnb", "rhythm and blues", "soul", "funk", "motown", "neo-soul"],
   },
   {
-    key: "rock",
+    key: "blues",
+    patterns: ["blues", "delta blues"],
+  },
+  {
+    key: "jazz",
+    patterns: ["jazz", "swing", "bossa", "fusion", "big band", "bebop"],
+  },
+  {
+    key: "classical",
+    patterns: ["classical", "orchestra", "orchestral", "opera", "symphony", "baroque"],
+  },
+  {
+    key: "country-music",
+    patterns: ["country", "americana", "bluegrass", "honky-tonk"],
+  },
+  {
+    key: "folk",
+    patterns: ["folk", "singer-songwriter", "acoustic"],
+  },
+  {
+    key: "latin",
     patterns: [
-      "rock",
-      "metal",
-      "punk",
-      "alternative",
-      "indie",
-      "grunge",
-      "emo",
-      "hardcore",
-      "garage rock",
+      "latin",
+      "reggaeton",
+      "salsa",
+      "bachata",
+      "cumbia",
+      "tango",
+      "mariachi",
     ],
   },
   {
-    key: "pop",
-    patterns: ["pop", "k-pop", "kpop", "boy band", "girl group", "top 40"],
+    key: "reggae",
+    patterns: ["reggae", "ska", "dancehall", "dub"],
   },
 ];
 
 const MOOD_RULES: Array<{ key: MoodKey; patterns: string[] }> = [
+  { key: "love", patterns: ["love", "romance", "romantic", "affection"] },
   {
-    key: "energetic",
-    patterns: [
-      "energetic",
-      "energy",
-      "party",
-      "upbeat",
-      "happy",
-      "excited",
-      "joy",
-      "fun",
-      "uplifting",
-      "feel good",
-    ],
+    key: "heartbreak",
+    patterns: ["heartbreak", "heartbroken", "breakup", "broken heart"],
+  },
+  { key: "joy", patterns: ["joy", "joyful", "happy", "happiness", "cheerful"] },
+  {
+    key: "empowerment",
+    patterns: ["empowerment", "empowering", "empowered", "confidence", "confident"],
   },
   {
-    key: "chill",
-    patterns: [
-      "chill",
-      "calm",
-      "relaxed",
-      "relaxing",
-      "peaceful",
-      "mellow",
-      "laid back",
-      "easy",
-      "soft",
-      "dreamy",
-    ],
+    key: "angst",
+    patterns: ["angst", "anxiety", "anxious", "restless", "tension"],
   },
   {
-    key: "emotional",
-    patterns: [
-      "emotional",
-      "sad",
-      "romantic",
-      "romance",
-      "love",
-      "melancholy",
-      "melancholic",
-      "heartbreak",
-      "nostalgic",
-      "tender",
-      "sentimental",
-    ],
+    key: "reflection",
+    patterns: ["reflection", "reflective", "introspective", "contemplative", "thoughtful"],
   },
   {
-    key: "dark",
-    patterns: [
-      "dark",
-      "angry",
-      "anger",
-      "aggressive",
-      "intense",
-      "brooding",
-      "moody",
-      "tension",
-      "haunting",
-      "sinister",
-    ],
+    key: "inspiration",
+    patterns: ["inspiration", "inspiring", "inspirational", "uplifting", "motivational"],
+  },
+  { key: "nostalgia", patterns: ["nostalgia", "nostalgic", "wistful"] },
+  {
+    key: "despair",
+    patterns: ["despair", "sad", "sadness", "sorrow", "melancholy", "melancholic", "grief", "depressing"],
+  },
+  {
+    key: "celebration",
+    patterns: ["celebration", "celebrate", "celebratory", "triumphant", "victory"],
+  },
+  {
+    key: "anger",
+    patterns: ["anger", "angry", "rage", "aggressive", "furious"],
+  },
+  {
+    key: "peace",
+    patterns: ["peace", "peaceful", "calm", "serene", "relaxed", "relaxing", "chill", "mellow"],
+  },
+  {
+    key: "solitude",
+    patterns: ["solitude", "lonely", "loneliness", "alone", "isolation"],
+  },
+  {
+    key: "adventure",
+    patterns: ["adventure", "adventurous", "wanderlust", "journey"],
+  },
+  {
+    key: "social-commentary",
+    patterns: ["social commentary", "social-commentary", "protest", "political", "activism"],
+  },
+  {
+    key: "hope",
+    patterns: ["hope", "hopeful", "optimistic", "optimism"],
+  },
+  {
+    key: "spirituality",
+    patterns: ["spirituality", "spiritual", "faith", "worship", "sacred", "gospel"],
+  },
+  {
+    key: "freedom",
+    patterns: ["freedom", "free", "liberation", "liberating", "independence"],
+  },
+  {
+    key: "party",
+    patterns: ["party", "energetic", "energy", "upbeat", "excited", "fun", "feel good"],
+  },
+  {
+    key: "nature",
+    patterns: ["nature", "natural", "earth", "outdoors", "wilderness"],
   },
 ];
 

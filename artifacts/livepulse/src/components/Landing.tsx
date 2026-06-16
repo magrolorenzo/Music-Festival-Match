@@ -37,127 +37,44 @@ function clampRadius(value: number): number {
   return Math.min(RADIUS_MAX, Math.max(RADIUS_MIN, value));
 }
 
-// ----- Mood "cake": a radial, multi-select segmented mood picker -------------
+// ----- Mood grid: a multi-select grid of emoji + label mood chips -----------
 
-function polar(cx: number, cy: number, r: number, angleDeg: number) {
-  const a = ((angleDeg - 90) * Math.PI) / 180;
-  return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
-}
-
-function annularSector(
-  cx: number,
-  cy: number,
-  rOuter: number,
-  rInner: number,
-  startAngle: number,
-  endAngle: number,
-): string {
-  const so = polar(cx, cy, rOuter, endAngle);
-  const eo = polar(cx, cy, rOuter, startAngle);
-  const si = polar(cx, cy, rInner, startAngle);
-  const ei = polar(cx, cy, rInner, endAngle);
-  const largeArc = endAngle - startAngle <= 180 ? "0" : "1";
-  return [
-    "M", so.x, so.y,
-    "A", rOuter, rOuter, 0, largeArc, 0, eo.x, eo.y,
-    "L", si.x, si.y,
-    "A", rInner, rInner, 0, largeArc, 1, ei.x, ei.y,
-    "Z",
-  ].join(" ");
-}
-
-function MoodCake({
+function MoodGrid({
   selected,
   onToggle,
 }: {
   selected: MoodKey[];
   onToggle: (m: MoodKey) => void;
 }) {
-  const size = 220;
-  const cx = size / 2;
-  const cy = size / 2;
-  const rOuter = 104;
-  const rInner = 52;
-  const slice = 360 / MOODS.length;
-
   return (
-    <div className="relative mx-auto" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-        className="overflow-visible"
-      >
-        {MOODS.map((m, i) => {
-          const start = i * slice;
-          const end = start + slice;
-          const isActive = selected.includes(m.key);
-          const mid = start + slice / 2;
-          const labelPos = polar(cx, cy, (rOuter + rInner) / 2, mid);
-          return (
-            <g key={m.key} className="cursor-pointer">
-              <path
-                data-testid={`filter-mood-${m.key}`}
-                d={annularSector(cx, cy, rOuter, rInner, start, end)}
-                onClick={() => onToggle(m.key)}
-                fill={`hsl(${m.hue})`}
-                fillOpacity={isActive ? 1 : 0.16}
-                stroke="#0a0a0a"
-                strokeWidth={3}
-                style={{
-                  filter: isActive
-                    ? `drop-shadow(0 0 12px hsl(${m.hue} / 0.6))`
-                    : "none",
-                  transition: "fill-opacity 0.3s ease, filter 0.3s ease",
-                }}
-                className="hover:fill-opacity-100"
-              />
-              <text
-                x={labelPos.x}
-                y={labelPos.y - 6}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize="22"
-                style={{ pointerEvents: "none", userSelect: "none" }}
-              >
-                {m.emoji}
-              </text>
-              <text
-                x={labelPos.x}
-                y={labelPos.y + 14}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize="10"
-                fontWeight="700"
-                fill={isActive ? "#fff" : "rgba(255,255,255,0.55)"}
-                style={{
-                  pointerEvents: "none",
-                  userSelect: "none",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.04em",
-                  transition: "fill 0.3s ease",
-                }}
-              >
-                {m.label}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="text-center">
-          <div className="text-2xl font-extrabold leading-none">
-            {selected.length || "Any"}
-          </div>
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
-            {selected.length === 1
-              ? "Mood"
-              : selected.length > 1
-                ? "Moods"
-                : "Vibe"}
-          </div>
-        </div>
-      </div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      {MOODS.map((m) => {
+        const active = selected.includes(m.key);
+        return (
+          <button
+            key={m.key}
+            type="button"
+            data-testid={`filter-mood-${m.key}`}
+            aria-pressed={active}
+            onClick={() => onToggle(m.key)}
+            style={
+              active
+                ? {
+                    backgroundColor: `hsl(${m.hue})`,
+                    color: "#fff",
+                    boxShadow: `0 0 15px hsl(${m.hue} / 0.4)`,
+                  }
+                : {}
+            }
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-left transition-all duration-300 ${
+              !active && "bg-white/5 text-muted-foreground hover:bg-white/10"
+            }`}
+          >
+            <span className="text-base leading-none shrink-0">{m.emoji}</span>
+            <span className="truncate">{m.label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -185,6 +102,18 @@ export default function Landing({
   );
   const [genres, setGenres] = useState<GenreKey[]>(initialFilters.genres);
   const [moods, setMoods] = useState<MoodKey[]>(initialFilters.moods);
+  const [showAllGenres, setShowAllGenres] = useState(false);
+
+  // Curated "popular" genres show up-front; the rest sit behind "More". A
+  // selected genre always stays visible so the choice is never hidden.
+  const visibleGenres = useMemo(
+    () =>
+      showAllGenres
+        ? GENRES
+        : GENRES.filter((g) => g.popular || genres.includes(g.key)),
+    [showAllGenres, genres],
+  );
+  const hiddenGenreCount = GENRES.length - visibleGenres.length;
   const [range, setRange] = useState<DayPickerRange | undefined>({
     from: fromISODate(initialFilters.startDate),
     to: fromISODate(initialFilters.endDate),
@@ -541,7 +470,7 @@ export default function Landing({
               </button>
             </label>
             <div className="flex flex-wrap gap-2">
-              {GENRES.map((g) => {
+              {visibleGenres.map((g) => {
                 const active = genres.includes(g.key);
                 return (
                   <button
@@ -567,10 +496,19 @@ export default function Landing({
                   </button>
                 );
               })}
+              {(hiddenGenreCount > 0 || showAllGenres) && (
+                <button
+                  data-testid="filter-genre-toggle"
+                  onClick={() => setShowAllGenres((v) => !v)}
+                  className="px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-muted-foreground hover:bg-white/10 transition-all duration-300"
+                >
+                  {showAllGenres ? "Less ▲" : `More +${hiddenGenreCount} ▾`}
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Mood — radial "cake" multi-select */}
+          {/* Mood — multi-select chip grid */}
           <div className="space-y-3 text-left">
             <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex justify-between">
               <span>Mood</span>
@@ -587,9 +525,9 @@ export default function Landing({
               </button>
             </label>
             <p className="text-xs text-muted-foreground -mt-1">
-              Tap slices to mix multiple moods.
+              Tap to mix multiple moods.
             </p>
-            <MoodCake selected={moods} onToggle={toggleMood} />
+            <MoodGrid selected={moods} onToggle={toggleMood} />
           </div>
         </div>
 

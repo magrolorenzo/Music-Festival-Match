@@ -17,8 +17,13 @@
         "longitude": 4.3667
       },
       "geoRadiusKm": 25,
-      "genreKeys": ["electronic"],
-      "moodKeys": ["energetic", "dark"],
+      "genreKeys": [
+        "edm"
+      ],
+      "moodKeys": [
+        "party",
+        "angst"
+      ],
       "performers": [
         {
           "id": "art-helix-bloom",
@@ -26,19 +31,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Electronic", "Progressive House"],
-            "genreKeys": ["electronic"],
+            "musicGenres": [
+              "Electronic",
+              "Progressive House"
+            ],
+            "genreKeys": [
+              "edm"
+            ],
             "audioValence": 0.78,
             "audioEnergy": 0.91,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+31%", "monthlyListeners": 18400000, "popularityScore": 92 },
+          "songstats": {
+            "popularityTrend": "+31%",
+            "monthlyListeners": 18400000,
+            "popularityScore": 92
+          },
           "recommendedSongs": [
-            { "trackName": "Skybreaker", "popularity": 94, "moodKeys": ["energetic"] },
-            { "trackName": "Lift Off", "popularity": 88, "moodKeys": ["energetic", "chill"] }
+            {
+              "trackName": "Skybreaker",
+              "popularity": 94,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Lift Off",
+              "popularity": 88,
+              "moodKeys": [
+                "party",
+                "peace"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Skybreaker", "mood": "energetic", "lyrics_body": "Hands to the ceiling, we set the night on fire / every drop a heartbeat climbing higher", "script_tracking_url": "https://mock.musixmatch.com/track/skybreaker" }
+            {
+              "trackName": "Skybreaker",
+              "mood": "party",
+              "lyrics_body": "Hands to the ceiling, we set the night on fire / every drop a heartbeat climbing higher",
+              "script_tracking_url": "https://mock.musixmatch.com/track/skybreaker"
+            }
           ]
         },
         {
@@ -47,19 +81,49 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Electronic", "Techno"],
-            "genreKeys": ["electronic"],
+            "musicGenres": [
+              "Electronic",
+              "Techno"
+            ],
+            "genreKeys": [
+              "edm"
+            ],
             "audioValence": 0.32,
             "audioEnergy": 0.84,
-            "moodKeys": ["dark", "energetic"]
+            "moodKeys": [
+              "angst",
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+22%", "monthlyListeners": 9200000, "popularityScore": 81 },
+          "songstats": {
+            "popularityTrend": "+22%",
+            "monthlyListeners": 9200000,
+            "popularityScore": 81
+          },
           "recommendedSongs": [
-            { "trackName": "Concrete Pulse", "popularity": 79, "moodKeys": ["dark"] },
-            { "trackName": "Afterhours", "popularity": 74, "moodKeys": ["dark", "energetic"] }
+            {
+              "trackName": "Concrete Pulse",
+              "popularity": 79,
+              "moodKeys": [
+                "angst"
+              ]
+            },
+            {
+              "trackName": "Afterhours",
+              "popularity": 74,
+              "moodKeys": [
+                "angst",
+                "party"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Concrete Pulse", "mood": "dark", "lyrics_body": "Underground and out of sight / we move like shadows through the strobe-lit night", "script_tracking_url": "https://mock.musixmatch.com/track/concrete-pulse" }
+            {
+              "trackName": "Concrete Pulse",
+              "mood": "angst",
+              "lyrics_body": "Underground and out of sight / we move like shadows through the strobe-lit night",
+              "script_tracking_url": "https://mock.musixmatch.com/track/concrete-pulse"
+            }
           ]
         },
         {
@@ -68,19 +132,49 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Electronic", "Melodic House"],
-            "genreKeys": ["electronic"],
+            "musicGenres": [
+              "Electronic",
+              "Melodic House"
+            ],
+            "genreKeys": [
+              "edm"
+            ],
             "audioValence": 0.61,
             "audioEnergy": 0.7,
-            "moodKeys": ["chill", "energetic"]
+            "moodKeys": [
+              "peace",
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+18%", "monthlyListeners": 7600000, "popularityScore": 77 },
+          "songstats": {
+            "popularityTrend": "+18%",
+            "monthlyListeners": 7600000,
+            "popularityScore": 77
+          },
           "recommendedSongs": [
-            { "trackName": "Tidal", "popularity": 80, "moodKeys": ["chill"] },
-            { "trackName": "Glasshouse", "popularity": 71, "moodKeys": ["chill", "emotional"] }
+            {
+              "trackName": "Tidal",
+              "popularity": 80,
+              "moodKeys": [
+                "peace"
+              ]
+            },
+            {
+              "trackName": "Glasshouse",
+              "popularity": 71,
+              "moodKeys": [
+                "peace",
+                "heartbreak"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Tidal", "mood": "chill", "lyrics_body": "Let the current carry us slow / nowhere to be but here in the glow", "script_tracking_url": "https://mock.musixmatch.com/track/tidal" }
+            {
+              "trackName": "Tidal",
+              "mood": "peace",
+              "lyrics_body": "Let the current carry us slow / nowhere to be but here in the glow",
+              "script_tracking_url": "https://mock.musixmatch.com/track/tidal"
+            }
           ]
         }
       ]
@@ -102,8 +196,14 @@
         "longitude": -2.5875
       },
       "geoRadiusKm": 20,
-      "genreKeys": ["rock", "pop"],
-      "moodKeys": ["energetic", "emotional"],
+      "genreKeys": [
+        "rock",
+        "pop"
+      ],
+      "moodKeys": [
+        "party",
+        "heartbreak"
+      ],
       "performers": [
         {
           "id": "art-the-paper-kings",
@@ -111,19 +211,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Rock", "Alternative"],
-            "genreKeys": ["rock"],
+            "musicGenres": [
+              "Rock",
+              "Alternative"
+            ],
+            "genreKeys": [
+              "rock"
+            ],
             "audioValence": 0.55,
             "audioEnergy": 0.86,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+27%", "monthlyListeners": 14200000, "popularityScore": 89 },
+          "songstats": {
+            "popularityTrend": "+27%",
+            "monthlyListeners": 14200000,
+            "popularityScore": 89
+          },
           "recommendedSongs": [
-            { "trackName": "Cathedral", "popularity": 91, "moodKeys": ["energetic", "emotional"] },
-            { "trackName": "Static Hymn", "popularity": 83, "moodKeys": ["energetic"] }
+            {
+              "trackName": "Cathedral",
+              "popularity": 91,
+              "moodKeys": [
+                "party",
+                "heartbreak"
+              ]
+            },
+            {
+              "trackName": "Static Hymn",
+              "popularity": 83,
+              "moodKeys": [
+                "party"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Cathedral", "mood": "energetic", "lyrics_body": "Sing it loud till the rafters shake / we are the noise that the silence makes", "script_tracking_url": "https://mock.musixmatch.com/track/cathedral" }
+            {
+              "trackName": "Cathedral",
+              "mood": "party",
+              "lyrics_body": "Sing it loud till the rafters shake / we are the noise that the silence makes",
+              "script_tracking_url": "https://mock.musixmatch.com/track/cathedral"
+            }
           ]
         },
         {
@@ -132,19 +261,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Pop", "Art Pop"],
-            "genreKeys": ["pop"],
+            "musicGenres": [
+              "Pop",
+              "Art Pop"
+            ],
+            "genreKeys": [
+              "pop"
+            ],
             "audioValence": 0.49,
             "audioEnergy": 0.58,
-            "moodKeys": ["emotional"]
+            "moodKeys": [
+              "heartbreak"
+            ]
           },
-          "songstats": { "popularityTrend": "+44%", "monthlyListeners": 26800000, "popularityScore": 95 },
+          "songstats": {
+            "popularityTrend": "+44%",
+            "monthlyListeners": 26800000,
+            "popularityScore": 95
+          },
           "recommendedSongs": [
-            { "trackName": "Paper Hearts", "popularity": 96, "moodKeys": ["emotional"] },
-            { "trackName": "Golden Hour", "popularity": 90, "moodKeys": ["emotional", "chill"] }
+            {
+              "trackName": "Paper Hearts",
+              "popularity": 96,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            },
+            {
+              "trackName": "Golden Hour",
+              "popularity": 90,
+              "moodKeys": [
+                "heartbreak",
+                "peace"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Paper Hearts", "mood": "emotional", "lyrics_body": "I folded all my fear into a paper heart / and let it sail to wherever you are", "script_tracking_url": "https://mock.musixmatch.com/track/paper-hearts" }
+            {
+              "trackName": "Paper Hearts",
+              "mood": "heartbreak",
+              "lyrics_body": "I folded all my fear into a paper heart / and let it sail to wherever you are",
+              "script_tracking_url": "https://mock.musixmatch.com/track/paper-hearts"
+            }
           ]
         },
         {
@@ -153,19 +311,47 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Pop", "Indie Pop"],
-            "genreKeys": ["pop"],
+            "musicGenres": [
+              "Pop",
+              "Indie Pop"
+            ],
+            "genreKeys": [
+              "pop"
+            ],
             "audioValence": 0.72,
             "audioEnergy": 0.74,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+19%", "monthlyListeners": 11300000, "popularityScore": 84 },
+          "songstats": {
+            "popularityTrend": "+19%",
+            "monthlyListeners": 11300000,
+            "popularityScore": 84
+          },
           "recommendedSongs": [
-            { "trackName": "Sunday Riot", "popularity": 85, "moodKeys": ["energetic"] },
-            { "trackName": "Daydreamer", "popularity": 78, "moodKeys": ["chill"] }
+            {
+              "trackName": "Sunday Riot",
+              "popularity": 85,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Daydreamer",
+              "popularity": 78,
+              "moodKeys": [
+                "peace"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Sunday Riot", "mood": "energetic", "lyrics_body": "Pour the morning into something bright / we'll start a little riot in the light", "script_tracking_url": "https://mock.musixmatch.com/track/sunday-riot" }
+            {
+              "trackName": "Sunday Riot",
+              "mood": "party",
+              "lyrics_body": "Pour the morning into something bright / we'll start a little riot in the light",
+              "script_tracking_url": "https://mock.musixmatch.com/track/sunday-riot"
+            }
           ]
         }
       ]
@@ -187,8 +373,13 @@
         "longitude": 6.9107
       },
       "geoRadiusKm": 15,
-      "genreKeys": ["jazz"],
-      "moodKeys": ["chill", "emotional"],
+      "genreKeys": [
+        "jazz"
+      ],
+      "moodKeys": [
+        "peace",
+        "heartbreak"
+      ],
       "performers": [
         {
           "id": "art-eli-toussaint",
@@ -196,19 +387,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Jazz", "Modern Jazz"],
-            "genreKeys": ["jazz"],
+            "musicGenres": [
+              "Jazz",
+              "Modern Jazz"
+            ],
+            "genreKeys": [
+              "jazz"
+            ],
             "audioValence": 0.52,
             "audioEnergy": 0.4,
-            "moodKeys": ["chill", "emotional"]
+            "moodKeys": [
+              "peace",
+              "heartbreak"
+            ]
           },
-          "songstats": { "popularityTrend": "+12%", "monthlyListeners": 2100000, "popularityScore": 68 },
+          "songstats": {
+            "popularityTrend": "+12%",
+            "monthlyListeners": 2100000,
+            "popularityScore": 68
+          },
           "recommendedSongs": [
-            { "trackName": "Lamplight", "popularity": 70, "moodKeys": ["chill"] },
-            { "trackName": "Slow River", "popularity": 64, "moodKeys": ["emotional"] }
+            {
+              "trackName": "Lamplight",
+              "popularity": 70,
+              "moodKeys": [
+                "peace"
+              ]
+            },
+            {
+              "trackName": "Slow River",
+              "popularity": 64,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Lamplight", "mood": "chill", "lyrics_body": "Brushed snare and a quiet room / the night unwinds in a minor blue", "script_tracking_url": "https://mock.musixmatch.com/track/lamplight" }
+            {
+              "trackName": "Lamplight",
+              "mood": "peace",
+              "lyrics_body": "Brushed snare and a quiet room / the night unwinds in a minor blue",
+              "script_tracking_url": "https://mock.musixmatch.com/track/lamplight"
+            }
           ]
         },
         {
@@ -217,19 +437,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Jazz", "Soul Jazz"],
-            "genreKeys": ["jazz"],
+            "musicGenres": [
+              "Jazz",
+              "Soul Jazz"
+            ],
+            "genreKeys": [
+              "jazz"
+            ],
             "audioValence": 0.45,
             "audioEnergy": 0.46,
-            "moodKeys": ["emotional"]
+            "moodKeys": [
+              "heartbreak"
+            ]
           },
-          "songstats": { "popularityTrend": "+21%", "monthlyListeners": 3400000, "popularityScore": 73 },
+          "songstats": {
+            "popularityTrend": "+21%",
+            "monthlyListeners": 3400000,
+            "popularityScore": 73
+          },
           "recommendedSongs": [
-            { "trackName": "Velvet Hour", "popularity": 76, "moodKeys": ["emotional"] },
-            { "trackName": "After the Rain", "popularity": 69, "moodKeys": ["emotional", "chill"] }
+            {
+              "trackName": "Velvet Hour",
+              "popularity": 76,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            },
+            {
+              "trackName": "After the Rain",
+              "popularity": 69,
+              "moodKeys": [
+                "heartbreak",
+                "peace"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Velvet Hour", "mood": "emotional", "lyrics_body": "Every note a little ache / a tender thing I won't let break", "script_tracking_url": "https://mock.musixmatch.com/track/velvet-hour" }
+            {
+              "trackName": "Velvet Hour",
+              "mood": "heartbreak",
+              "lyrics_body": "Every note a little ache / a tender thing I won't let break",
+              "script_tracking_url": "https://mock.musixmatch.com/track/velvet-hour"
+            }
           ]
         },
         {
@@ -238,19 +487,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Jazz", "Nu Jazz"],
-            "genreKeys": ["jazz"],
+            "musicGenres": [
+              "Jazz",
+              "Nu Jazz"
+            ],
+            "genreKeys": [
+              "jazz"
+            ],
             "audioValence": 0.58,
             "audioEnergy": 0.55,
-            "moodKeys": ["chill"]
+            "moodKeys": [
+              "peace"
+            ]
           },
-          "songstats": { "popularityTrend": "+15%", "monthlyListeners": 1800000, "popularityScore": 66 },
+          "songstats": {
+            "popularityTrend": "+15%",
+            "monthlyListeners": 1800000,
+            "popularityScore": 66
+          },
           "recommendedSongs": [
-            { "trackName": "Driftwood", "popularity": 67, "moodKeys": ["chill"] },
-            { "trackName": "Glasswater", "popularity": 61, "moodKeys": ["chill", "emotional"] }
+            {
+              "trackName": "Driftwood",
+              "popularity": 67,
+              "moodKeys": [
+                "peace"
+              ]
+            },
+            {
+              "trackName": "Glasswater",
+              "popularity": 61,
+              "moodKeys": [
+                "peace",
+                "heartbreak"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Driftwood", "mood": "chill", "lyrics_body": "Let the chords just float away / nowhere to go but where they may", "script_tracking_url": "https://mock.musixmatch.com/track/driftwood" }
+            {
+              "trackName": "Driftwood",
+              "mood": "peace",
+              "lyrics_body": "Let the chords just float away / nowhere to go but where they may",
+              "script_tracking_url": "https://mock.musixmatch.com/track/driftwood"
+            }
           ]
         }
       ]
@@ -272,8 +550,15 @@
         "longitude": 2.2278
       },
       "geoRadiusKm": 18,
-      "genreKeys": ["pop", "electronic", "rock"],
-      "moodKeys": ["energetic", "chill"],
+      "genreKeys": [
+        "pop",
+        "edm",
+        "rock"
+      ],
+      "moodKeys": [
+        "party",
+        "peace"
+      ],
       "performers": [
         {
           "id": "art-violet-static",
@@ -281,19 +566,47 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Pop", "Synth Pop"],
-            "genreKeys": ["pop"],
+            "musicGenres": [
+              "Pop",
+              "Synth Pop"
+            ],
+            "genreKeys": [
+              "pop"
+            ],
             "audioValence": 0.69,
             "audioEnergy": 0.76,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+38%", "monthlyListeners": 19500000, "popularityScore": 90 },
+          "songstats": {
+            "popularityTrend": "+38%",
+            "monthlyListeners": 19500000,
+            "popularityScore": 90
+          },
           "recommendedSongs": [
-            { "trackName": "Neon Pulse", "popularity": 92, "moodKeys": ["energetic"] },
-            { "trackName": "Slow Burn", "popularity": 81, "moodKeys": ["chill"] }
+            {
+              "trackName": "Neon Pulse",
+              "popularity": 92,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Slow Burn",
+              "popularity": 81,
+              "moodKeys": [
+                "peace"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Neon Pulse", "mood": "energetic", "lyrics_body": "City lights in stereo / we glow wherever the night will go", "script_tracking_url": "https://mock.musixmatch.com/track/neon-pulse" }
+            {
+              "trackName": "Neon Pulse",
+              "mood": "party",
+              "lyrics_body": "City lights in stereo / we glow wherever the night will go",
+              "script_tracking_url": "https://mock.musixmatch.com/track/neon-pulse"
+            }
           ]
         },
         {
@@ -302,19 +615,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Electronic", "Downtempo"],
-            "genreKeys": ["electronic"],
+            "musicGenres": [
+              "Electronic",
+              "Downtempo"
+            ],
+            "genreKeys": [
+              "edm"
+            ],
             "audioValence": 0.6,
             "audioEnergy": 0.52,
-            "moodKeys": ["chill"]
+            "moodKeys": [
+              "peace"
+            ]
           },
-          "songstats": { "popularityTrend": "+16%", "monthlyListeners": 6100000, "popularityScore": 75 },
+          "songstats": {
+            "popularityTrend": "+16%",
+            "monthlyListeners": 6100000,
+            "popularityScore": 75
+          },
           "recommendedSongs": [
-            { "trackName": "Low Tide", "popularity": 77, "moodKeys": ["chill"] },
-            { "trackName": "Indigo", "popularity": 70, "moodKeys": ["chill", "emotional"] }
+            {
+              "trackName": "Low Tide",
+              "popularity": 77,
+              "moodKeys": [
+                "peace"
+              ]
+            },
+            {
+              "trackName": "Indigo",
+              "popularity": 70,
+              "moodKeys": [
+                "peace",
+                "heartbreak"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Low Tide", "mood": "chill", "lyrics_body": "Breathe in slow, let the bassline drift / the night's a gift, no need to lift", "script_tracking_url": "https://mock.musixmatch.com/track/low-tide" }
+            {
+              "trackName": "Low Tide",
+              "mood": "peace",
+              "lyrics_body": "Breathe in slow, let the bassline drift / the night's a gift, no need to lift",
+              "script_tracking_url": "https://mock.musixmatch.com/track/low-tide"
+            }
           ]
         },
         {
@@ -323,19 +665,47 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Rock", "Indie Rock"],
-            "genreKeys": ["rock"],
+            "musicGenres": [
+              "Rock",
+              "Indie Rock"
+            ],
+            "genreKeys": [
+              "rock"
+            ],
             "audioValence": 0.63,
             "audioEnergy": 0.82,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+24%", "monthlyListeners": 10200000, "popularityScore": 83 },
+          "songstats": {
+            "popularityTrend": "+24%",
+            "monthlyListeners": 10200000,
+            "popularityScore": 83
+          },
           "recommendedSongs": [
-            { "trackName": "Hometown Sparks", "popularity": 84, "moodKeys": ["energetic"] },
-            { "trackName": "Coastline", "popularity": 75, "moodKeys": ["chill"] }
+            {
+              "trackName": "Hometown Sparks",
+              "popularity": 84,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Coastline",
+              "popularity": 75,
+              "moodKeys": [
+                "peace"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Hometown Sparks", "mood": "energetic", "lyrics_body": "Kick the doors of summer wide / we're the spark the small towns hide", "script_tracking_url": "https://mock.musixmatch.com/track/hometown-sparks" }
+            {
+              "trackName": "Hometown Sparks",
+              "mood": "party",
+              "lyrics_body": "Kick the doors of summer wide / we're the spark the small towns hide",
+              "script_tracking_url": "https://mock.musixmatch.com/track/hometown-sparks"
+            }
           ]
         }
       ]
@@ -357,8 +727,13 @@
         "longitude": 2.128
       },
       "geoRadiusKm": 18,
-      "genreKeys": ["electronic"],
-      "moodKeys": ["dark", "energetic"],
+      "genreKeys": [
+        "edm"
+      ],
+      "moodKeys": [
+        "angst",
+        "party"
+      ],
       "performers": [
         {
           "id": "art-grid-saint",
@@ -366,19 +741,49 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Electronic", "Industrial Techno"],
-            "genreKeys": ["electronic"],
+            "musicGenres": [
+              "Electronic",
+              "Industrial Techno"
+            ],
+            "genreKeys": [
+              "edm"
+            ],
             "audioValence": 0.24,
             "audioEnergy": 0.93,
-            "moodKeys": ["dark", "energetic"]
+            "moodKeys": [
+              "angst",
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+29%", "monthlyListeners": 5400000, "popularityScore": 79 },
+          "songstats": {
+            "popularityTrend": "+29%",
+            "monthlyListeners": 5400000,
+            "popularityScore": 79
+          },
           "recommendedSongs": [
-            { "trackName": "Iron Lung", "popularity": 80, "moodKeys": ["dark"] },
-            { "trackName": "Override", "popularity": 73, "moodKeys": ["dark", "energetic"] }
+            {
+              "trackName": "Iron Lung",
+              "popularity": 80,
+              "moodKeys": [
+                "angst"
+              ]
+            },
+            {
+              "trackName": "Override",
+              "popularity": 73,
+              "moodKeys": [
+                "angst",
+                "party"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Iron Lung", "mood": "dark", "lyrics_body": "Steel and smoke in a four-four pulse / the floor is church, the bass absolves", "script_tracking_url": "https://mock.musixmatch.com/track/iron-lung" }
+            {
+              "trackName": "Iron Lung",
+              "mood": "angst",
+              "lyrics_body": "Steel and smoke in a four-four pulse / the floor is church, the bass absolves",
+              "script_tracking_url": "https://mock.musixmatch.com/track/iron-lung"
+            }
           ]
         },
         {
@@ -387,19 +792,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Electronic", "IDM"],
-            "genreKeys": ["electronic"],
+            "musicGenres": [
+              "Electronic",
+              "IDM"
+            ],
+            "genreKeys": [
+              "edm"
+            ],
             "audioValence": 0.41,
             "audioEnergy": 0.71,
-            "moodKeys": ["dark", "chill"]
+            "moodKeys": [
+              "angst",
+              "peace"
+            ]
           },
-          "songstats": { "popularityTrend": "+17%", "monthlyListeners": 3900000, "popularityScore": 72 },
+          "songstats": {
+            "popularityTrend": "+17%",
+            "monthlyListeners": 3900000,
+            "popularityScore": 72
+          },
           "recommendedSongs": [
-            { "trackName": "Ghost Protocol", "popularity": 74, "moodKeys": ["dark"] },
-            { "trackName": "Soft Machine", "popularity": 66, "moodKeys": ["chill"] }
+            {
+              "trackName": "Ghost Protocol",
+              "popularity": 74,
+              "moodKeys": [
+                "angst"
+              ]
+            },
+            {
+              "trackName": "Soft Machine",
+              "popularity": 66,
+              "moodKeys": [
+                "peace"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Ghost Protocol", "mood": "dark", "lyrics_body": "Numbers fall like quiet rain / a phantom signal in my brain", "script_tracking_url": "https://mock.musixmatch.com/track/ghost-protocol" }
+            {
+              "trackName": "Ghost Protocol",
+              "mood": "angst",
+              "lyrics_body": "Numbers fall like quiet rain / a phantom signal in my brain",
+              "script_tracking_url": "https://mock.musixmatch.com/track/ghost-protocol"
+            }
           ]
         },
         {
@@ -408,19 +842,47 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Electronic", "Bass"],
-            "genreKeys": ["electronic"],
+            "musicGenres": [
+              "Electronic",
+              "Bass"
+            ],
+            "genreKeys": [
+              "edm"
+            ],
             "audioValence": 0.55,
             "audioEnergy": 0.88,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+26%", "monthlyListeners": 6800000, "popularityScore": 78 },
+          "songstats": {
+            "popularityTrend": "+26%",
+            "monthlyListeners": 6800000,
+            "popularityScore": 78
+          },
           "recommendedSongs": [
-            { "trackName": "Detonate", "popularity": 79, "moodKeys": ["energetic"] },
-            { "trackName": "Lowlight", "popularity": 70, "moodKeys": ["dark"] }
+            {
+              "trackName": "Detonate",
+              "popularity": 79,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Lowlight",
+              "popularity": 70,
+              "moodKeys": [
+                "angst"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Detonate", "mood": "energetic", "lyrics_body": "Count it down, let the whole thing blow / a thousand hands in the undertow", "script_tracking_url": "https://mock.musixmatch.com/track/detonate" }
+            {
+              "trackName": "Detonate",
+              "mood": "party",
+              "lyrics_body": "Count it down, let the whole thing blow / a thousand hands in the undertow",
+              "script_tracking_url": "https://mock.musixmatch.com/track/detonate"
+            }
           ]
         }
       ]
@@ -442,8 +904,13 @@
         "longitude": 6.9475
       },
       "geoRadiusKm": 22,
-      "genreKeys": ["rock"],
-      "moodKeys": ["energetic", "dark"],
+      "genreKeys": [
+        "rock"
+      ],
+      "moodKeys": [
+        "party",
+        "angst"
+      ],
       "performers": [
         {
           "id": "art-ashfall",
@@ -451,19 +918,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Rock", "Hard Rock"],
-            "genreKeys": ["rock"],
+            "musicGenres": [
+              "Rock",
+              "Hard Rock"
+            ],
+            "genreKeys": [
+              "rock"
+            ],
             "audioValence": 0.42,
             "audioEnergy": 0.95,
-            "moodKeys": ["energetic", "dark"]
+            "moodKeys": [
+              "party",
+              "angst"
+            ]
           },
-          "songstats": { "popularityTrend": "+23%", "monthlyListeners": 8900000, "popularityScore": 82 },
+          "songstats": {
+            "popularityTrend": "+23%",
+            "monthlyListeners": 8900000,
+            "popularityScore": 82
+          },
           "recommendedSongs": [
-            { "trackName": "Burn It Down", "popularity": 85, "moodKeys": ["energetic"] },
-            { "trackName": "Black Tide", "popularity": 77, "moodKeys": ["dark"] }
+            {
+              "trackName": "Burn It Down",
+              "popularity": 85,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Black Tide",
+              "popularity": 77,
+              "moodKeys": [
+                "angst"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Burn It Down", "mood": "energetic", "lyrics_body": "Strike the match and let it roar / we don't live quiet anymore", "script_tracking_url": "https://mock.musixmatch.com/track/burn-it-down" }
+            {
+              "trackName": "Burn It Down",
+              "mood": "party",
+              "lyrics_body": "Strike the match and let it roar / we don't live quiet anymore",
+              "script_tracking_url": "https://mock.musixmatch.com/track/burn-it-down"
+            }
           ]
         },
         {
@@ -472,19 +968,49 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Rock", "Metal"],
-            "genreKeys": ["rock"],
+            "musicGenres": [
+              "Rock",
+              "Metal"
+            ],
+            "genreKeys": [
+              "rock"
+            ],
             "audioValence": 0.2,
             "audioEnergy": 0.97,
-            "moodKeys": ["dark", "energetic"]
+            "moodKeys": [
+              "angst",
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+20%", "monthlyListeners": 6300000, "popularityScore": 76 },
+          "songstats": {
+            "popularityTrend": "+20%",
+            "monthlyListeners": 6300000,
+            "popularityScore": 76
+          },
           "recommendedSongs": [
-            { "trackName": "Gravewalker", "popularity": 78, "moodKeys": ["dark"] },
-            { "trackName": "Steel Veins", "popularity": 71, "moodKeys": ["dark", "energetic"] }
+            {
+              "trackName": "Gravewalker",
+              "popularity": 78,
+              "moodKeys": [
+                "angst"
+              ]
+            },
+            {
+              "trackName": "Steel Veins",
+              "popularity": 71,
+              "moodKeys": [
+                "angst",
+                "party"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Gravewalker", "mood": "dark", "lyrics_body": "Down where the cold light never goes / I carry thunder in my bones", "script_tracking_url": "https://mock.musixmatch.com/track/gravewalker" }
+            {
+              "trackName": "Gravewalker",
+              "mood": "angst",
+              "lyrics_body": "Down where the cold light never goes / I carry thunder in my bones",
+              "script_tracking_url": "https://mock.musixmatch.com/track/gravewalker"
+            }
           ]
         },
         {
@@ -493,19 +1019,47 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Rock", "Punk"],
-            "genreKeys": ["rock"],
+            "musicGenres": [
+              "Rock",
+              "Punk"
+            ],
+            "genreKeys": [
+              "rock"
+            ],
             "audioValence": 0.5,
             "audioEnergy": 0.9,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+18%", "monthlyListeners": 4700000, "popularityScore": 74 },
+          "songstats": {
+            "popularityTrend": "+18%",
+            "monthlyListeners": 4700000,
+            "popularityScore": 74
+          },
           "recommendedSongs": [
-            { "trackName": "Anthem No. 4", "popularity": 75, "moodKeys": ["energetic"] },
-            { "trackName": "Last Call", "popularity": 68, "moodKeys": ["emotional"] }
+            {
+              "trackName": "Anthem No. 4",
+              "popularity": 75,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Last Call",
+              "popularity": 68,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Anthem No. 4", "mood": "energetic", "lyrics_body": "Throw your fists at the open sky / we were never built to sit and die", "script_tracking_url": "https://mock.musixmatch.com/track/anthem-no-4" }
+            {
+              "trackName": "Anthem No. 4",
+              "mood": "party",
+              "lyrics_body": "Throw your fists at the open sky / we were never built to sit and die",
+              "script_tracking_url": "https://mock.musixmatch.com/track/anthem-no-4"
+            }
           ]
         }
       ]
@@ -527,8 +1081,15 @@
         "longitude": -87.6217
       },
       "geoRadiusKm": 20,
-      "genreKeys": ["rock", "pop", "hip-hop", "electronic"],
-      "moodKeys": ["energetic"],
+      "genreKeys": [
+        "rock",
+        "pop",
+        "hip-hop-rap",
+        "edm"
+      ],
+      "moodKeys": [
+        "party"
+      ],
       "performers": [
         {
           "id": "art-juno-fields",
@@ -536,19 +1097,47 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Pop", "Electropop"],
-            "genreKeys": ["pop"],
+            "musicGenres": [
+              "Pop",
+              "Electropop"
+            ],
+            "genreKeys": [
+              "pop"
+            ],
             "audioValence": 0.75,
             "audioEnergy": 0.8,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+41%", "monthlyListeners": 24300000, "popularityScore": 94 },
+          "songstats": {
+            "popularityTrend": "+41%",
+            "monthlyListeners": 24300000,
+            "popularityScore": 94
+          },
           "recommendedSongs": [
-            { "trackName": "Supernova Kid", "popularity": 95, "moodKeys": ["energetic"] },
-            { "trackName": "Slow Dance Alone", "popularity": 86, "moodKeys": ["emotional"] }
+            {
+              "trackName": "Supernova Kid",
+              "popularity": 95,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Slow Dance Alone",
+              "popularity": 86,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Supernova Kid", "mood": "energetic", "lyrics_body": "I was born to burn out loud / a supernova in the crowd", "script_tracking_url": "https://mock.musixmatch.com/track/supernova-kid" }
+            {
+              "trackName": "Supernova Kid",
+              "mood": "party",
+              "lyrics_body": "I was born to burn out loud / a supernova in the crowd",
+              "script_tracking_url": "https://mock.musixmatch.com/track/supernova-kid"
+            }
           ]
         },
         {
@@ -557,19 +1146,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Hip-Hop", "Trap"],
-            "genreKeys": ["hip-hop"],
+            "musicGenres": [
+              "Hip-Hop",
+              "Trap"
+            ],
+            "genreKeys": [
+              "hip-hop-rap"
+            ],
             "audioValence": 0.38,
             "audioEnergy": 0.78,
-            "moodKeys": ["energetic", "dark"]
+            "moodKeys": [
+              "party",
+              "angst"
+            ]
           },
-          "songstats": { "popularityTrend": "+33%", "monthlyListeners": 21100000, "popularityScore": 91 },
+          "songstats": {
+            "popularityTrend": "+33%",
+            "monthlyListeners": 21100000,
+            "popularityScore": 91
+          },
           "recommendedSongs": [
-            { "trackName": "Citylights", "popularity": 92, "moodKeys": ["dark"] },
-            { "trackName": "Run It Up", "popularity": 88, "moodKeys": ["energetic"] }
+            {
+              "trackName": "Citylights",
+              "popularity": 92,
+              "moodKeys": [
+                "angst"
+              ]
+            },
+            {
+              "trackName": "Run It Up",
+              "popularity": 88,
+              "moodKeys": [
+                "party"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Citylights", "mood": "dark", "lyrics_body": "Skyline cold but the grind stay warm / came from nothing, built a storm", "script_tracking_url": "https://mock.musixmatch.com/track/citylights" }
+            {
+              "trackName": "Citylights",
+              "mood": "angst",
+              "lyrics_body": "Skyline cold but the grind stay warm / came from nothing, built a storm",
+              "script_tracking_url": "https://mock.musixmatch.com/track/citylights"
+            }
           ]
         },
         {
@@ -578,19 +1196,47 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Rock", "Garage Rock"],
-            "genreKeys": ["rock"],
+            "musicGenres": [
+              "Rock",
+              "Garage Rock"
+            ],
+            "genreKeys": [
+              "rock"
+            ],
             "audioValence": 0.6,
             "audioEnergy": 0.87,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+21%", "monthlyListeners": 9600000, "popularityScore": 80 },
+          "songstats": {
+            "popularityTrend": "+21%",
+            "monthlyListeners": 9600000,
+            "popularityScore": 80
+          },
           "recommendedSongs": [
-            { "trackName": "Loud Machine", "popularity": 82, "moodKeys": ["energetic"] },
-            { "trackName": "Wires", "popularity": 73, "moodKeys": ["dark"] }
+            {
+              "trackName": "Loud Machine",
+              "popularity": 82,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Wires",
+              "popularity": 73,
+              "moodKeys": [
+                "angst"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Loud Machine", "mood": "energetic", "lyrics_body": "Turn it up till the speakers cry / we are the loud that won't say goodbye", "script_tracking_url": "https://mock.musixmatch.com/track/loud-machine" }
+            {
+              "trackName": "Loud Machine",
+              "mood": "party",
+              "lyrics_body": "Turn it up till the speakers cry / we are the loud that won't say goodbye",
+              "script_tracking_url": "https://mock.musixmatch.com/track/loud-machine"
+            }
           ]
         }
       ]
@@ -612,8 +1258,13 @@
         "longitude": -71.3398
       },
       "geoRadiusKm": 14,
-      "genreKeys": ["jazz"],
-      "moodKeys": ["chill", "emotional"],
+      "genreKeys": [
+        "jazz"
+      ],
+      "moodKeys": [
+        "peace",
+        "heartbreak"
+      ],
       "performers": [
         {
           "id": "art-orrin-blake",
@@ -621,19 +1272,47 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Jazz", "Hard Bop"],
-            "genreKeys": ["jazz"],
+            "musicGenres": [
+              "Jazz",
+              "Hard Bop"
+            ],
+            "genreKeys": [
+              "jazz"
+            ],
             "audioValence": 0.57,
             "audioEnergy": 0.6,
-            "moodKeys": ["chill"]
+            "moodKeys": [
+              "peace"
+            ]
           },
-          "songstats": { "popularityTrend": "+14%", "monthlyListeners": 2600000, "popularityScore": 69 },
+          "songstats": {
+            "popularityTrend": "+14%",
+            "monthlyListeners": 2600000,
+            "popularityScore": 69
+          },
           "recommendedSongs": [
-            { "trackName": "Harbor Lights", "popularity": 71, "moodKeys": ["chill"] },
-            { "trackName": "Blue Fort", "popularity": 65, "moodKeys": ["emotional"] }
+            {
+              "trackName": "Harbor Lights",
+              "popularity": 71,
+              "moodKeys": [
+                "peace"
+              ]
+            },
+            {
+              "trackName": "Blue Fort",
+              "popularity": 65,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Harbor Lights", "mood": "chill", "lyrics_body": "Salt on the breeze and a walking bass / the evening keeps an easy pace", "script_tracking_url": "https://mock.musixmatch.com/track/harbor-lights" }
+            {
+              "trackName": "Harbor Lights",
+              "mood": "peace",
+              "lyrics_body": "Salt on the breeze and a walking bass / the evening keeps an easy pace",
+              "script_tracking_url": "https://mock.musixmatch.com/track/harbor-lights"
+            }
           ]
         },
         {
@@ -642,19 +1321,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Jazz", "Vocal Jazz"],
-            "genreKeys": ["jazz"],
+            "musicGenres": [
+              "Jazz",
+              "Vocal Jazz"
+            ],
+            "genreKeys": [
+              "jazz"
+            ],
             "audioValence": 0.43,
             "audioEnergy": 0.44,
-            "moodKeys": ["emotional"]
+            "moodKeys": [
+              "heartbreak"
+            ]
           },
-          "songstats": { "popularityTrend": "+19%", "monthlyListeners": 3100000, "popularityScore": 72 },
+          "songstats": {
+            "popularityTrend": "+19%",
+            "monthlyListeners": 3100000,
+            "popularityScore": 72
+          },
           "recommendedSongs": [
-            { "trackName": "Letters Unsent", "popularity": 74, "moodKeys": ["emotional"] },
-            { "trackName": "Quiet Town", "popularity": 67, "moodKeys": ["emotional", "chill"] }
+            {
+              "trackName": "Letters Unsent",
+              "popularity": 74,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            },
+            {
+              "trackName": "Quiet Town",
+              "popularity": 67,
+              "moodKeys": [
+                "heartbreak",
+                "peace"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Letters Unsent", "mood": "emotional", "lyrics_body": "I keep the words I never said / folded soft beneath the thread", "script_tracking_url": "https://mock.musixmatch.com/track/letters-unsent" }
+            {
+              "trackName": "Letters Unsent",
+              "mood": "heartbreak",
+              "lyrics_body": "I keep the words I never said / folded soft beneath the thread",
+              "script_tracking_url": "https://mock.musixmatch.com/track/letters-unsent"
+            }
           ]
         },
         {
@@ -663,19 +1371,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Jazz", "Fusion"],
-            "genreKeys": ["jazz"],
+            "musicGenres": [
+              "Jazz",
+              "Fusion"
+            ],
+            "genreKeys": [
+              "jazz"
+            ],
             "audioValence": 0.61,
             "audioEnergy": 0.66,
-            "moodKeys": ["chill", "energetic"]
+            "moodKeys": [
+              "peace",
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+16%", "monthlyListeners": 1900000, "popularityScore": 66 },
+          "songstats": {
+            "popularityTrend": "+16%",
+            "monthlyListeners": 1900000,
+            "popularityScore": 66
+          },
           "recommendedSongs": [
-            { "trackName": "Riverbend", "popularity": 68, "moodKeys": ["chill"] },
-            { "trackName": "Daybreak Shuffle", "popularity": 62, "moodKeys": ["energetic"] }
+            {
+              "trackName": "Riverbend",
+              "popularity": 68,
+              "moodKeys": [
+                "peace"
+              ]
+            },
+            {
+              "trackName": "Daybreak Shuffle",
+              "popularity": 62,
+              "moodKeys": [
+                "party"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Riverbend", "mood": "chill", "lyrics_body": "Let the rhythm take the slow way home / a gentle groove to call our own", "script_tracking_url": "https://mock.musixmatch.com/track/riverbend" }
+            {
+              "trackName": "Riverbend",
+              "mood": "peace",
+              "lyrics_body": "Let the rhythm take the slow way home / a gentle groove to call our own",
+              "script_tracking_url": "https://mock.musixmatch.com/track/riverbend"
+            }
           ]
         }
       ]
@@ -697,8 +1434,15 @@
         "longitude": -73.5329
       },
       "geoRadiusKm": 16,
-      "genreKeys": ["pop", "electronic", "rock"],
-      "moodKeys": ["energetic", "chill"],
+      "genreKeys": [
+        "pop",
+        "edm",
+        "rock"
+      ],
+      "moodKeys": [
+        "party",
+        "peace"
+      ],
       "performers": [
         {
           "id": "art-lumen-coast",
@@ -706,19 +1450,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Pop", "Indie Pop"],
-            "genreKeys": ["pop"],
+            "musicGenres": [
+              "Pop",
+              "Indie Pop"
+            ],
+            "genreKeys": [
+              "pop"
+            ],
             "audioValence": 0.7,
             "audioEnergy": 0.68,
-            "moodKeys": ["chill", "energetic"]
+            "moodKeys": [
+              "peace",
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+28%", "monthlyListeners": 13800000, "popularityScore": 86 },
+          "songstats": {
+            "popularityTrend": "+28%",
+            "monthlyListeners": 13800000,
+            "popularityScore": 86
+          },
           "recommendedSongs": [
-            { "trackName": "Saltwater Sunday", "popularity": 87, "moodKeys": ["chill"] },
-            { "trackName": "Headlights", "popularity": 79, "moodKeys": ["energetic"] }
+            {
+              "trackName": "Saltwater Sunday",
+              "popularity": 87,
+              "moodKeys": [
+                "peace"
+              ]
+            },
+            {
+              "trackName": "Headlights",
+              "popularity": 79,
+              "moodKeys": [
+                "party"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Saltwater Sunday", "mood": "chill", "lyrics_body": "Windows down on a slow coast road / nowhere to be, no heavy load", "script_tracking_url": "https://mock.musixmatch.com/track/saltwater-sunday" }
+            {
+              "trackName": "Saltwater Sunday",
+              "mood": "peace",
+              "lyrics_body": "Windows down on a slow coast road / nowhere to be, no heavy load",
+              "script_tracking_url": "https://mock.musixmatch.com/track/saltwater-sunday"
+            }
           ]
         },
         {
@@ -727,19 +1500,47 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Electronic", "Future Bass"],
-            "genreKeys": ["electronic"],
+            "musicGenres": [
+              "Electronic",
+              "Future Bass"
+            ],
+            "genreKeys": [
+              "edm"
+            ],
             "audioValence": 0.66,
             "audioEnergy": 0.83,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+25%", "monthlyListeners": 8200000, "popularityScore": 81 },
+          "songstats": {
+            "popularityTrend": "+25%",
+            "monthlyListeners": 8200000,
+            "popularityScore": 81
+          },
           "recommendedSongs": [
-            { "trackName": "Higher Still", "popularity": 83, "moodKeys": ["energetic"] },
-            { "trackName": "Float", "popularity": 74, "moodKeys": ["chill"] }
+            {
+              "trackName": "Higher Still",
+              "popularity": 83,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Float",
+              "popularity": 74,
+              "moodKeys": [
+                "peace"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Higher Still", "mood": "energetic", "lyrics_body": "Lift the room a little higher / hands like sparks above the wire", "script_tracking_url": "https://mock.musixmatch.com/track/higher-still" }
+            {
+              "trackName": "Higher Still",
+              "mood": "party",
+              "lyrics_body": "Lift the room a little higher / hands like sparks above the wire",
+              "script_tracking_url": "https://mock.musixmatch.com/track/higher-still"
+            }
           ]
         },
         {
@@ -748,19 +1549,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Rock", "Indie Rock"],
-            "genreKeys": ["rock"],
+            "musicGenres": [
+              "Rock",
+              "Indie Rock"
+            ],
+            "genreKeys": [
+              "rock"
+            ],
             "audioValence": 0.58,
             "audioEnergy": 0.79,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+17%", "monthlyListeners": 7100000, "popularityScore": 77 },
+          "songstats": {
+            "popularityTrend": "+17%",
+            "monthlyListeners": 7100000,
+            "popularityScore": 77
+          },
           "recommendedSongs": [
-            { "trackName": "Aurora Drive", "popularity": 78, "moodKeys": ["energetic"] },
-            { "trackName": "Snowmelt", "popularity": 70, "moodKeys": ["chill", "emotional"] }
+            {
+              "trackName": "Aurora Drive",
+              "popularity": 78,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Snowmelt",
+              "popularity": 70,
+              "moodKeys": [
+                "peace",
+                "heartbreak"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Aurora Drive", "mood": "energetic", "lyrics_body": "Chasing colors through the cold / a northern light we'll never hold", "script_tracking_url": "https://mock.musixmatch.com/track/aurora-drive" }
+            {
+              "trackName": "Aurora Drive",
+              "mood": "party",
+              "lyrics_body": "Chasing colors through the cold / a northern light we'll never hold",
+              "script_tracking_url": "https://mock.musixmatch.com/track/aurora-drive"
+            }
           ]
         }
       ]
@@ -782,8 +1612,13 @@
         "longitude": -80.2389
       },
       "geoRadiusKm": 20,
-      "genreKeys": ["hip-hop"],
-      "moodKeys": ["energetic", "dark"],
+      "genreKeys": [
+        "hip-hop-rap"
+      ],
+      "moodKeys": [
+        "party",
+        "angst"
+      ],
       "performers": [
         {
           "id": "art-kʼose",
@@ -791,19 +1626,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Hip-Hop", "Drill"],
-            "genreKeys": ["hip-hop"],
+            "musicGenres": [
+              "Hip-Hop",
+              "Drill"
+            ],
+            "genreKeys": [
+              "hip-hop-rap"
+            ],
             "audioValence": 0.3,
             "audioEnergy": 0.85,
-            "moodKeys": ["dark", "energetic"]
+            "moodKeys": [
+              "angst",
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+36%", "monthlyListeners": 19800000, "popularityScore": 90 },
+          "songstats": {
+            "popularityTrend": "+36%",
+            "monthlyListeners": 19800000,
+            "popularityScore": 90
+          },
           "recommendedSongs": [
-            { "trackName": "No Ceiling", "popularity": 91, "moodKeys": ["energetic"] },
-            { "trackName": "Shadow Work", "popularity": 84, "moodKeys": ["dark"] }
+            {
+              "trackName": "No Ceiling",
+              "popularity": 91,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Shadow Work",
+              "popularity": 84,
+              "moodKeys": [
+                "angst"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Shadow Work", "mood": "dark", "lyrics_body": "Count the scars like they're a map / every wrong turn led me back", "script_tracking_url": "https://mock.musixmatch.com/track/shadow-work" }
+            {
+              "trackName": "Shadow Work",
+              "mood": "angst",
+              "lyrics_body": "Count the scars like they're a map / every wrong turn led me back",
+              "script_tracking_url": "https://mock.musixmatch.com/track/shadow-work"
+            }
           ]
         },
         {
@@ -812,19 +1676,47 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Hip-Hop", "Rap"],
-            "genreKeys": ["hip-hop"],
+            "musicGenres": [
+              "Hip-Hop",
+              "Rap"
+            ],
+            "genreKeys": [
+              "hip-hop-rap"
+            ],
             "audioValence": 0.52,
             "audioEnergy": 0.82,
-            "moodKeys": ["energetic"]
+            "moodKeys": [
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+34%", "monthlyListeners": 17400000, "popularityScore": 88 },
+          "songstats": {
+            "popularityTrend": "+34%",
+            "monthlyListeners": 17400000,
+            "popularityScore": 88
+          },
           "recommendedSongs": [
-            { "trackName": "Crown Heavy", "popularity": 89, "moodKeys": ["energetic"] },
-            { "trackName": "Mirror Talk", "popularity": 80, "moodKeys": ["emotional"] }
+            {
+              "trackName": "Crown Heavy",
+              "popularity": 89,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Mirror Talk",
+              "popularity": 80,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Crown Heavy", "mood": "energetic", "lyrics_body": "Heavy is the head, still I wear it proud / queen of my block, say it loud", "script_tracking_url": "https://mock.musixmatch.com/track/crown-heavy" }
+            {
+              "trackName": "Crown Heavy",
+              "mood": "party",
+              "lyrics_body": "Heavy is the head, still I wear it proud / queen of my block, say it loud",
+              "script_tracking_url": "https://mock.musixmatch.com/track/crown-heavy"
+            }
           ]
         },
         {
@@ -833,19 +1725,48 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Hip-Hop", "Boom Bap"],
-            "genreKeys": ["hip-hop"],
+            "musicGenres": [
+              "Hip-Hop",
+              "Boom Bap"
+            ],
+            "genreKeys": [
+              "hip-hop-rap"
+            ],
             "audioValence": 0.46,
             "audioEnergy": 0.64,
-            "moodKeys": ["emotional", "dark"]
+            "moodKeys": [
+              "heartbreak",
+              "angst"
+            ]
           },
-          "songstats": { "popularityTrend": "+22%", "monthlyListeners": 9300000, "popularityScore": 79 },
+          "songstats": {
+            "popularityTrend": "+22%",
+            "monthlyListeners": 9300000,
+            "popularityScore": 79
+          },
           "recommendedSongs": [
-            { "trackName": "Sunday Sermon", "popularity": 80, "moodKeys": ["emotional"] },
-            { "trackName": "Cold Block", "popularity": 72, "moodKeys": ["dark"] }
+            {
+              "trackName": "Sunday Sermon",
+              "popularity": 80,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            },
+            {
+              "trackName": "Cold Block",
+              "popularity": 72,
+              "moodKeys": [
+                "angst"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Sunday Sermon", "mood": "emotional", "lyrics_body": "Grandma's prayers in a minor key / still the realest thing to me", "script_tracking_url": "https://mock.musixmatch.com/track/sunday-sermon" }
+            {
+              "trackName": "Sunday Sermon",
+              "mood": "heartbreak",
+              "lyrics_body": "Grandma's prayers in a minor key / still the realest thing to me",
+              "script_tracking_url": "https://mock.musixmatch.com/track/sunday-sermon"
+            }
           ]
         }
       ]
@@ -867,8 +1788,13 @@
         "longitude": 0.0032
       },
       "geoRadiusKm": 10,
-      "genreKeys": ["pop"],
-      "moodKeys": ["emotional", "energetic"],
+      "genreKeys": [
+        "pop"
+      ],
+      "moodKeys": [
+        "heartbreak",
+        "party"
+      ],
       "performers": [
         {
           "id": "art-aurora-lake",
@@ -876,21 +1802,62 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Pop", "Dance Pop"],
-            "genreKeys": ["pop"],
+            "musicGenres": [
+              "Pop",
+              "Dance Pop"
+            ],
+            "genreKeys": [
+              "pop"
+            ],
             "audioValence": 0.54,
             "audioEnergy": 0.72,
-            "moodKeys": ["emotional", "energetic"]
+            "moodKeys": [
+              "heartbreak",
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+47%", "monthlyListeners": 31200000, "popularityScore": 97 },
+          "songstats": {
+            "popularityTrend": "+47%",
+            "monthlyListeners": 31200000,
+            "popularityScore": 97
+          },
           "recommendedSongs": [
-            { "trackName": "Neon Hearts", "popularity": 98, "moodKeys": ["emotional", "energetic"] },
-            { "trackName": "Glass Ceiling", "popularity": 92, "moodKeys": ["energetic"] },
-            { "trackName": "Quiet Part", "popularity": 88, "moodKeys": ["emotional"] }
+            {
+              "trackName": "Neon Hearts",
+              "popularity": 98,
+              "moodKeys": [
+                "heartbreak",
+                "party"
+              ]
+            },
+            {
+              "trackName": "Glass Ceiling",
+              "popularity": 92,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Quiet Part",
+              "popularity": 88,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Neon Hearts", "mood": "emotional", "lyrics_body": "We wore our hearts like neon signs / glowing loud through the hardest times", "script_tracking_url": "https://mock.musixmatch.com/track/neon-hearts" },
-            { "trackName": "Glass Ceiling", "mood": "energetic", "lyrics_body": "Watch me dance on the breaking glass / nothing about tonight will last", "script_tracking_url": "https://mock.musixmatch.com/track/glass-ceiling" }
+            {
+              "trackName": "Neon Hearts",
+              "mood": "heartbreak",
+              "lyrics_body": "We wore our hearts like neon signs / glowing loud through the hardest times",
+              "script_tracking_url": "https://mock.musixmatch.com/track/neon-hearts"
+            },
+            {
+              "trackName": "Glass Ceiling",
+              "mood": "party",
+              "lyrics_body": "Watch me dance on the breaking glass / nothing about tonight will last",
+              "script_tracking_url": "https://mock.musixmatch.com/track/glass-ceiling"
+            }
           ]
         }
       ]
@@ -912,8 +1879,13 @@
         "longitude": 13.3989
       },
       "geoRadiusKm": 10,
-      "genreKeys": ["rock"],
-      "moodKeys": ["dark", "energetic"],
+      "genreKeys": [
+        "rock"
+      ],
+      "moodKeys": [
+        "angst",
+        "party"
+      ],
       "performers": [
         {
           "id": "art-ironwidow-solo",
@@ -921,20 +1893,56 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Rock", "Metal"],
-            "genreKeys": ["rock"],
+            "musicGenres": [
+              "Rock",
+              "Metal"
+            ],
+            "genreKeys": [
+              "rock"
+            ],
             "audioValence": 0.2,
             "audioEnergy": 0.97,
-            "moodKeys": ["dark", "energetic"]
+            "moodKeys": [
+              "angst",
+              "party"
+            ]
           },
-          "songstats": { "popularityTrend": "+20%", "monthlyListeners": 6300000, "popularityScore": 76 },
+          "songstats": {
+            "popularityTrend": "+20%",
+            "monthlyListeners": 6300000,
+            "popularityScore": 76
+          },
           "recommendedSongs": [
-            { "trackName": "Gravewalker", "popularity": 78, "moodKeys": ["dark"] },
-            { "trackName": "Steel Veins", "popularity": 71, "moodKeys": ["dark", "energetic"] },
-            { "trackName": "Hollow Crown", "popularity": 66, "moodKeys": ["dark"] }
+            {
+              "trackName": "Gravewalker",
+              "popularity": 78,
+              "moodKeys": [
+                "angst"
+              ]
+            },
+            {
+              "trackName": "Steel Veins",
+              "popularity": 71,
+              "moodKeys": [
+                "angst",
+                "party"
+              ]
+            },
+            {
+              "trackName": "Hollow Crown",
+              "popularity": 66,
+              "moodKeys": [
+                "angst"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Gravewalker", "mood": "dark", "lyrics_body": "Down where the cold light never goes / I carry thunder in my bones", "script_tracking_url": "https://mock.musixmatch.com/track/gravewalker" }
+            {
+              "trackName": "Gravewalker",
+              "mood": "angst",
+              "lyrics_body": "Down where the cold light never goes / I carry thunder in my bones",
+              "script_tracking_url": "https://mock.musixmatch.com/track/gravewalker"
+            }
           ]
         }
       ]
@@ -956,8 +1964,13 @@
         "longitude": -73.9571
       },
       "geoRadiusKm": 12,
-      "genreKeys": ["hip-hop"],
-      "moodKeys": ["dark", "emotional"],
+      "genreKeys": [
+        "hip-hop-rap"
+      ],
+      "moodKeys": [
+        "angst",
+        "heartbreak"
+      ],
       "performers": [
         {
           "id": "art-marcus-vale-solo",
@@ -965,21 +1978,61 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Hip-Hop", "Conscious Rap"],
-            "genreKeys": ["hip-hop"],
+            "musicGenres": [
+              "Hip-Hop",
+              "Conscious Rap"
+            ],
+            "genreKeys": [
+              "hip-hop-rap"
+            ],
             "audioValence": 0.36,
             "audioEnergy": 0.6,
-            "moodKeys": ["dark", "emotional"]
+            "moodKeys": [
+              "angst",
+              "heartbreak"
+            ]
           },
-          "songstats": { "popularityTrend": "+33%", "monthlyListeners": 21100000, "popularityScore": 91 },
+          "songstats": {
+            "popularityTrend": "+33%",
+            "monthlyListeners": 21100000,
+            "popularityScore": 91
+          },
           "recommendedSongs": [
-            { "trackName": "Citylights", "popularity": 92, "moodKeys": ["dark"] },
-            { "trackName": "Letters Home", "popularity": 85, "moodKeys": ["emotional"] },
-            { "trackName": "Run It Up", "popularity": 88, "moodKeys": ["energetic"] }
+            {
+              "trackName": "Citylights",
+              "popularity": 92,
+              "moodKeys": [
+                "angst"
+              ]
+            },
+            {
+              "trackName": "Letters Home",
+              "popularity": 85,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            },
+            {
+              "trackName": "Run It Up",
+              "popularity": 88,
+              "moodKeys": [
+                "party"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Letters Home", "mood": "emotional", "lyrics_body": "Wrote my mama every line I earned / a hundred lessons, every bridge I burned", "script_tracking_url": "https://mock.musixmatch.com/track/letters-home" },
-            { "trackName": "Citylights", "mood": "dark", "lyrics_body": "Skyline cold but the grind stay warm / came from nothing, built a storm", "script_tracking_url": "https://mock.musixmatch.com/track/citylights" }
+            {
+              "trackName": "Letters Home",
+              "mood": "heartbreak",
+              "lyrics_body": "Wrote my mama every line I earned / a hundred lessons, every bridge I burned",
+              "script_tracking_url": "https://mock.musixmatch.com/track/letters-home"
+            },
+            {
+              "trackName": "Citylights",
+              "mood": "angst",
+              "lyrics_body": "Skyline cold but the grind stay warm / came from nothing, built a storm",
+              "script_tracking_url": "https://mock.musixmatch.com/track/citylights"
+            }
           ]
         }
       ]
@@ -1001,8 +2054,13 @@
         "longitude": -90.0648
       },
       "geoRadiusKm": 8,
-      "genreKeys": ["jazz"],
-      "moodKeys": ["chill", "emotional"],
+      "genreKeys": [
+        "jazz"
+      ],
+      "moodKeys": [
+        "peace",
+        "heartbreak"
+      ],
       "performers": [
         {
           "id": "art-blue-mensch",
@@ -1010,20 +2068,55 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Jazz", "Cool Jazz"],
-            "genreKeys": ["jazz"],
+            "musicGenres": [
+              "Jazz",
+              "Cool Jazz"
+            ],
+            "genreKeys": [
+              "jazz"
+            ],
             "audioValence": 0.5,
             "audioEnergy": 0.42,
-            "moodKeys": ["chill", "emotional"]
+            "moodKeys": [
+              "peace",
+              "heartbreak"
+            ]
           },
-          "songstats": { "popularityTrend": "+11%", "monthlyListeners": 1400000, "popularityScore": 63 },
+          "songstats": {
+            "popularityTrend": "+11%",
+            "monthlyListeners": 1400000,
+            "popularityScore": 63
+          },
           "recommendedSongs": [
-            { "trackName": "Two A.M. Blue", "popularity": 65, "moodKeys": ["chill"] },
-            { "trackName": "Quarter Moon", "popularity": 60, "moodKeys": ["emotional"] },
-            { "trackName": "Slow Bourbon", "popularity": 58, "moodKeys": ["chill"] }
+            {
+              "trackName": "Two A.M. Blue",
+              "popularity": 65,
+              "moodKeys": [
+                "peace"
+              ]
+            },
+            {
+              "trackName": "Quarter Moon",
+              "popularity": 60,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            },
+            {
+              "trackName": "Slow Bourbon",
+              "popularity": 58,
+              "moodKeys": [
+                "peace"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Two A.M. Blue", "mood": "chill", "lyrics_body": "The room hums low and the lights go dim / let the bass walk slow, let the night begin", "script_tracking_url": "https://mock.musixmatch.com/track/two-am-blue" }
+            {
+              "trackName": "Two A.M. Blue",
+              "mood": "peace",
+              "lyrics_body": "The room hums low and the lights go dim / let the bass walk slow, let the night begin",
+              "script_tracking_url": "https://mock.musixmatch.com/track/two-am-blue"
+            }
           ]
         }
       ]
@@ -1045,8 +2138,13 @@
         "longitude": 4.8312
       },
       "geoRadiusKm": 10,
-      "genreKeys": ["electronic"],
-      "moodKeys": ["energetic", "chill"],
+      "genreKeys": [
+        "edm"
+      ],
+      "moodKeys": [
+        "party",
+        "peace"
+      ],
       "performers": [
         {
           "id": "art-novasynth",
@@ -1054,20 +2152,55 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Electronic", "Trance"],
-            "genreKeys": ["electronic"],
+            "musicGenres": [
+              "Electronic",
+              "Trance"
+            ],
+            "genreKeys": [
+              "edm"
+            ],
             "audioValence": 0.72,
             "audioEnergy": 0.9,
-            "moodKeys": ["energetic", "chill"]
+            "moodKeys": [
+              "party",
+              "peace"
+            ]
           },
-          "songstats": { "popularityTrend": "+30%", "monthlyListeners": 12700000, "popularityScore": 85 },
+          "songstats": {
+            "popularityTrend": "+30%",
+            "monthlyListeners": 12700000,
+            "popularityScore": 85
+          },
           "recommendedSongs": [
-            { "trackName": "Event Horizon", "popularity": 86, "moodKeys": ["energetic"] },
-            { "trackName": "Slow Orbit", "popularity": 77, "moodKeys": ["chill"] },
-            { "trackName": "Reentry", "popularity": 80, "moodKeys": ["energetic"] }
+            {
+              "trackName": "Event Horizon",
+              "popularity": 86,
+              "moodKeys": [
+                "party"
+              ]
+            },
+            {
+              "trackName": "Slow Orbit",
+              "popularity": 77,
+              "moodKeys": [
+                "peace"
+              ]
+            },
+            {
+              "trackName": "Reentry",
+              "popularity": 80,
+              "moodKeys": [
+                "party"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Event Horizon", "mood": "energetic", "lyrics_body": "Past the point of no return / let the whole sky burn", "script_tracking_url": "https://mock.musixmatch.com/track/event-horizon" }
+            {
+              "trackName": "Event Horizon",
+              "mood": "party",
+              "lyrics_body": "Past the point of no return / let the whole sky burn",
+              "script_tracking_url": "https://mock.musixmatch.com/track/event-horizon"
+            }
           ]
         }
       ]
@@ -1089,8 +2222,13 @@
         "longitude": -79.3789
       },
       "geoRadiusKm": 10,
-      "genreKeys": ["pop"],
-      "moodKeys": ["chill", "emotional"],
+      "genreKeys": [
+        "pop"
+      ],
+      "moodKeys": [
+        "peace",
+        "heartbreak"
+      ],
       "performers": [
         {
           "id": "art-linnea-frost",
@@ -1098,20 +2236,56 @@
           "image": null,
           "isHeadliner": true,
           "cyanite": {
-            "musicGenres": ["Pop", "Singer-Songwriter"],
-            "genreKeys": ["pop"],
+            "musicGenres": [
+              "Pop",
+              "Singer-Songwriter"
+            ],
+            "genreKeys": [
+              "pop"
+            ],
             "audioValence": 0.4,
             "audioEnergy": 0.35,
-            "moodKeys": ["chill", "emotional"]
+            "moodKeys": [
+              "peace",
+              "heartbreak"
+            ]
           },
-          "songstats": { "popularityTrend": "+26%", "monthlyListeners": 15600000, "popularityScore": 87 },
+          "songstats": {
+            "popularityTrend": "+26%",
+            "monthlyListeners": 15600000,
+            "popularityScore": 87
+          },
           "recommendedSongs": [
-            { "trackName": "Winter Light", "popularity": 88, "moodKeys": ["emotional"] },
-            { "trackName": "Still Here", "popularity": 82, "moodKeys": ["chill", "emotional"] },
-            { "trackName": "Paper Boats", "popularity": 79, "moodKeys": ["chill"] }
+            {
+              "trackName": "Winter Light",
+              "popularity": 88,
+              "moodKeys": [
+                "heartbreak"
+              ]
+            },
+            {
+              "trackName": "Still Here",
+              "popularity": 82,
+              "moodKeys": [
+                "peace",
+                "heartbreak"
+              ]
+            },
+            {
+              "trackName": "Paper Boats",
+              "popularity": 79,
+              "moodKeys": [
+                "peace"
+              ]
+            }
           ],
           "quotes": [
-            { "trackName": "Winter Light", "mood": "emotional", "lyrics_body": "Soft as the snow on a streetlamp's glow / I'll love you slow, I'll love you slow", "script_tracking_url": "https://mock.musixmatch.com/track/winter-light" }
+            {
+              "trackName": "Winter Light",
+              "mood": "heartbreak",
+              "lyrics_body": "Soft as the snow on a streetlamp's glow / I'll love you slow, I'll love you slow",
+              "script_tracking_url": "https://mock.musixmatch.com/track/winter-light"
+            }
           ]
         }
       ]

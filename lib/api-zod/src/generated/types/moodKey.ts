@@ -10,8 +10,24 @@ export type MoodKey = typeof MoodKey[keyof typeof MoodKey];
 
 
 export const MoodKey = {
-  energetic: 'energetic',
-  chill: 'chill',
-  emotional: 'emotional',
-  dark: 'dark',
+  love: 'love',
+  heartbreak: 'heartbreak',
+  joy: 'joy',
+  empowerment: 'empowerment',
+  angst: 'angst',
+  reflection: 'reflection',
+  inspiration: 'inspiration',
+  nostalgia: 'nostalgia',
+  despair: 'despair',
+  celebration: 'celebration',
+  anger: 'anger',
+  peace: 'peace',
+  solitude: 'solitude',
+  adventure: 'adventure',
+  'social-commentary': 'social-commentary',
+  hope: 'hope',
+  spirituality: 'spirituality',
+  freedom: 'freedom',
+  party: 'party',
+  nature: 'nature',
 } as const;

@@ -101,7 +101,7 @@ async function computeEnrichment(name: string): Promise<ArtistEnrichmentData> {
       partial = true;
       continue;
     }
-    const primaryMood: MoodKey = tq.moods[0] ?? "energetic";
+    const primaryMood: MoodKey = tq.moods[0] ?? "party";
     if (tq.moods.length === 0) partial = true;
     tq.moods.forEach((m) => moodSet.add(m));
     quotes.push({

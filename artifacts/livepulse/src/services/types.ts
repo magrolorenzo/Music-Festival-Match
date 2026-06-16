@@ -13,8 +13,45 @@
 
 export type RegionKey = "europe" | "north-america";
 
-export type GenreKey = "rock" | "pop" | "electronic" | "hip-hop" | "jazz";
-export type MoodKey = "energetic" | "chill" | "emotional" | "dark";
+export type GenreKey =
+  | "blues"
+  | "classical"
+  | "country-music"
+  | "edm"
+  | "folk"
+  | "hip-hop-rap"
+  | "indie"
+  | "jazz"
+  | "kpop"
+  | "latin"
+  | "metal"
+  | "pop"
+  | "punk"
+  | "rhythm-and-blues-soul"
+  | "reggae"
+  | "rock";
+
+export type MoodKey =
+  | "love"
+  | "heartbreak"
+  | "joy"
+  | "empowerment"
+  | "angst"
+  | "reflection"
+  | "inspiration"
+  | "nostalgia"
+  | "despair"
+  | "celebration"
+  | "anger"
+  | "peace"
+  | "solitude"
+  | "adventure"
+  | "social-commentary"
+  | "hope"
+  | "spirituality"
+  | "freedom"
+  | "party"
+  | "nature";
 
 /** Distance unit for the location search radius. */
 export type RadiusUnit = "km" | "mi";

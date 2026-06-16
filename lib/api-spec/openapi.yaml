@@ -100,10 +100,46 @@ components:
         - error
     GenreKey:
       type: string
-      enum: [rock, pop, electronic, hip-hop, jazz]
+      enum:
+        - blues
+        - classical
+        - country-music
+        - edm
+        - folk
+        - hip-hop-rap
+        - indie
+        - jazz
+        - kpop
+        - latin
+        - metal
+        - pop
+        - punk
+        - rhythm-and-blues-soul
+        - reggae
+        - rock
     MoodKey:
       type: string
-      enum: [energetic, chill, emotional, dark]
+      enum:
+        - love
+        - heartbreak
+        - joy
+        - empowerment
+        - angst
+        - reflection
+        - inspiration
+        - nostalgia
+        - despair
+        - celebration
+        - anger
+        - peace
+        - solitude
+        - adventure
+        - social-commentary
+        - hope
+        - spirituality
+        - freedom
+        - party
+        - nature
     RegionKey:
       type: string
       enum: [europe, north-america]

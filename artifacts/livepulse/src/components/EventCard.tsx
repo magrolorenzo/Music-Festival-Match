@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { formatEventDate } from "@/lib/dates";
 import { matchStrength } from "@/services/matching";
-import { getImageForId } from "@/lib/images";
+import { getImageForId, initialsFor, placeholderGradient } from "@/lib/images";
 import type { MatchResult, SearchFilters } from "@/services/types";
 import { MapPin, Calendar, Star, Sparkles, Music } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +22,7 @@ interface EventCardProps {
 export default function EventCard({ result, filters, isSelected, onClick }: EventCardProps) {
   const { event, isExactMatch, score } = result;
   const { matched, total } = matchStrength(result, filters);
-  const image = getImageForId(event.id);
+  const image = event.image ?? getImageForId(event.id);
 
   const headliners = event.performers.filter((p) => p.isHeadliner).map((p) => p.name);
   const artistNames = (headliners.length ? headliners : event.performers.map((p) => p.name));
@@ -49,7 +49,12 @@ export default function EventCard({ result, filters, isSelected, onClick }: Even
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-70"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-purple-900/20" />
+          <div
+            className="w-full h-full flex items-center justify-center text-3xl font-extrabold text-white/80 tracking-wide"
+            style={{ background: placeholderGradient(event.id) }}
+          >
+            {initialsFor(event.name)}
+          </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
         

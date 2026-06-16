@@ -17,21 +17,48 @@ export type GenreKey = typeof GenreKey[keyof typeof GenreKey];
 
 
 export const GenreKey = {
-  rock: 'rock',
-  pop: 'pop',
-  electronic: 'electronic',
-  'hip-hop': 'hip-hop',
+  blues: 'blues',
+  classical: 'classical',
+  'country-music': 'country-music',
+  edm: 'edm',
+  folk: 'folk',
+  'hip-hop-rap': 'hip-hop-rap',
+  indie: 'indie',
   jazz: 'jazz',
+  kpop: 'kpop',
+  latin: 'latin',
+  metal: 'metal',
+  pop: 'pop',
+  punk: 'punk',
+  'rhythm-and-blues-soul': 'rhythm-and-blues-soul',
+  reggae: 'reggae',
+  rock: 'rock',
 } as const;
 
 export type MoodKey = typeof MoodKey[keyof typeof MoodKey];
 
 
 export const MoodKey = {
-  energetic: 'energetic',
-  chill: 'chill',
-  emotional: 'emotional',
-  dark: 'dark',
+  love: 'love',
+  heartbreak: 'heartbreak',
+  joy: 'joy',
+  empowerment: 'empowerment',
+  angst: 'angst',
+  reflection: 'reflection',
+  inspiration: 'inspiration',
+  nostalgia: 'nostalgia',
+  despair: 'despair',
+  celebration: 'celebration',
+  anger: 'anger',
+  peace: 'peace',
+  solitude: 'solitude',
+  adventure: 'adventure',
+  'social-commentary': 'social-commentary',
+  hope: 'hope',
+  spirituality: 'spirituality',
+  freedom: 'freedom',
+  party: 'party',
+  nature: 'nature',
 } as const;
 
 export type RegionKey = typeof RegionKey[keyof typeof RegionKey];

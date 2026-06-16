@@ -52,7 +52,7 @@ export const SearchEventsBody = zod.object({
   "radiusKm": zod.number().min(1),
   "startDate": zod.string().describe('Inclusive ISO date (YYYY-MM-DD).'),
   "endDate": zod.string().describe('Inclusive ISO date (YYYY-MM-DD).'),
-  "genres": zod.array(zod.enum(['rock', 'pop', 'electronic', 'hip-hop', 'jazz'])).describe('Selected genre keys; an empty list means \"any genre\".')
+  "genres": zod.array(zod.enum(['blues', 'classical', 'country-music', 'edm', 'folk', 'hip-hop-rap', 'indie', 'jazz', 'kpop', 'latin', 'metal', 'pop', 'punk', 'rhythm-and-blues-soul', 'reggae', 'rock'])).describe('Selected genre keys; an empty list means \"any genre\".')
 })
 
 export const SearchEventsResponse = zod.object({
@@ -81,10 +81,10 @@ export const SearchEventsResponse = zod.object({
   "isHeadliner": zod.boolean(),
   "cyanite": zod.object({
   "musicGenres": zod.array(zod.string()),
-  "genreKeys": zod.array(zod.enum(['rock', 'pop', 'electronic', 'hip-hop', 'jazz'])),
+  "genreKeys": zod.array(zod.enum(['blues', 'classical', 'country-music', 'edm', 'folk', 'hip-hop-rap', 'indie', 'jazz', 'kpop', 'latin', 'metal', 'pop', 'punk', 'rhythm-and-blues-soul', 'reggae', 'rock'])),
   "audioValence": zod.number(),
   "audioEnergy": zod.number(),
-  "moodKeys": zod.array(zod.enum(['energetic', 'chill', 'emotional', 'dark']))
+  "moodKeys": zod.array(zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature']))
 }),
   "songstats": zod.object({
   "popularityTrend": zod.string(),
@@ -94,17 +94,17 @@ export const SearchEventsResponse = zod.object({
   "recommendedSongs": zod.array(zod.object({
   "trackName": zod.string(),
   "popularity": zod.number(),
-  "moodKeys": zod.array(zod.enum(['energetic', 'chill', 'emotional', 'dark']))
+  "moodKeys": zod.array(zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature']))
 })),
   "quotes": zod.array(zod.object({
   "trackName": zod.string(),
-  "mood": zod.enum(['energetic', 'chill', 'emotional', 'dark']),
+  "mood": zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature']),
   "lyrics_body": zod.string(),
   "script_tracking_url": zod.string()
 }))
 })),
-  "genreKeys": zod.array(zod.enum(['rock', 'pop', 'electronic', 'hip-hop', 'jazz'])),
-  "moodKeys": zod.array(zod.enum(['energetic', 'chill', 'emotional', 'dark']))
+  "genreKeys": zod.array(zod.enum(['blues', 'classical', 'country-music', 'edm', 'folk', 'hip-hop-rap', 'indie', 'jazz', 'kpop', 'latin', 'metal', 'pop', 'punk', 'rhythm-and-blues-soul', 'reggae', 'rock'])),
+  "moodKeys": zod.array(zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature']))
 }))
 })
 

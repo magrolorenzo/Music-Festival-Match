@@ -10,9 +10,20 @@ export type GenreKey = typeof GenreKey[keyof typeof GenreKey];
 
 
 export const GenreKey = {
-  rock: 'rock',
-  pop: 'pop',
-  electronic: 'electronic',
-  'hip-hop': 'hip-hop',
+  blues: 'blues',
+  classical: 'classical',
+  'country-music': 'country-music',
+  edm: 'edm',
+  folk: 'folk',
+  'hip-hop-rap': 'hip-hop-rap',
+  indie: 'indie',
   jazz: 'jazz',
+  kpop: 'kpop',
+  latin: 'latin',
+  metal: 'metal',
+  pop: 'pop',
+  punk: 'punk',
+  'rhythm-and-blues-soul': 'rhythm-and-blues-soul',
+  reggae: 'reggae',
+  rock: 'rock',
 } as const;

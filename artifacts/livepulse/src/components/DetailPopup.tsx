@@ -1,12 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { formatEventDate } from "@/lib/dates";
-import { getImageForId } from "@/lib/images";
+import { getImageForId, initialsFor, placeholderGradient } from "@/lib/images";
 import { pickArtistQuote } from "@/services/api";
 import type { MatchResult, SearchFilters, Performer, MoodKey } from "@/services/types";
 import { MapPin, Calendar, X, ExternalLink, Headphones, TrendingUp, Music, Quote } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Carousel,
   CarouselContent,
@@ -22,7 +21,7 @@ interface DetailPopupProps {
 }
 
 function PerformerCard({ performer, preferredMood }: { performer: Performer, preferredMood?: MoodKey }) {
-  const image = getImageForId(performer.id);
+  const image = performer.image ?? getImageForId(performer.id);
   const quote = pickArtistQuote(performer, preferredMood);
 
   return (
@@ -32,8 +31,11 @@ function PerformerCard({ performer, preferredMood }: { performer: Performer, pre
           {image ? (
             <img src={image} alt={performer.name} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary/30 to-purple-900/30 flex items-center justify-center text-3xl font-bold text-white/50">
-              {performer.name.substring(0, 2).toUpperCase()}
+            <div
+              className="w-full h-full flex items-center justify-center text-3xl font-bold text-white/80"
+              style={{ background: placeholderGradient(performer.id) }}
+            >
+              {initialsFor(performer.name)}
             </div>
           )}
         </div>
@@ -110,7 +112,7 @@ function StarIcon(props: any) {
 
 export default function DetailPopup({ result, filters, onClose }: DetailPopupProps) {
   const { event, reasons, matchedGenreKeys, matchedMoodKeys, matchingPerformers } = result;
-  const image = getImageForId(event.id);
+  const image = event.image ?? getImageForId(event.id);
 
   // We show matching performers first, then any others
   const performerIds = new Set(matchingPerformers.map(p => p.id));
@@ -142,13 +144,18 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
           </Button>
         </div>
 
-        <ScrollArea className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           {/* Hero */}
           <div className="h-64 md:h-80 relative overflow-hidden bg-muted">
             {image ? (
               <img src={image} alt={event.name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-primary/30 to-purple-900/30" />
+              <div
+                className="w-full h-full flex items-center justify-center text-6xl font-extrabold text-white/80"
+                style={{ background: placeholderGradient(event.id) }}
+              >
+                {initialsFor(event.name)}
+              </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f]/60 to-transparent" />
             
@@ -199,7 +206,7 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
                 >
                   <CarouselContent>
                     {displayPerformers.map((performer) => (
-                      <CarouselItem key={performer.id} className="md:basis-1/1 lg:basis-1/1">
+                      <CarouselItem key={performer.id} className="basis-full">
                         <PerformerCard performer={performer} preferredMood={filters.moods[0]} />
                       </CarouselItem>
                     ))}
@@ -218,7 +225,7 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
               </Button>
             </div>
           </div>
-        </ScrollArea>
+        </div>
       </motion.div>
     </div>
   );

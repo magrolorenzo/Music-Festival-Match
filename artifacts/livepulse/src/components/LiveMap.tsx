@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Tooltip, useMap } from "react-leaflet";
 import L from "leaflet";
 import { formatEventDate } from "@/lib/dates";
-import { getImageForId } from "@/lib/images";
+import { getImageForId, initialsFor, placeholderGradient } from "@/lib/images";
 import type { MatchResult } from "@/services/types";
 
 function artistLabelFor(result: MatchResult): string {
@@ -104,7 +104,7 @@ export default function LiveMap({ results, selectedEventId, onSelect, searchCent
       {results.map((result) => {
         const isSelected = result.event.id === selectedEventId;
         const color = isSelected ? "hsl(var(--primary))" : (result.isExactMatch ? "#ffffff" : "#666");
-        const image = getImageForId(result.event.id);
+        const image = result.event.image ?? getImageForId(result.event.id);
         
         const icon = L.divIcon({
           className: "",
@@ -125,12 +125,19 @@ export default function LiveMap({ results, selectedEventId, onSelect, searchCent
           >
             <Tooltip direction="top" offset={[0, -8]} opacity={1} className="livepulse-tooltip">
               <div className="flex gap-2.5 items-center">
-                {image && (
+                {image ? (
                   <img
                     src={image}
                     alt={result.event.name}
                     className="w-12 h-12 rounded-md object-cover shrink-0"
                   />
+                ) : (
+                  <div
+                    className="w-12 h-12 rounded-md shrink-0 flex items-center justify-center text-sm font-bold text-white/80"
+                    style={{ background: placeholderGradient(result.event.id) }}
+                  >
+                    {initialsFor(result.event.name)}
+                  </div>
                 )}
                 <div className="space-y-0.5">
                   <div className="font-bold text-sm text-white">{result.event.name}</div>

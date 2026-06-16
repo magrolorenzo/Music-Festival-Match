@@ -3,7 +3,7 @@ import type { SearchFilters, MoodKey, GenreKey } from "@/services/types";
 import { moodHue, moodEmoji, genreEmoji, GENRE_BY_KEY, MOOD_BY_KEY } from "@/lib/taxonomy";
 
 export default function Loading({ filters }: { filters: SearchFilters }) {
-  const mKey: MoodKey = filters.moods[0] ?? "energetic";
+  const mKey: MoodKey = filters.moods[0] ?? "party";
   const gKey: GenreKey | null = filters.genres[0] ?? null;
   const hue = moodHue(mKey);
   const mEmoji = moodEmoji(mKey);
