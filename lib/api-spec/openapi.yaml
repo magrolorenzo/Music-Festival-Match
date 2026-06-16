@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: places
+    description: Geocoding / location autocomplete
+  - name: events
+    description: Live event search
 paths:
   /healthz:
     get:
@@ -24,6 +28,60 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /places:
+    get:
+      operationId: searchPlaces
+      tags: [places]
+      summary: Location autocomplete
+      description: >
+        Geo-normalizes a free-text query into structured place suggestions with
+        exact coordinates via OpenStreetMap Nominatim (server-side, rate-limited).
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Free-text place query, e.g. "Verona" or "Berlin, Germany".
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Up to five matching places, best-first.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Place"
+  /search:
+    post:
+      operationId: searchEvents
+      tags: [events]
+      summary: Search live events
+      description: >
+        Runs the full live pipeline server-side: JamBase v3 events in the geo +
+        date window, genre filtered, then per-headliner enrichment (Songstats
+        hype + Musixmatch mood) with DB-cached TTL. Degrades to mock data with a
+        visible source flag when the live pipeline is unavailable.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchInput"
+      responses:
+        "200":
+          description: Enriched events plus the data source that served them.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResults"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +91,212 @@ components:
           type: string
       required:
         - status
-
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    GenreKey:
+      type: string
+      enum: [rock, pop, electronic, hip-hop, jazz]
+    MoodKey:
+      type: string
+      enum: [energetic, chill, emotional, dark]
+    RegionKey:
+      type: string
+      enum: [europe, north-america]
+    EventKind:
+      type: string
+      enum: [festival, concert]
+    Place:
+      type: object
+      required: [query, label, latitude, longitude]
+      properties:
+        query:
+          type: string
+          description: The raw text the user typed.
+        label:
+          type: string
+          description: Clean human-readable place name from the geocoder.
+        latitude:
+          type: number
+        longitude:
+          type: number
+    JamBaseLocation:
+      type: object
+      required: [name, city, country, latitude, longitude]
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+    CyaniteAnalysis:
+      type: object
+      required: [musicGenres, genreKeys, audioValence, audioEnergy, moodKeys]
+      properties:
+        musicGenres:
+          type: array
+          items:
+            type: string
+        genreKeys:
+          type: array
+          items:
+            $ref: "#/components/schemas/GenreKey"
+        audioValence:
+          type: number
+        audioEnergy:
+          type: number
+        moodKeys:
+          type: array
+          items:
+            $ref: "#/components/schemas/MoodKey"
+    SongstatsTrend:
+      type: object
+      required: [popularityTrend, monthlyListeners, popularityScore]
+      properties:
+        popularityTrend:
+          type: string
+        monthlyListeners:
+          type: integer
+        popularityScore:
+          type: integer
+    MusixmatchQuote:
+      type: object
+      required: [trackName, mood, lyrics_body, script_tracking_url]
+      properties:
+        trackName:
+          type: string
+        mood:
+          $ref: "#/components/schemas/MoodKey"
+        lyrics_body:
+          type: string
+        script_tracking_url:
+          type: string
+    RecommendedSong:
+      type: object
+      required: [trackName, popularity, moodKeys]
+      properties:
+        trackName:
+          type: string
+        popularity:
+          type: integer
+        moodKeys:
+          type: array
+          items:
+            $ref: "#/components/schemas/MoodKey"
+    Performer:
+      type: object
+      required:
+        [id, name, image, isHeadliner, cyanite, songstats, recommendedSongs, quotes]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        image:
+          type: ["string", "null"]
+        isHeadliner:
+          type: boolean
+        cyanite:
+          $ref: "#/components/schemas/CyaniteAnalysis"
+        songstats:
+          $ref: "#/components/schemas/SongstatsTrend"
+        recommendedSongs:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecommendedSong"
+        quotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/MusixmatchQuote"
+    LiveEvent:
+      type: object
+      required:
+        - id
+        - kind
+        - name
+        - description
+        - startDate
+        - endDate
+        - image
+        - region
+        - location
+        - geoRadiusKm
+        - performers
+        - genreKeys
+        - moodKeys
+      properties:
+        id:
+          type: string
+        kind:
+          $ref: "#/components/schemas/EventKind"
+        name:
+          type: string
+        description:
+          type: string
+        startDate:
+          type: string
+        endDate:
+          type: string
+        image:
+          type: ["string", "null"]
+        region:
+          $ref: "#/components/schemas/RegionKey"
+        location:
+          $ref: "#/components/schemas/JamBaseLocation"
+        geoRadiusKm:
+          type: number
+        performers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Performer"
+        genreKeys:
+          type: array
+          items:
+            $ref: "#/components/schemas/GenreKey"
+        moodKeys:
+          type: array
+          items:
+            $ref: "#/components/schemas/MoodKey"
+    SearchInput:
+      type: object
+      required: [latitude, longitude, radiusKm, startDate, endDate, genres]
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+        radiusKm:
+          type: number
+          minimum: 1
+        startDate:
+          type: string
+          description: Inclusive ISO date (YYYY-MM-DD).
+        endDate:
+          type: string
+          description: Inclusive ISO date (YYYY-MM-DD).
+        genres:
+          type: array
+          description: Selected genre keys; an empty list means "any genre".
+          items:
+            $ref: "#/components/schemas/GenreKey"
+    SearchResults:
+      type: object
+      required: [source, events]
+      properties:
+        source:
+          type: string
+          enum: [live, mock]
+          description: Whether results came from the live pipeline or mock fallback.
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/LiveEvent"

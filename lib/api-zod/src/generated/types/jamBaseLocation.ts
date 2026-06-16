@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface JamBaseLocation {
+  name: string;
+  city: string;
+  country: string;
+  latitude: number;
+  longitude: number;
 }

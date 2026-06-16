@@ -1,1 +1,3 @@
 - [react-day-picker date serialization](livepulse-date-tz.md) — calendar gives LOCAL Date objects; never round-trip through UTC/toISOString or days shift off-by-one.
+- [JamBase v3 events API](jambase-v3.md) — Bearer auth (jbd_ keys); eventDateFrom must be ≥ tomorrow or HTTP 400; clamp the from-date.
+- [Songstats + Musixmatch chain](songstats-musixmatch.md) — artists/tracks 404s (use catalog); tracks/stats with_links gives Spotify id; Musixmatch mood endpoint 403 on key.

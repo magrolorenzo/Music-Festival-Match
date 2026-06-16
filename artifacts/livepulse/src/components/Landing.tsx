@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import type { DateRange as DayPickerRange } from "react-day-picker";
@@ -10,21 +10,31 @@ import type {
   GeoLocation,
 } from "@/services/types";
 import { GENRES, MOODS, moodHue } from "@/lib/taxonomy";
-import { geocodeLocation } from "@/services/api";
+import { fetchPlaces } from "@/services/places";
 import { APP_TODAY, fromISODate, toISODate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
+import { Slider } from "@/components/ui/slider";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Loader2, MapPin, CalendarDays } from "lucide-react";
+import { Loader2, MapPin, CalendarDays, Check } from "lucide-react";
 
 interface LandingProps {
   filters: SearchFilters;
   onSearch: (filters: SearchFilters) => void;
+}
+
+const RADIUS_MIN = 50;
+const RADIUS_MAX = 800;
+const RADIUS_STEP = 10;
+const SUGGEST_DEBOUNCE_MS = 300;
+
+function clampRadius(value: number): number {
+  return Math.min(RADIUS_MAX, Math.max(RADIUS_MIN, value));
 }
 
 // ----- Mood "cake": a radial, multi-select segmented mood picker -------------
@@ -159,9 +169,17 @@ export default function Landing({
   onSearch,
 }: LandingProps) {
   const [locationQuery, setLocationQuery] = useState(
-    initialFilters.location?.query ?? "",
+    initialFilters.location?.label ?? "",
   );
-  const [radius, setRadius] = useState(initialFilters.radius);
+  const [selectedPlace, setSelectedPlace] = useState<GeoLocation | null>(
+    initialFilters.location,
+  );
+  const [suggestions, setSuggestions] = useState<GeoLocation[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  const [radius, setRadius] = useState(clampRadius(initialFilters.radius));
   const [radiusUnit, setRadiusUnit] = useState<RadiusUnit>(
     initialFilters.radiusUnit,
   );
@@ -172,9 +190,62 @@ export default function Landing({
     to: fromISODate(initialFilters.endDate),
   });
   const [geoError, setGeoError] = useState<string | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
 
   const [cycleIndex, setCycleIndex] = useState(0);
+
+  const locationBoxRef = useRef<HTMLDivElement>(null);
+
+  // Debounced place autocomplete. Each keystroke (re)starts a 300ms timer and an
+  // AbortController so superseded requests are cancelled and never overwrite a
+  // fresher result. We skip fetching when the text already matches the selected
+  // place (i.e. right after a selection) so the dropdown doesn't reopen.
+  useEffect(() => {
+    const q = locationQuery.trim();
+    if (selectedPlace && locationQuery === selectedPlace.label) return;
+    if (q.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      setLoadingSuggestions(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    setLoadingSuggestions(true);
+    const timer = setTimeout(async () => {
+      try {
+        const results = await fetchPlaces(q, controller.signal);
+        setSuggestions(results);
+        setShowSuggestions(true);
+        setActiveIndex(-1);
+      } catch {
+        if (!controller.signal.aborted) {
+          setSuggestions([]);
+          setShowSuggestions(true);
+        }
+      } finally {
+        if (!controller.signal.aborted) setLoadingSuggestions(false);
+      }
+    }, SUGGEST_DEBOUNCE_MS);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [locationQuery, selectedPlace]);
+
+  // Close the dropdown on outside click.
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (
+        locationBoxRef.current &&
+        !locationBoxRef.current.contains(e.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
 
   // When no mood is chosen, the hero backdrop autonomously cycles through the
   // mood themes. Selecting moods locks the hue to the first selected mood.
@@ -210,37 +281,70 @@ export default function Landing({
     return `${from} – ${format(range.to, "MMM d, yyyy")}`;
   }, [range]);
 
-  const handleSubmit = async () => {
+  const selectPlace = (place: GeoLocation) => {
+    setSelectedPlace(place);
+    setLocationQuery(place.label);
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setActiveIndex(-1);
     setGeoError(null);
-    setIsSearching(true);
-    try {
-      let location: GeoLocation | null = null;
-      const q = locationQuery.trim();
-      if (q) {
-        location = await geocodeLocation(q);
-        if (!location) {
-          setGeoError(
-            `We couldn't find "${q}". Try a city, region, or country.`,
-          );
-          setIsSearching(false);
-          return;
-        }
+  };
+
+  const handleLocationChange = (value: string) => {
+    setLocationQuery(value);
+    // Editing the text invalidates any previously verified selection.
+    if (selectedPlace) setSelectedPlace(null);
+    if (geoError) setGeoError(null);
+  };
+
+  const handleLocationKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (showSuggestions && suggestions.length > 0) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((i) => (i + 1) % suggestions.length);
+        return;
       }
-      const start = range?.from ?? APP_TODAY;
-      const end = range?.to ?? start;
-      onSearch({
-        location,
-        radius,
-        radiusUnit,
-        genres,
-        moods,
-        startDate: toISODate(start),
-        endDate: toISODate(end),
-      });
-    } catch {
-      setGeoError("Location lookup failed. Check your connection and retry.");
-      setIsSearching(false);
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
+        return;
+      }
+      if (e.key === "Enter" && activeIndex >= 0) {
+        e.preventDefault();
+        selectPlace(suggestions[activeIndex]);
+        return;
+      }
+      if (e.key === "Escape") {
+        setShowSuggestions(false);
+        return;
+      }
     }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!selectedPlace) {
+      setGeoError("Select a place from the list to search.");
+      setShowSuggestions(suggestions.length > 0);
+      return;
+    }
+    setGeoError(null);
+    const start = range?.from ?? APP_TODAY;
+    const end = range?.to ?? start;
+    onSearch({
+      location: selectedPlace,
+      radius,
+      radiusUnit,
+      genres,
+      moods,
+      startDate: toISODate(start),
+      endDate: toISODate(end),
+    });
   };
 
   return (
@@ -269,56 +373,111 @@ export default function Landing({
         <div className="w-full space-y-8 bg-card/40 backdrop-blur-xl border border-white/5 p-6 rounded-3xl shadow-2xl">
           {/* Location & When */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Location free-text + radius */}
+            {/* Location autocomplete + radius */}
             <div className="space-y-3 text-left">
               <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 Where
               </label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <div className="relative" ref={locationBoxRef}>
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
                 <Input
                   data-testid="input-location"
                   value={locationQuery}
-                  onChange={(e) => {
-                    setLocationQuery(e.target.value);
-                    if (geoError) setGeoError(null);
+                  onChange={(e) => handleLocationChange(e.target.value)}
+                  onFocus={() => {
+                    if (suggestions.length > 0 && !selectedPlace) {
+                      setShowSuggestions(true);
+                    }
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !isSearching) handleSubmit();
-                  }}
-                  placeholder='Anywhere — try "Verona, Italy"'
-                  className="pl-9 h-11 bg-white/5 border-white/10 rounded-xl"
+                  onKeyDown={handleLocationKeyDown}
+                  placeholder='Search a city — try "Verona, Italy"'
+                  autoComplete="off"
+                  className="pl-9 pr-9 h-11 bg-white/5 border-white/10 rounded-xl"
                 />
+                {selectedPlace ? (
+                  <Check
+                    data-testid="icon-location-verified"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-400"
+                  />
+                ) : loadingSuggestions ? (
+                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />
+                ) : null}
+
+                {/* Dark autocomplete dropdown */}
+                {showSuggestions && !selectedPlace && (
+                  <div
+                    data-testid="location-suggestions"
+                    className="absolute z-50 mt-2 w-full rounded-xl border border-white/10 bg-neutral-900/95 backdrop-blur-xl shadow-2xl overflow-hidden"
+                  >
+                    {suggestions.length === 0 ? (
+                      <div className="px-4 py-3 text-sm text-muted-foreground">
+                        {loadingSuggestions
+                          ? "Searching…"
+                          : "No places found."}
+                      </div>
+                    ) : (
+                      suggestions.map((place, i) => (
+                        <button
+                          key={`${place.latitude},${place.longitude}`}
+                          data-testid={`place-suggestion-${i}`}
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            selectPlace(place);
+                          }}
+                          onMouseEnter={() => setActiveIndex(i)}
+                          className={`w-full flex items-start gap-2 px-4 py-2.5 text-left text-sm transition-colors ${
+                            activeIndex === i
+                              ? "bg-primary/20 text-white"
+                              : "text-white/80 hover:bg-white/5"
+                          }`}
+                        >
+                          <MapPin className="w-3.5 h-3.5 mt-0.5 text-primary shrink-0" />
+                          <span className="truncate">{place.label}</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-2">
-                <Input
-                  data-testid="input-radius"
-                  type="number"
-                  min={1}
-                  value={radius}
-                  onChange={(e) =>
-                    setRadius(Math.max(1, Number(e.target.value) || 0))
-                  }
-                  className="h-9 w-20 bg-white/5 border-white/10 rounded-lg"
-                />
-                <div className="flex rounded-lg overflow-hidden border border-white/10">
-                  {(["mi", "km"] as RadiusUnit[]).map((u) => (
-                    <button
-                      key={u}
-                      data-testid={`radius-unit-${u}`}
-                      onClick={() => setRadiusUnit(u)}
-                      className={`px-3 py-1.5 text-sm font-medium transition-colors ${
-                        radiusUnit === u
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-white/5 text-muted-foreground hover:bg-white/10"
-                      }`}
-                    >
-                      {u}
-                    </button>
-                  ))}
+
+              {/* Radius slider + unit toggle */}
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Radius</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold tabular-nums">
+                      {radius} {radiusUnit}
+                    </span>
+                    <div className="flex rounded-lg overflow-hidden border border-white/10">
+                      {(["mi", "km"] as RadiusUnit[]).map((u) => (
+                        <button
+                          key={u}
+                          data-testid={`radius-unit-${u}`}
+                          type="button"
+                          onClick={() => setRadiusUnit(u)}
+                          className={`px-2.5 py-1 text-xs font-medium transition-colors ${
+                            radiusUnit === u
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-white/5 text-muted-foreground hover:bg-white/10"
+                          }`}
+                        >
+                          {u}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <span className="text-xs text-muted-foreground">radius</span>
+                <Slider
+                  data-testid="input-radius"
+                  value={[radius]}
+                  min={RADIUS_MIN}
+                  max={RADIUS_MAX}
+                  step={RADIUS_STEP}
+                  onValueChange={(v) => setRadius(v[0])}
+                />
               </div>
+
               {geoError && (
                 <p
                   data-testid="text-geo-error"
@@ -437,17 +596,10 @@ export default function Landing({
         <Button
           data-testid="button-find-experiences"
           onClick={handleSubmit}
-          disabled={isSearching}
           size="lg"
-          className="text-lg px-8 py-6 rounded-full font-bold shadow-[0_0_30px_rgba(255,69,0,0.4)] hover:shadow-[0_0_45px_rgba(255,69,0,0.6)] transition-all hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
+          className="text-lg px-8 py-6 rounded-full font-bold shadow-[0_0_30px_rgba(255,69,0,0.4)] hover:shadow-[0_0_45px_rgba(255,69,0,0.6)] transition-all hover:scale-105"
         >
-          {isSearching ? (
-            <>
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Locating…
-            </>
-          ) : (
-            "Find Live Experiences"
-          )}
+          Find Live Experiences
         </Button>
       </div>
     </div>

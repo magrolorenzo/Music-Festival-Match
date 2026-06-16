@@ -2,16 +2,26 @@ import { useState } from "react";
 import type { SearchResponse } from "@/services/search";
 import type { MatchResult } from "@/services/types";
 import EventCard from "./EventCard";
-import LiveMap from "./LiveMap";
+import LiveMap, { type SearchCenter } from "./LiveMap";
 import DetailPopup from "./DetailPopup";
+import { radiusToKm } from "@/services/api";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, SlidersHorizontal, Info } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "framer-motion";
 
 export default function Results({ response, onReset }: { response: SearchResponse, onReset: () => void }) {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const selectedEvent = response.results.find(r => r.event.id === selectedEventId) || null;
+
+  const { location, radius, radiusUnit } = response.filters;
+  const searchCenter: SearchCenter | null = location
+    ? {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        radiusKm: radiusToKm(radius, radiusUnit),
+      }
+    : null;
 
   return (
     <div className="w-full h-full flex flex-col md:flex-row bg-background">
@@ -26,6 +36,19 @@ export default function Results({ response, onReset }: { response: SearchRespons
             <span className="text-primary font-bold">{response.results.length}</span> matches
           </div>
         </div>
+
+        {response.source === "mock" && (
+          <div
+            data-testid="notice-mock-data"
+            className="flex items-start gap-2 px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 text-amber-300 text-xs shrink-0"
+          >
+            <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+            <span>
+              Showing sample data — the live events service is unavailable right
+              now, so these results are illustrative.
+            </span>
+          </div>
+        )}
 
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-4">
@@ -61,6 +84,7 @@ export default function Results({ response, onReset }: { response: SearchRespons
           results={response.results} 
           selectedEventId={selectedEventId} 
           onSelect={setSelectedEventId} 
+          searchCenter={searchCenter}
         />
       </div>
 

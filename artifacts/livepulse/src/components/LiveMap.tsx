@@ -12,50 +12,81 @@ function artistLabelFor(result: MatchResult): string {
   return names.length > 2 ? `${names.slice(0, 2).join(", ")} +${names.length - 2} more` : names.join(", ");
 }
 
+export interface SearchCenter {
+  latitude: number;
+  longitude: number;
+  /** Search radius in km — drives the initial map extent (country vs city). */
+  radiusKm: number;
+}
+
 interface LiveMapProps {
   results: MatchResult[];
   selectedEventId: string | null;
   onSelect: (id: string) => void;
+  /** The verified place the user searched; the map opens framed on this. */
+  searchCenter: SearchCenter | null;
 }
 
-// Controller to fly to selected marker
-function MapController({ selectedResult, results }: { selectedResult: MatchResult | null, results: MatchResult[] }) {
+/**
+ * Builds a lat/lng bounds box of `radiusKm` around a center point. Flying to
+ * these bounds makes Leaflet pick a zoom that reflects the search extent — a
+ * country-scale radius zooms out, a city-scale radius zooms in.
+ */
+function boundsForRadius(
+  latitude: number,
+  longitude: number,
+  radiusKm: number,
+): L.LatLngBounds {
+  const latDelta = radiusKm / 111;
+  const lngDelta =
+    radiusKm / (111 * Math.max(0.1, Math.cos((latitude * Math.PI) / 180)));
+  return L.latLngBounds(
+    [latitude - latDelta, longitude - lngDelta],
+    [latitude + latDelta, longitude + lngDelta],
+  );
+}
+
+// Controller: open framed on the chosen search coordinates (extent-based zoom),
+// then fly straight to a marker when the user selects an event.
+function MapController({
+  selectedResult,
+  searchCenter,
+}: {
+  selectedResult: MatchResult | null;
+  searchCenter: SearchCenter | null;
+}) {
   const map = useMap();
-  
+
+  // Initial framing: drive the view from the user's selected place + radius.
+  useEffect(() => {
+    if (!searchCenter) return;
+    const bounds = boundsForRadius(
+      searchCenter.latitude,
+      searchCenter.longitude,
+      searchCenter.radiusKm,
+    );
+    map.flyToBounds(bounds, {
+      duration: 1.5,
+      padding: L.point(48, 48),
+      maxZoom: 11,
+    });
+  }, [searchCenter, map]);
+
+  // Marker selection: fly to the chosen event's exact coordinates.
   useEffect(() => {
     if (selectedResult) {
       map.flyTo(
-        [selectedResult.event.location.latitude, selectedResult.event.location.longitude], 
-        10, 
+        [selectedResult.event.location.latitude, selectedResult.event.location.longitude],
+        10,
         { duration: 1.5 }
       );
-    } else if (results.length > 0) {
-      // Fly to the geographic center of the top-ranked results (results are
-      // already sorted best-first). Spread of the top set drives the zoom.
-      const top = results.slice(0, Math.min(3, results.length));
-      const centerLat = top.reduce((s, r) => s + r.event.location.latitude, 0) / top.length;
-      const centerLng = top.reduce((s, r) => s + r.event.location.longitude, 0) / top.length;
-      const zoom =
-        top.length > 1
-          ? Math.min(
-              6,
-              map.getBoundsZoom(
-                L.latLngBounds(
-                  top.map((r) => [r.event.location.latitude, r.event.location.longitude]),
-                ),
-                false,
-                L.point(60, 60),
-              ),
-            )
-          : 6;
-      map.flyTo([centerLat, centerLng], zoom, { duration: 1.5 });
     }
-  }, [selectedResult, results, map]);
+  }, [selectedResult, map]);
 
   return null;
 }
 
-export default function LiveMap({ results, selectedEventId, onSelect }: LiveMapProps) {
+export default function LiveMap({ results, selectedEventId, onSelect, searchCenter }: LiveMapProps) {
   const selectedResult = results.find(r => r.event.id === selectedEventId) || null;
 
   return (
@@ -114,7 +145,7 @@ export default function LiveMap({ results, selectedEventId, onSelect }: LiveMapP
         );
       })}
 
-      <MapController selectedResult={selectedResult} results={results} />
+      <MapController selectedResult={selectedResult} searchCenter={searchCenter} />
     </MapContainer>
   );
 }
