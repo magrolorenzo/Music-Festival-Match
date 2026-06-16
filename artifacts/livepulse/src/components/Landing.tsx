@@ -150,11 +150,24 @@ export default function Landing({
   });
   const [fromOpen, setFromOpen] = useState(false);
   const [toOpen, setToOpen] = useState(false);
+  const [whenWidth, setWhenWidth] = useState<number>();
   const [geoError, setGeoError] = useState<string | null>(null);
 
   const [cycleIndex, setCycleIndex] = useState(0);
 
   const locationBoxRef = useRef<HTMLDivElement>(null);
+  const whenRef = useRef<HTMLDivElement>(null);
+
+  // Keep each From/To calendar dropdown as wide as the whole When column.
+  useEffect(() => {
+    const el = whenRef.current;
+    if (!el) return;
+    const update = () => setWhenWidth(el.offsetWidth);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   // Debounced place autocomplete. Each keystroke (re)starts a 300ms timer and an
   // AbortController so superseded requests are cancelled and never overwrite a
@@ -473,7 +486,7 @@ export default function Landing({
             </div>
 
             {/* When — calendar */}
-            <div className="space-y-3 text-left">
+            <div ref={whenRef} className="space-y-3 text-left">
               <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 When
               </label>
@@ -492,11 +505,13 @@ export default function Landing({
                       </button>
                     </PopoverTrigger>
                     <PopoverContent
-                      className="w-auto p-0 overflow-hidden"
+                      className="p-0 overflow-hidden"
                       align="start"
+                      style={whenWidth ? { width: whenWidth } : undefined}
                       data-testid="popover-date-from"
                     >
                       <Calendar
+                        className="w-full"
                         mode="single"
                         selected={range?.from}
                         onSelect={(day) => {
@@ -531,11 +546,13 @@ export default function Landing({
                       </button>
                     </PopoverTrigger>
                     <PopoverContent
-                      className="w-auto p-0 overflow-hidden"
+                      className="p-0 overflow-hidden"
                       align="end"
+                      style={whenWidth ? { width: whenWidth } : undefined}
                       data-testid="popover-date-to"
                     >
                       <Calendar
+                        className="w-full"
                         mode="single"
                         selected={range?.to}
                         onSelect={(day) => {
