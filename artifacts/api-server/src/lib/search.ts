@@ -25,7 +25,7 @@ import { logger } from "./logger";
 // ============================================================================
 
 const MAX_EVENTS = 30;
-const MAX_HEADLINERS_PER_EVENT = 5;
+const MAX_PERFORMERS_PER_EVENT = 5;
 const ENRICH_CONCURRENCY = 5;
 
 export interface SearchOutput {
@@ -47,10 +47,8 @@ function eventMatchesGenres(event: RawEvent, genres: GenreKey[]): boolean {
   );
 }
 
-function selectHeadliners(event: RawEvent): RawPerformer[] {
-  const headliners = event.performers.filter((p) => p.isHeadliner);
-  const pool = headliners.length > 0 ? headliners : event.performers;
-  return pool.slice(0, MAX_HEADLINERS_PER_EVENT);
+function selectPerformers(event: RawEvent): RawPerformer[] {
+  return event.performers.slice(0, MAX_PERFORMERS_PER_EVENT);
 }
 
 // Normalizes a single cached mood string to a valid MoodKey, defaulting to
@@ -66,7 +64,7 @@ function performerId(eventId: string, name: string): string {
   );
 }
 
-/** Builds the live pipeline result, enriching only the headliners we keep. */
+/** Builds the live pipeline result, enriching all performers up to the cap. */
 async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
   const raw = await fetchJamBaseEvents({
     latitude: input.latitude,
@@ -81,14 +79,14 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
     .filter((e) => eventMatchesGenres(e, genres))
     .slice(0, MAX_EVENTS);
 
-  // Collect the unique set of headliner names to enrich, so a shared concurrency
+  // Collect the unique set of performer names to enrich, so a shared concurrency
   // pool dedupes work and caps sockets across the whole result set.
   const enrichTargets = new Map<string, RawPerformer>();
-  const eventHeadliners = new Map<string, RawPerformer[]>();
+  const eventPerformers = new Map<string, RawPerformer[]>();
   for (const event of filtered) {
-    const headliners = selectHeadliners(event);
-    eventHeadliners.set(event.id, headliners);
-    for (const p of headliners) {
+    const performers = selectPerformers(event);
+    eventPerformers.set(event.id, performers);
+    for (const p of performers) {
       if (!enrichTargets.has(p.name)) enrichTargets.set(p.name, p);
     }
   }
@@ -102,15 +100,15 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
   const byName = new Map(names.map((n, i) => [n, enrichments[i]]));
 
   return filtered.map((event) => {
-    const headlinerNames = new Set(
-      (eventHeadliners.get(event.id) ?? []).map((p) => p.name),
+    const enrichedNames = new Set(
+      (eventPerformers.get(event.id) ?? []).map((p) => p.name),
     );
 
     const performers: Performer[] = event.performers
       .slice(0, 12)
       .map((p) => {
         const genreKeys = mapGenres(p.genres);
-        const enriched = headlinerNames.has(p.name)
+        const enriched = enrichedNames.has(p.name)
           ? byName.get(p.name) ?? PLACEHOLDER_ENRICHMENT
           : PLACEHOLDER_ENRICHMENT;
         // Cached enrichment may predate the current taxonomy, so re-normalize
