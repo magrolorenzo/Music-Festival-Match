@@ -29,7 +29,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Loader2, MapPin, CalendarDays, Check, RotateCcw } from "lucide-react";
+import {
+  Loader2,
+  MapPin,
+  CalendarDays,
+  Check,
+  RotateCcw,
+  ChevronLeft,
+} from "lucide-react";
 
 interface LandingProps {
   filters: SearchFilters;
@@ -148,6 +155,9 @@ export default function Landing({
     from: fromISODate(initialFilters.startDate),
     to: fromISODate(initialFilters.endDate),
   });
+  const [dateOpen, setDateOpen] = useState(false);
+  const [dateStep, setDateStep] = useState<"start" | "end">("start");
+  const [draftStart, setDraftStart] = useState<Date | undefined>(undefined);
   const [geoError, setGeoError] = useState<string | null>(null);
 
   const [cycleIndex, setCycleIndex] = useState(0);
@@ -309,6 +319,9 @@ export default function Landing({
     setMoods(d.moods);
     setShowAllGenres(false);
     setRange({ from: fromISODate(d.startDate), to: fromISODate(d.endDate) });
+    setDateOpen(false);
+    setDateStep("start");
+    setDraftStart(undefined);
     setGeoError(null);
   };
 
@@ -477,7 +490,16 @@ export default function Landing({
               <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 When
               </label>
-              <Popover>
+              <Popover
+                open={dateOpen}
+                onOpenChange={(open) => {
+                  setDateOpen(open);
+                  if (open) {
+                    setDateStep("start");
+                    setDraftStart(undefined);
+                  }
+                }}
+              >
                 <PopoverTrigger asChild>
                   <button
                     data-testid="button-date-range"
@@ -488,18 +510,66 @@ export default function Landing({
                   </button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-auto p-0"
-                  align="start"
+                  className="w-auto max-w-[calc(100vw-2rem)] p-0 overflow-hidden"
+                  align="end"
                   data-testid="popover-calendar"
                 >
-                  <Calendar
-                    mode="range"
-                    selected={range}
-                    onSelect={setRange}
-                    defaultMonth={range?.from ?? APP_TODAY}
-                    numberOfMonths={1}
-                    disabled={{ before: APP_TODAY }}
-                  />
+                  <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
+                    {dateStep === "end" && (
+                      <button
+                        type="button"
+                        onClick={() => setDateStep("start")}
+                        data-testid="button-date-back"
+                        className="shrink-0 w-8 h-8 -ml-1 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors"
+                        aria-label="Back to start date"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold">
+                        {dateStep === "start"
+                          ? "Pick a start date"
+                          : "Pick an end date"}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {dateStep === "start"
+                          ? "When does your search window begin?"
+                          : draftStart
+                            ? `Start · ${format(draftStart, "MMM d, yyyy")}`
+                            : "Choose the end of your window"}
+                      </p>
+                    </div>
+                  </div>
+                  {dateStep === "start" ? (
+                    <Calendar
+                      key="start"
+                      mode="single"
+                      selected={draftStart ?? range?.from}
+                      onSelect={(day) => {
+                        if (!day) return;
+                        setDraftStart(day);
+                        setDateStep("end");
+                      }}
+                      defaultMonth={draftStart ?? range?.from ?? APP_TODAY}
+                      numberOfMonths={2}
+                      disabled={{ before: APP_TODAY }}
+                    />
+                  ) : (
+                    <Calendar
+                      key="end"
+                      mode="single"
+                      selected={undefined}
+                      onSelect={(day) => {
+                        if (!day || !draftStart) return;
+                        setRange({ from: draftStart, to: day });
+                        setDateOpen(false);
+                      }}
+                      defaultMonth={draftStart ?? APP_TODAY}
+                      numberOfMonths={2}
+                      disabled={{ before: draftStart ?? APP_TODAY }}
+                    />
+                  )}
                 </PopoverContent>
               </Popover>
               <p className="text-xs text-muted-foreground">

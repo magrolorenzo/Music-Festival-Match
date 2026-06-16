@@ -36,12 +36,12 @@ export interface DateRange {
 }
 
 /**
- * The default search window: from today through the last day of the third
- * month ahead (inclusive). e.g. on Jun 15 this spans Jun 15 -> Sep 30.
+ * The default search window: from today through 15 days later (inclusive).
+ * e.g. on Jun 15 this spans Jun 15 -> Jun 30.
  */
 export function defaultDateRange(): DateRange {
   const today = APP_TODAY;
-  const end = new Date(today.getFullYear(), today.getMonth() + 4, 0);
+  const end = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 15);
   return { startDate: toISODate(today), endDate: toISODate(end) };
 }
 
