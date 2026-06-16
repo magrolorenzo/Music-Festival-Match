@@ -1,0 +1,75 @@
+We need to implement a detailed multi-API data orchestration pipeline for our React application "MatchMyMood". The entire flow goes from the user's geographic input to a cascading backend search involving OpenStreetMap, JamBase, Songstats, and Musixmatch.
+
+Please read through the architecture requirements below. Do NOT write the code yet. Read the specifications, analyze the pipeline, and then ask me clarification questions at the end based on the potential performance bottlenecks.
+
+---
+
+### 1. THE DATA PIPELINE FLOW
+
+#### STEP 1: Geographic Input & Normalization (OpenStreetMap Nominatim)
+- The user types a location string in the frontend (e.g., "ver" or "ita").
+- React performs a debounced fetch to: `https://nominatim.openstreetmap.org/search?format=json&q={TEXT}&limit=5&addressdetails=1`
+- The user selects a specific result (e.g., "Verona" or "Italy"). The backend extracts the exact `latitude` and `longitude` floats.
+- The user also inputs a Date Range (From/To, defaulting From to Today) and selects one or more Music Genres.
+
+#### STEP 2: Fetching Events from JamBase
+- The backend performs a GET request to the real JamBase v3 API: `https://api.data.jambase.com/v3/events`
+- It passes the coordinates and dates using the official schema: `geoLatitude`, `geoLongitude`, `geoRadiusAmount`, `eventDateFrom`, and `eventDateTo`.
+- JamBase returns an array of events. Here is the exact structure we must parse:
+```json
+{
+  "success": true,
+  "events": [
+    {
+      "@type": "Concert",
+      "name": "Bebe Rexha at Irving Plaza",
+      "startDate": "2026-06-15T19:00:00",
+      "location": {
+        "@type": "Venue",
+        "name": "Irving Plaza",
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 40.7348,
+          "longitude": -73.9882
+        }
+      },
+      "performer": [
+        {
+          "@type": "MusicGroup",
+          "name": "Bebe Rexha",
+          "genre": ["edm", "pop"],
+          "x-isHeadliner": true
+        }
+      ]
+    }
+  ]
+}
+STEP 3: Backend Filtering (Genre Match)
+Loop through the events returned by JamBase.
+
+For each event, scan the performer array.
+
+Compare the performer's genre array (e.g., ["edm", "pop"]) against the user's selected frontend genres.
+
+Rule: If there is a match, keep the event and proceed to Step 4. If not, discard it immediately to save API calls.
+
+STEP 4: Hype Enrichment via Songstats
+For each matching artist/performer:
+
+Query the Songstats Artist Search endpoint using the artist's name to retrieve the internal songstats_artist_id.
+
+Query the Songstats Top Tracks endpoint: https://docs.songstats.com/docs/api/b25a8506d6eae-get-artist-top-tracks using that ID.
+
+For each of the top tracks, call the Songstats Track Info endpoint: https://docs.songstats.com/docs/api/28e3995624aab-get-track-info to extract its raw spotify_track_id.
+
+STEP 5: Mood Analysis via Musixmatch
+Use the retrieved spotify_track_id from Songstats to query Musixmatch.
+
+Call the Musixmatch Track Lyrics Analysis endpoint: https://docs.musixmatch.com/api-reference/analysis/track-lyrics-analysis-get by matching the Spotify ID.
+
+Extract the lyrical emotional tags/moods (e.g., happy, sad, energetic, dark) to cross-reference with our frontend Mood filter and display them in the React UI.
+
+YOUR ASSIGNMENT NOW:
+Review this complete pipeline. Because querying JamBase -> Songstats (Search + Top Tracks + Track Info) -> Musixmatch sequentially inside a single HTTP request can cause extreme performance lag, rate limits, or timeouts, I need you to analyze this setup.
+
+Before writing any backend or frontend code, please ask me specific questions on how we should handle caching, rate-limiting, placeholders, or data-mocking strategies to make this flow efficient on Replit.
