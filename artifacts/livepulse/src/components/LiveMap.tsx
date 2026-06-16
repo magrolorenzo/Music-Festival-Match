@@ -203,7 +203,7 @@ function CityFocusController({
       map.flyToBounds(boundsForVenues(target.venues), {
         duration: 1.2,
         padding: L.point(60, 60),
-        maxZoom: 15,
+        maxZoom: 13,
       });
     }
     onConsumed();
