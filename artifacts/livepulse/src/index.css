@@ -143,11 +143,39 @@
   z-index: 1000 !important;
 }
 
+/* Venue marker: the dot plus an optional event-count badge */
+.venue-marker {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+.venue-count {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: #0a0a0a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+}
+
 /* Custom leaflet popup overrides */
 .leaflet-popup-content-wrapper {
   background: transparent !important;
   box-shadow: none !important;
   padding: 0 !important;
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+  width: auto !important;
 }
 .leaflet-popup-tip {
   display: none !important;

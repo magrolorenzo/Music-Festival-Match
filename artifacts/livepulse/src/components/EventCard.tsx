@@ -62,7 +62,7 @@ export default function EventCard({
       onClick={onClick}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
-      className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col ${
+      className={`group relative w-full min-w-0 overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col ${
         isSelected
           ? "border-primary bg-primary/10 shadow-[0_0_20px_rgba(255,69,0,0.15)]"
           : "border-white/5 bg-card/40 hover:bg-card/60 hover:border-white/20"
@@ -133,7 +133,7 @@ export default function EventCard({
       </div>
 
       <div className="p-4 flex flex-col gap-2">
-        <h3 className="text-xl font-bold leading-tight group-hover:text-primary transition-colors">{event.name}</h3>
+        <h3 className="text-xl font-bold leading-tight break-words group-hover:text-primary transition-colors">{event.name}</h3>
 
         {artistLabel && (
           <div className="flex items-center gap-1.5 text-sm font-medium text-white/80">

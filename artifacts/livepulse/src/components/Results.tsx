@@ -34,8 +34,8 @@ export default function Results({ response, onReset }: { response: SearchRespons
 
   return (
     <div className="w-full h-full flex flex-col md:flex-row bg-background">
-      {/* Left List Pane */}
-      <div className="w-full md:w-[450px] lg:w-[500px] h-[50vh] md:h-full flex flex-col border-b md:border-b-0 md:border-r border-border bg-card/50 backdrop-blur-md z-20 shadow-xl">
+      {/* Left List Pane — on mobile this sits BELOW the map (order-2) */}
+      <div className="order-2 md:order-none w-full md:w-[450px] lg:w-[500px] h-[50vh] md:h-full flex flex-col border-t md:border-t-0 md:border-r border-border bg-card/50 backdrop-blur-md z-20 shadow-xl">
         <div className="p-4 border-b border-white/5 flex items-center justify-between shrink-0">
           <Button variant="ghost" size="sm" onClick={onReset} className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -47,7 +47,7 @@ export default function Results({ response, onReset }: { response: SearchRespons
           </div>
         </div>
 
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 [&_[data-radix-scroll-area-viewport]>div]:!block">
           <div className="p-4 space-y-4">
             {orderedResults.length === 0 ? (
               <div
@@ -97,8 +97,8 @@ export default function Results({ response, onReset }: { response: SearchRespons
         </ScrollArea>
       </div>
 
-      {/* Right Map Pane */}
-      <div className="flex-1 h-[50vh] md:h-full relative z-0">
+      {/* Right Map Pane — on mobile this sits ABOVE the list (order-1) */}
+      <div className="order-1 md:order-none flex-1 h-[50vh] md:h-full relative z-0">
         <LiveMap 
           results={orderedResults} 
           selectedEventId={selectedEventId} 
