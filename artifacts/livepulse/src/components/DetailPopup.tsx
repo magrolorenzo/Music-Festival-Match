@@ -43,26 +43,26 @@ function PerformerCard({ performer, preferredMood }: { performer: Performer, pre
         <div className="flex-1 space-y-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
+              <h4 className="text-3xl font-bold">{performer.name}</h4>
               {performer.isHeadliner && <Badge className="bg-primary/20 text-primary hover:bg-primary/30 border-none">Headliner</Badge>}
             </div>
-            <h4 className="text-3xl font-bold">{performer.name}</h4>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-black/40 rounded-xl p-3 border border-white/5">
-              <div className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
+          <div className="flex flex-col gap-3">
+            <div className="bg-black/40 rounded-xl p-3 border border-white/5 flex items-center justify-between gap-3">
+              <div className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" /> Trend
               </div>
               <div className="text-lg font-bold text-green-400">{performer.songstats.popularityTrend}</div>
             </div>
-            <div className="bg-black/40 rounded-xl p-3 border border-white/5">
-              <div className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
+            <div className="bg-black/40 rounded-xl p-3 border border-white/5 flex items-center justify-between gap-3">
+              <div className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1">
                 <Headphones className="w-3 h-3" /> Monthly
               </div>
               <div className="text-lg font-bold">{(performer.songstats.monthlyListeners / 1000000).toFixed(1)}M</div>
             </div>
-            <div className="bg-black/40 rounded-xl p-3 border border-white/5">
-              <div className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
+            <div className="bg-black/40 rounded-xl p-3 border border-white/5 flex items-center justify-between gap-3">
+              <div className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1">
                 <StarIcon className="w-3 h-3" /> Score
               </div>
               <div className="text-lg font-bold text-primary">{performer.songstats.popularityScore}</div>
@@ -200,7 +200,7 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
               ) : (
                 <Carousel
                   opts={{
-                    align: "start",
+                    align: "center",
                   }}
                   className="w-full h-full"
                 >
@@ -208,7 +208,7 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
                     {displayPerformers.map((performer) => (
                       <CarouselItem
                         key={performer.id}
-                        className="basis-[88%] md:basis-[85%] h-full flex"
+                        className="basis-[90%] md:basis-[55%] h-full flex"
                       >
                         <PerformerCard performer={performer} preferredMood={filters.moods[0]} />
                       </CarouselItem>
