@@ -8,7 +8,7 @@ import { fetchJson } from "./http";
 // gap returns null so the enrichment layer can fall back to placeholders.
 // ============================================================================
 
-const SONGSTATS_BASE = "https://api.songstats.com/enterprise/v1";
+const SONGSTATS_BASE = "https://stoplight.io/mocks/songstats/api/12173793";
 
 export interface SongstatsTrack {
   trackName: string;
@@ -25,7 +25,9 @@ export interface SongstatsResult {
 }
 
 function headers(apiKey: string): Record<string, string> {
-  return { Accept: "application/json", apikey: apiKey };
+  const h: Record<string, string> = { Accept: "application/json" };
+  if (apiKey && apiKey !== "mock") h.apikey = apiKey;
+  return h;
 }
 
 function pickNumber(...values: unknown[]): number {
@@ -176,15 +178,15 @@ async function fetchTopTracks(
 }
 
 export function hasSongstatsKey(): boolean {
-  return Boolean(process.env.SONGSTATS_API_KEY);
+  return true;
 }
 
 /** Returns hype metrics + top tracks for an artist, or null on any failure. */
 export async function fetchArtistHype(
   name: string,
 ): Promise<SongstatsResult | null> {
-  const apiKey = process.env.SONGSTATS_API_KEY;
-  if (!apiKey) return null;
+  // Use a dummy key for the Stoplight mock server (public, no auth required).
+  const apiKey = process.env.SONGSTATS_API_KEY ?? "mock";
 
   const artistId = await findArtistId(name, apiKey);
   if (!artistId) return null;
