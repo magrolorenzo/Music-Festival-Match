@@ -12,7 +12,14 @@ import { motion } from "framer-motion";
 
 export default function Results({ response, onReset }: { response: SearchResponse, onReset: () => void }) {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [hoveredEventId, setHoveredEventId] = useState<string | null>(null);
   const selectedEvent = response.results.find(r => r.event.id === selectedEventId) || null;
+
+  // Sidebar + map share the same set, ordered by event start date (soonest
+  // first). Scoring is untouched; only the display order changes.
+  const orderedResults = [...response.results].sort((a, b) =>
+    a.event.startDate.localeCompare(b.event.startDate),
+  );
 
   const { location, radius, radiusUnit } = response.filters;
   const hasFilters =
@@ -35,14 +42,14 @@ export default function Results({ response, onReset }: { response: SearchRespons
             Back
           </Button>
           <div className="text-sm font-medium">
-            <span className="text-primary font-bold">{response.results.length}</span>{" "}
+            <span className="text-primary font-bold">{orderedResults.length}</span>{" "}
             {hasFilters ? "matches" : "events"}
           </div>
         </div>
 
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-4">
-            {response.results.length === 0 ? (
+            {orderedResults.length === 0 ? (
               <div
                 data-testid="empty-no-events"
                 className="flex flex-col items-center text-center px-6 py-12 gap-4"
@@ -68,7 +75,7 @@ export default function Results({ response, onReset }: { response: SearchRespons
                 </Button>
               </div>
             ) : (
-              response.results.map((result, i) => (
+              orderedResults.map((result, i) => (
                 <motion.div
                   key={result.event.id}
                   initial={{ opacity: 0, y: 10 }}
@@ -80,6 +87,8 @@ export default function Results({ response, onReset }: { response: SearchRespons
                     filters={response.filters}
                     isSelected={selectedEventId === result.event.id}
                     onClick={() => setSelectedEventId(result.event.id)}
+                    onHoverStart={() => setHoveredEventId(result.event.id)}
+                    onHoverEnd={() => setHoveredEventId(null)}
                   />
                 </motion.div>
               ))
@@ -91,8 +100,9 @@ export default function Results({ response, onReset }: { response: SearchRespons
       {/* Right Map Pane */}
       <div className="flex-1 h-[50vh] md:h-full relative z-0">
         <LiveMap 
-          results={response.results} 
+          results={orderedResults} 
           selectedEventId={selectedEventId} 
+          hoveredEventId={hoveredEventId}
           onSelect={setSelectedEventId} 
           searchCenter={searchCenter}
         />

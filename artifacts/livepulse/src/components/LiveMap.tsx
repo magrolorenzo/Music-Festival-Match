@@ -22,10 +22,16 @@ export interface SearchCenter {
 interface LiveMapProps {
   results: MatchResult[];
   selectedEventId: string | null;
+  /** Event currently hovered in the sidebar list; the map flies to it. */
+  hoveredEventId: string | null;
   onSelect: (id: string) => void;
   /** The verified place the user searched; the map opens framed on this. */
   searchCenter: SearchCenter | null;
 }
+
+// Default + highlighted (hovered/selected) marker hues — an all-orange scheme.
+const DOT_DEFAULT = "#ff4500";
+const DOT_HIGHLIGHT = "#ffb347";
 
 /**
  * Builds a lat/lng bounds box of `radiusKm` around a center point. Flying to
@@ -50,9 +56,11 @@ function boundsForRadius(
 // then fly straight to a marker when the user selects an event.
 function MapController({
   selectedResult,
+  hoveredResult,
   searchCenter,
 }: {
   selectedResult: MatchResult | null;
+  hoveredResult: MatchResult | null;
   searchCenter: SearchCenter | null;
 }) {
   const map = useMap();
@@ -83,11 +91,23 @@ function MapController({
     }
   }, [selectedResult, map]);
 
+  // Card hover: fly to the hovered event's coordinates (gentler than select).
+  useEffect(() => {
+    if (hoveredResult) {
+      map.flyTo(
+        [hoveredResult.event.location.latitude, hoveredResult.event.location.longitude],
+        Math.max(map.getZoom(), 6),
+        { duration: 1.2 }
+      );
+    }
+  }, [hoveredResult, map]);
+
   return null;
 }
 
-export default function LiveMap({ results, selectedEventId, onSelect, searchCenter }: LiveMapProps) {
+export default function LiveMap({ results, selectedEventId, hoveredEventId, onSelect, searchCenter }: LiveMapProps) {
   const selectedResult = results.find(r => r.event.id === selectedEventId) || null;
+  const hoveredResult = results.find(r => r.event.id === hoveredEventId) || null;
 
   return (
     <MapContainer 
@@ -103,12 +123,14 @@ export default function LiveMap({ results, selectedEventId, onSelect, searchCent
       
       {results.map((result) => {
         const isSelected = result.event.id === selectedEventId;
-        const color = isSelected ? "hsl(var(--primary))" : (result.isExactMatch ? "#ffffff" : "#666");
+        const isHovered = result.event.id === hoveredEventId;
+        const isHighlighted = isSelected || isHovered;
+        const color = isHighlighted ? DOT_HIGHLIGHT : DOT_DEFAULT;
         const image = result.event.image;
         
         const icon = L.divIcon({
           className: "",
-          html: `<div class="glow-point ${isSelected ? "scale-125" : ""}" style="--marker-color: ${color}"></div>`,
+          html: `<div class="glow-point ${isHighlighted ? "scale-125" : ""}" style="--marker-color: ${color}"></div>`,
           iconSize: [16, 16],
           iconAnchor: [8, 8]
         });
@@ -121,7 +143,7 @@ export default function LiveMap({ results, selectedEventId, onSelect, searchCent
             eventHandlers={{
               click: () => onSelect(result.event.id)
             }}
-            zIndexOffset={isSelected ? 1000 : result.isExactMatch ? 500 : 100}
+            zIndexOffset={isHighlighted ? 1000 : 100}
           >
             <Tooltip direction="top" offset={[0, -8]} opacity={1} className="livepulse-tooltip">
               <div className="flex gap-2.5 items-center">
@@ -152,7 +174,7 @@ export default function LiveMap({ results, selectedEventId, onSelect, searchCent
         );
       })}
 
-      <MapController selectedResult={selectedResult} searchCenter={searchCenter} />
+      <MapController selectedResult={selectedResult} hoveredResult={hoveredResult} searchCenter={searchCenter} />
     </MapContainer>
   );
 }
