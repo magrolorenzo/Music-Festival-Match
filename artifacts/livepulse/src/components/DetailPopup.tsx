@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { formatEventDate } from "@/lib/dates";
-import { getImageForId, initialsFor, placeholderGradient } from "@/lib/images";
+import { initialsFor, placeholderGradient } from "@/lib/images";
 import { pickArtistQuote } from "@/services/api";
 import type { MatchResult, SearchFilters, Performer, MoodKey } from "@/services/types";
 import { MapPin, Calendar, X, ExternalLink, Headphones, TrendingUp, Music, Quote } from "lucide-react";
@@ -21,7 +21,7 @@ interface DetailPopupProps {
 }
 
 function PerformerCard({ performer, preferredMood }: { performer: Performer, preferredMood?: MoodKey }) {
-  const image = performer.image ?? getImageForId(performer.id);
+  const image = performer.image;
   const quote = pickArtistQuote(performer, preferredMood);
 
   return (
@@ -29,7 +29,7 @@ function PerformerCard({ performer, preferredMood }: { performer: Performer, pre
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-xl overflow-hidden bg-muted relative">
           {image ? (
-            <img src={image} alt={performer.name} className="w-full h-full object-cover" />
+            <img src={image} alt={performer.name} className="w-full h-full object-cover object-top" />
           ) : (
             <div
               className="w-full h-full flex items-center justify-center text-3xl font-bold text-white/80"
@@ -112,7 +112,7 @@ function StarIcon(props: any) {
 
 export default function DetailPopup({ result, filters, onClose }: DetailPopupProps) {
   const { event, reasons, matchedGenreKeys, matchedMoodKeys, matchingPerformers } = result;
-  const image = event.image ?? getImageForId(event.id);
+  const image = event.image;
 
   // We show matching performers first, then any others
   const performerIds = new Set(matchingPerformers.map(p => p.id));
@@ -144,11 +144,11 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
           </Button>
         </div>
 
-        <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto livepulse-scroll">
           {/* Hero */}
           <div className="h-64 md:h-80 relative overflow-hidden bg-muted">
             {image ? (
-              <img src={image} alt={event.name} className="w-full h-full object-cover" />
+              <img src={image} alt={event.name} className="w-full h-full object-cover object-top" />
             ) : (
               <div
                 className="w-full h-full flex items-center justify-center text-6xl font-extrabold text-white/80"
@@ -206,14 +206,17 @@ export default function DetailPopup({ result, filters, onClose }: DetailPopupPro
                 >
                   <CarouselContent>
                     {displayPerformers.map((performer) => (
-                      <CarouselItem key={performer.id} className="basis-full">
+                      <CarouselItem
+                        key={performer.id}
+                        className="basis-[88%] md:basis-[85%]"
+                      >
                         <PerformerCard performer={performer} preferredMood={filters.moods[0]} />
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <div className="flex items-center justify-end gap-2 mt-4 pr-4">
-                    <CarouselPrevious className="static transform-none bg-white/5 border-white/10 hover:bg-white/10 text-white" />
-                    <CarouselNext className="static transform-none bg-white/5 border-white/10 hover:bg-white/10 text-white" />
+                  <div className="flex items-center justify-end gap-3 mt-6 pr-2">
+                    <CarouselPrevious className="static transform-none h-12 w-12 [&_svg]:size-6 bg-white/5 border-white/10 hover:bg-white/10 text-white" />
+                    <CarouselNext className="static transform-none h-12 w-12 [&_svg]:size-6 bg-white/5 border-white/10 hover:bg-white/10 text-white" />
                   </div>
                 </Carousel>
               )}

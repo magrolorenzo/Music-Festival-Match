@@ -61,8 +61,8 @@ paths:
       description: >
         Runs the full live pipeline server-side: JamBase v3 events in the geo +
         date window, genre filtered, then per-headliner enrichment (Songstats
-        hype + Musixmatch mood) with DB-cached TTL. Degrades to mock data with a
-        visible source flag when the live pipeline is unavailable.
+        hype + Musixmatch mood) with DB-cached TTL. Returns an empty list when
+        the live pipeline is unavailable.
       requestBody:
         required: true
         content:
@@ -71,7 +71,7 @@ paths:
               $ref: "#/components/schemas/SearchInput"
       responses:
         "200":
-          description: Enriched events plus the data source that served them.
+          description: Enriched events in the geo + date window.
           content:
             application/json:
               schema:
@@ -326,12 +326,8 @@ components:
             $ref: "#/components/schemas/GenreKey"
     SearchResults:
       type: object
-      required: [source, events]
+      required: [events]
       properties:
-        source:
-          type: string
-          enum: [live, mock]
-          description: Whether results came from the live pipeline or mock fallback.
         events:
           type: array
           items:

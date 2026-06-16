@@ -39,7 +39,7 @@ export const SearchPlacesResponse = zod.array(SearchPlacesResponseItem)
 
 
 /**
- * Runs the full live pipeline server-side: JamBase v3 events in the geo + date window, genre filtered, then per-headliner enrichment (Songstats hype + Musixmatch mood) with DB-cached TTL. Degrades to mock data with a visible source flag when the live pipeline is unavailable.
+ * Runs the full live pipeline server-side: JamBase v3 events in the geo + date window, genre filtered, then per-headliner enrichment (Songstats hype + Musixmatch mood) with DB-cached TTL. Returns an empty list when the live pipeline is unavailable.
 
  * @summary Search live events
  */
@@ -56,7 +56,6 @@ export const SearchEventsBody = zod.object({
 })
 
 export const SearchEventsResponse = zod.object({
-  "source": zod.enum(['live', 'mock']).describe('Whether results came from the live pipeline or mock fallback.'),
   "events": zod.array(zod.object({
   "id": zod.string(),
   "kind": zod.enum(['festival', 'concert']),

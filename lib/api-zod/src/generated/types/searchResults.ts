@@ -6,10 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { LiveEvent } from './liveEvent';
-import type { SearchResultsSource } from './searchResultsSource';
 
 export interface SearchResults {
-  /** Whether results came from the live pipeline or mock fallback. */
-  source: SearchResultsSource;
   events: LiveEvent[];
 }

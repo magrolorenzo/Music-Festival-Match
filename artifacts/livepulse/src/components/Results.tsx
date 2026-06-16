@@ -6,7 +6,7 @@ import LiveMap, { type SearchCenter } from "./LiveMap";
 import DetailPopup from "./DetailPopup";
 import { radiusToKm } from "@/services/api";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, SlidersHorizontal, Info } from "lucide-react";
+import { ArrowLeft, SlidersHorizontal, CalendarX } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "framer-motion";
 
@@ -40,29 +40,32 @@ export default function Results({ response, onReset }: { response: SearchRespons
           </div>
         </div>
 
-        {response.source === "mock" && (
-          <div
-            data-testid="notice-mock-data"
-            className="flex items-start gap-2 px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 text-amber-300 text-xs shrink-0"
-          >
-            <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-            <span>
-              Showing sample data — the live events service is unavailable right
-              now, so these results are illustrative.
-            </span>
-          </div>
-        )}
-
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-4">
             {response.results.length === 0 ? (
-              <div className="text-center p-8 text-muted-foreground">
-                <SlidersHorizontal className="w-8 h-8 mx-auto mb-3 opacity-50" />
-                <p>
-                  {hasFilters
-                    ? "No exact matches found. Try loosening your filters."
-                    : "No events found in this area. Try a wider radius or different dates."}
-                </p>
+              <div
+                data-testid="empty-no-events"
+                className="flex flex-col items-center text-center px-6 py-12 gap-4"
+              >
+                <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                  <CalendarX className="w-7 h-7 text-muted-foreground" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="text-lg font-bold">No events found</h3>
+                  <p className="text-sm text-muted-foreground max-w-xs">
+                    {hasFilters
+                      ? "Nothing matched here for these dates and filters. Try a different place, wider dates, or other genres and moods."
+                      : "Nothing's happening in this area for the dates you picked. Try a different place or wider dates."}
+                  </p>
+                </div>
+                <Button
+                  data-testid="button-back-to-filters"
+                  onClick={onReset}
+                  className="rounded-full font-semibold"
+                >
+                  <SlidersHorizontal className="w-4 h-4 mr-2" />
+                  Adjust filters
+                </Button>
               </div>
             ) : (
               response.results.map((result, i) => (

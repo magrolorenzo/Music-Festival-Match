@@ -22,5 +22,4 @@ export * from './regionKey';
 export * from './searchInput';
 export * from './searchPlacesParams';
 export * from './searchResults';
-export * from './searchResultsSource';
 export * from './songstatsTrend';

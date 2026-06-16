@@ -1,8 +1,8 @@
-import { motion } from "framer-motion";
 import { formatEventDate } from "@/lib/dates";
 import { matchStrength } from "@/services/matching";
-import { getImageForId, initialsFor, placeholderGradient } from "@/lib/images";
-import type { MatchResult, SearchFilters } from "@/services/types";
+import { initialsFor, placeholderGradient } from "@/lib/images";
+import { moodHue, moodAccent, moodGroupGradient } from "@/lib/taxonomy";
+import type { MatchResult, SearchFilters, MoodKey } from "@/services/types";
 import { MapPin, Calendar, Star, Sparkles, Music } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,8 +21,8 @@ interface EventCardProps {
 
 export default function EventCard({ result, filters, isSelected, onClick }: EventCardProps) {
   const { event, isExactMatch, score } = result;
-  const { matched, total } = matchStrength(result, filters);
-  const image = event.image ?? getImageForId(event.id);
+  const { total } = matchStrength(result, filters);
+  const image = event.image;
 
   const headliners = event.performers.filter((p) => p.isHeadliner).map((p) => p.name);
   const artistNames = (headliners.length ? headliners : event.performers.map((p) => p.name));
@@ -46,7 +46,7 @@ export default function EventCard({ result, filters, isSelected, onClick }: Even
           <img 
             src={image} 
             alt={event.name} 
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-70"
+            className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110 opacity-70"
           />
         ) : (
           <div
@@ -59,11 +59,6 @@ export default function EventCard({ result, filters, isSelected, onClick }: Even
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
         
         <div className="absolute top-3 left-3 flex gap-2">
-          {!isExactMatch && total > 0 && (
-            <Badge variant="secondary" className="bg-black/60 backdrop-blur-md border-white/10 text-white font-medium">
-              Partial ({matched}/{total})
-            </Badge>
-          )}
           {isExactMatch && total > 0 && (
             <Badge variant="default" className="bg-primary/90 text-primary-foreground backdrop-blur-md shadow-[0_0_10px_rgba(255,69,0,0.5)] border-none">
               <Sparkles className="w-3 h-3 mr-1" /> Perfect Match
@@ -112,11 +107,33 @@ export default function EventCard({ result, filters, isSelected, onClick }: Even
         </div>
 
         <div className="mt-2 flex flex-wrap gap-1">
-          {result.reasons.map((r, i) => (
-            <span key={i} className="text-xs px-2 py-1 rounded bg-white/5 text-white/70 border border-white/5">
-              {r.label}
-            </span>
-          ))}
+          {result.reasons.map((r, i) => {
+            const isMoodMatch =
+              r.type === "mood" &&
+              result.matchedMoodKeys.includes(r.key as MoodKey);
+            return (
+              <span
+                key={i}
+                style={
+                  isMoodMatch
+                    ? {
+                        background: moodGroupGradient([r.key as MoodKey], 0.32),
+                        borderColor: moodAccent(moodHue(r.key as MoodKey), 0.6),
+                        color: "#fff",
+                        boxShadow: `0 0 12px ${moodAccent(moodHue(r.key as MoodKey), 0.35)}`,
+                      }
+                    : undefined
+                }
+                className={`text-xs px-2 py-1 rounded border ${
+                  isMoodMatch
+                    ? "font-semibold"
+                    : "bg-white/5 text-white/70 border-white/5"
+                }`}
+              >
+                {r.label}
+              </span>
+            );
+          })}
         </div>
       </div>
     </div>

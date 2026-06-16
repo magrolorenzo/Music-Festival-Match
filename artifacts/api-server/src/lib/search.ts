@@ -7,10 +7,9 @@ import type {
   SearchInput,
 } from "@workspace/api-zod";
 import { fetchJamBaseEvents, hasJamBaseKey, type RawEvent, type RawPerformer } from "./jambase";
-import { mapGenres } from "./taxonomy";
+import { mapGenres, mapMoods } from "./taxonomy";
 import { enrichArtist, PLACEHOLDER_ENRICHMENT } from "./enrichment";
 import { mapWithConcurrency } from "./http";
-import { mockEvents } from "./mockEvents";
 import { logger } from "./logger";
 
 // ============================================================================
@@ -20,9 +19,9 @@ import { logger } from "./logger";
 //   (Songstats hype + Musixmatch mood, DB-cached)  ->  assembled LiveEvent[].
 //
 // Fan-out is bounded: only headliners are enriched, only the top events are
-// processed, and all artist enrichments share a single concurrency pool. Any
-// failure (or a missing JamBase key) falls back to the mock dataset, surfaced
-// via the `source` flag.
+// processed, and all artist enrichments share a single concurrency pool. The
+// pipeline is live-only: a missing JamBase key or any failure yields an empty
+// result, so the UI shows a clear "no events" state rather than mock data.
 // ============================================================================
 
 const MAX_EVENTS = 30;
@@ -30,7 +29,6 @@ const MAX_HEADLINERS_PER_EVENT = 5;
 const ENRICH_CONCURRENCY = 5;
 
 export interface SearchOutput {
-  source: "live" | "mock";
   events: LiveEvent[];
 }
 
@@ -53,6 +51,12 @@ function selectHeadliners(event: RawEvent): RawPerformer[] {
   const headliners = event.performers.filter((p) => p.isHeadliner);
   const pool = headliners.length > 0 ? headliners : event.performers;
   return pool.slice(0, MAX_HEADLINERS_PER_EVENT);
+}
+
+// Normalizes a single cached mood string to a valid MoodKey, defaulting to
+// "party" when the label no longer maps to any current taxonomy entry.
+function coerceMood(raw: string): MoodKey {
+  return mapMoods([raw])[0] ?? "party";
 }
 
 function performerId(eventId: string, name: string): string {
@@ -109,7 +113,10 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
         const enriched = headlinerNames.has(p.name)
           ? byName.get(p.name) ?? PLACEHOLDER_ENRICHMENT
           : PLACEHOLDER_ENRICHMENT;
-        const moodKeys = enriched.moodKeys as MoodKey[];
+        // Cached enrichment may predate the current taxonomy, so re-normalize
+        // every mood string through mapMoods before it hits the response schema
+        // (stray labels like "energetic" would otherwise fail Zod validation).
+        const moodKeys = mapMoods(enriched.moodKeys);
 
         return {
           id: performerId(event.id, p.name),
@@ -126,11 +133,11 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
           songstats: enriched.songstats,
           recommendedSongs: enriched.recommendedSongs.map((s) => ({
             ...s,
-            moodKeys: s.moodKeys as MoodKey[],
+            moodKeys: mapMoods(s.moodKeys),
           })),
           quotes: enriched.quotes.map((q) => ({
             ...q,
-            mood: q.mood as MoodKey,
+            mood: coerceMood(q.mood),
           })),
         } satisfies Performer;
       });
@@ -157,29 +164,21 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
 }
 
 /**
- * Top-level search: runs the live pipeline when a JamBase key is present,
- * otherwise (or on any failure) returns the mock dataset with `source: "mock"`.
+ * Top-level search: runs the live pipeline when a JamBase key is present.
+ * A missing key or any pipeline failure yields an empty result, so the UI
+ * surfaces a clear "no events" state rather than illustrative mock data.
  */
 export async function runSearch(input: SearchInput): Promise<SearchOutput> {
-  if (hasJamBaseKey()) {
-    try {
-      const events = await buildLive(input);
-      return { source: "live", events };
-    } catch (err) {
-      logger.warn({ err }, "live pipeline failed; falling back to mock data");
-    }
-  } else {
-    logger.info("JAMBASE_API_KEY missing; serving mock data");
+  if (!hasJamBaseKey()) {
+    logger.warn("JAMBASE_API_KEY missing; returning no events");
+    return { events: [] };
   }
 
-  return {
-    source: "mock",
-    events: mockEvents({
-      latitude: input.latitude,
-      longitude: input.longitude,
-      radiusKm: input.radiusKm,
-      startDate: input.startDate,
-      endDate: input.endDate,
-    }),
-  };
+  try {
+    const events = await buildLive(input);
+    return { events };
+  } catch (err) {
+    logger.warn({ err }, "live pipeline failed; returning no events");
+    return { events: [] };
+  }
 }

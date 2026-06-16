@@ -163,20 +163,7 @@ export interface SearchInput {
   genres: GenreKey[];
 }
 
-/**
- * Whether results came from the live pipeline or mock fallback.
- */
-export type SearchResultsSource = typeof SearchResultsSource[keyof typeof SearchResultsSource];
-
-
-export const SearchResultsSource = {
-  live: 'live',
-  mock: 'mock',
-} as const;
-
 export interface SearchResults {
-  /** Whether results came from the live pipeline or mock fallback. */
-  source: SearchResultsSource;
   events: LiveEvent[];
 }
 

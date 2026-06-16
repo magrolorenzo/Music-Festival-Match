@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Tooltip, useMap } from "react-leaflet";
 import L from "leaflet";
 import { formatEventDate } from "@/lib/dates";
-import { getImageForId, initialsFor, placeholderGradient } from "@/lib/images";
+import { initialsFor, placeholderGradient } from "@/lib/images";
 import type { MatchResult } from "@/services/types";
 
 function artistLabelFor(result: MatchResult): string {
@@ -104,7 +104,7 @@ export default function LiveMap({ results, selectedEventId, onSelect, searchCent
       {results.map((result) => {
         const isSelected = result.event.id === selectedEventId;
         const color = isSelected ? "hsl(var(--primary))" : (result.isExactMatch ? "#ffffff" : "#666");
-        const image = result.event.image ?? getImageForId(result.event.id);
+        const image = result.event.image;
         
         const icon = L.divIcon({
           className: "",
@@ -129,7 +129,7 @@ export default function LiveMap({ results, selectedEventId, onSelect, searchCent
                   <img
                     src={image}
                     alt={result.event.name}
-                    className="w-12 h-12 rounded-md object-cover shrink-0"
+                    className="w-12 h-12 rounded-md object-cover object-top shrink-0"
                   />
                 ) : (
                   <div

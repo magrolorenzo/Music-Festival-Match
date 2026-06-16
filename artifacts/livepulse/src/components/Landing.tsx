@@ -19,6 +19,7 @@ import {
 } from "@/lib/taxonomy";
 import { fetchPlaces } from "@/services/places";
 import { APP_TODAY, fromISODate, toISODate } from "@/lib/dates";
+import { defaultFilters } from "@/lib/filters";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
@@ -28,7 +29,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Loader2, MapPin, CalendarDays, Check } from "lucide-react";
+import { Loader2, MapPin, CalendarDays, Check, RotateCcw } from "lucide-react";
 
 interface LandingProps {
   filters: SearchFilters;
@@ -294,6 +295,23 @@ export default function Landing({
     }
   };
 
+  // Resets every filter on the form back to the shared app defaults.
+  const handleReset = () => {
+    const d = defaultFilters();
+    setSelectedPlace(d.location);
+    setLocationQuery(d.location?.label ?? "");
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setActiveIndex(-1);
+    setRadius(clampRadius(d.radius));
+    setRadiusUnit(d.radiusUnit);
+    setGenres(d.genres);
+    setMoods(d.moods);
+    setShowAllGenres(false);
+    setRange({ from: fromISODate(d.startDate), to: fromISODate(d.endDate) });
+    setGeoError(null);
+  };
+
   const handleSubmit = () => {
     if (!selectedPlace) {
       setGeoError("Select a place from the list to search.");
@@ -318,9 +336,9 @@ export default function Landing({
     <div className="w-full h-full overflow-y-auto relative">
       {/* Mood reactive backdrop */}
       <motion.div
-        className="fixed inset-0 opacity-25 pointer-events-none transition-[background] duration-1000"
+        className="fixed inset-0 pointer-events-none blur-2xl transition-[background] duration-1000"
         style={{ background: backdrop }}
-        animate={{ scale: [1, 1.05, 1], opacity: [0.18, 0.3, 0.18] }}
+        animate={{ scale: [1, 1.08, 1], opacity: [0.45, 0.7, 0.45] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
 
@@ -568,14 +586,26 @@ export default function Landing({
           </div>
         </div>
 
-        <Button
-          data-testid="button-find-experiences"
-          onClick={handleSubmit}
-          size="lg"
-          className="text-lg px-8 py-6 rounded-full font-bold shadow-[0_0_30px_rgba(255,69,0,0.4)] hover:shadow-[0_0_45px_rgba(255,69,0,0.6)] transition-all hover:scale-105"
-        >
-          Find Live Experiences
-        </Button>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <Button
+            data-testid="button-find-experiences"
+            onClick={handleSubmit}
+            size="lg"
+            className="text-lg px-8 py-6 rounded-full font-bold shadow-[0_0_30px_rgba(255,69,0,0.4)] hover:shadow-[0_0_45px_rgba(255,69,0,0.6)] transition-all hover:scale-105"
+          >
+            Find Live Experiences
+          </Button>
+          <Button
+            data-testid="button-reset-filters"
+            onClick={handleReset}
+            variant="ghost"
+            size="lg"
+            className="rounded-full text-muted-foreground hover:text-white hover:bg-white/5"
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Reset filters
+          </Button>
+        </div>
       </div>
       </div>
     </div>
