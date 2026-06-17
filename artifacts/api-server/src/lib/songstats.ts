@@ -1,5 +1,4 @@
 import { fetchJson } from "./http";
-import { withCache } from "./cache";
 
 // ============================================================================
 // Songstats artist hype client (enterprise API).
@@ -51,11 +50,7 @@ async function findArtistId(
   const url = new URL(`${SONGSTATS_BASE}/artists/search`);
   url.searchParams.set("q", name);
   url.searchParams.set("limit", "1");
-  const data = await withCache(
-    "songstats",
-    url.toString(),
-    () => fetchJson<any>(url.toString(), { headers: headers(apiKey) }),
-  );
+  const data = await fetchJson<any>(url.toString(), { headers: headers(apiKey) });
   const list = data?.results ?? data?.artists ?? data?.data ?? [];
   const first = Array.isArray(list) ? list[0] : null;
   const id =
@@ -73,11 +68,7 @@ async function fetchStats(
   const url = new URL(`${SONGSTATS_BASE}/artists/stats`);
   url.searchParams.set("songstats_artist_id", artistId);
   url.searchParams.set("source", "spotify");
-  const data = await withCache(
-    "songstats",
-    url.toString(),
-    () => fetchJson<any>(url.toString(), { headers: headers(apiKey) }),
-  );
+  const data = await fetchJson<any>(url.toString(), { headers: headers(apiKey) });
 
   const stats =
     data?.stats?.[0]?.data ?? data?.stats?.data ?? data?.data ?? data?.stats ?? {};
@@ -118,11 +109,7 @@ async function fetchCatalog(
   const url = new URL(`${SONGSTATS_BASE}/artists/catalog`);
   url.searchParams.set("songstats_artist_id", artistId);
   url.searchParams.set("limit", String(limit));
-  const data = await withCache(
-    "songstats",
-    url.toString(),
-    () => fetchJson<any>(url.toString(), { headers: headers(apiKey) }),
-  );
+  const data = await fetchJson<any>(url.toString(), { headers: headers(apiKey) });
   const list = data?.catalog ?? data?.results ?? data?.data ?? [];
   if (!Array.isArray(list)) return [];
   return list
@@ -151,11 +138,7 @@ async function fetchTrackMeta(
   url.searchParams.set("songstats_track_id", trackId);
   url.searchParams.set("source", "spotify");
   url.searchParams.set("with_links", "true");
-  const data = await withCache(
-    "songstats",
-    url.toString(),
-    () => fetchJson<any>(url.toString(), { headers: headers(apiKey) }),
-  );
+  const data = await fetchJson<any>(url.toString(), { headers: headers(apiKey) });
 
   const stat = data?.stats?.[0]?.data ?? data?.stats?.data ?? {};
   const popularity = clampScore(
