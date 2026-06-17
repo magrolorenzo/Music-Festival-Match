@@ -1,4 +1,5 @@
 import { fetchJson } from "./http";
+import { withCache } from "./cache";
 
 // ============================================================================
 // Songstats artist hype client (enterprise API).
@@ -8,7 +9,7 @@ import { fetchJson } from "./http";
 // gap returns null so the enrichment layer can fall back to placeholders.
 // ============================================================================
 
-const SONGSTATS_BASE = "https://stoplight.io/mocks/songstats/api/12173793";
+const SONGSTATS_BASE = "https://api.songstats.com/enterprise/v1";
 
 export interface SongstatsTrack {
   trackName: string;
@@ -25,9 +26,7 @@ export interface SongstatsResult {
 }
 
 function headers(apiKey: string): Record<string, string> {
-  const h: Record<string, string> = { Accept: "application/json" };
-  if (apiKey && apiKey !== "mock") h.apikey = apiKey;
-  return h;
+  return { Accept: "application/json", apikey: apiKey };
 }
 
 function pickNumber(...values: unknown[]): number {
@@ -50,7 +49,11 @@ async function findArtistId(
   const url = new URL(`${SONGSTATS_BASE}/artists/search`);
   url.searchParams.set("q", name);
   url.searchParams.set("limit", "1");
-  const data = await fetchJson<any>(url.toString(), { headers: headers(apiKey) });
+  const data = await withCache(
+    "songstats",
+    url.toString(),
+    () => fetchJson<any>(url.toString(), { headers: headers(apiKey) }),
+  );
   const list = data?.results ?? data?.artists ?? data?.data ?? [];
   const first = Array.isArray(list) ? list[0] : null;
   const id =
@@ -68,7 +71,11 @@ async function fetchStats(
   const url = new URL(`${SONGSTATS_BASE}/artists/stats`);
   url.searchParams.set("songstats_artist_id", artistId);
   url.searchParams.set("source", "spotify");
-  const data = await fetchJson<any>(url.toString(), { headers: headers(apiKey) });
+  const data = await withCache(
+    "songstats",
+    url.toString(),
+    () => fetchJson<any>(url.toString(), { headers: headers(apiKey) }),
+  );
 
   const stats =
     data?.stats?.[0]?.data ?? data?.stats?.data ?? data?.data ?? data?.stats ?? {};
@@ -109,7 +116,11 @@ async function fetchCatalog(
   const url = new URL(`${SONGSTATS_BASE}/artists/catalog`);
   url.searchParams.set("songstats_artist_id", artistId);
   url.searchParams.set("limit", String(limit));
-  const data = await fetchJson<any>(url.toString(), { headers: headers(apiKey) });
+  const data = await withCache(
+    "songstats",
+    url.toString(),
+    () => fetchJson<any>(url.toString(), { headers: headers(apiKey) }),
+  );
   const list = data?.catalog ?? data?.results ?? data?.data ?? [];
   if (!Array.isArray(list)) return [];
   return list
@@ -138,7 +149,11 @@ async function fetchTrackMeta(
   url.searchParams.set("songstats_track_id", trackId);
   url.searchParams.set("source", "spotify");
   url.searchParams.set("with_links", "true");
-  const data = await fetchJson<any>(url.toString(), { headers: headers(apiKey) });
+  const data = await withCache(
+    "songstats",
+    url.toString(),
+    () => fetchJson<any>(url.toString(), { headers: headers(apiKey) }),
+  );
 
   const stat = data?.stats?.[0]?.data ?? data?.stats?.data ?? {};
   const popularity = clampScore(
@@ -178,15 +193,15 @@ async function fetchTopTracks(
 }
 
 export function hasSongstatsKey(): boolean {
-  return true;
+  return Boolean(process.env.SONGSTATS_API_KEY);
 }
 
 /** Returns hype metrics + top tracks for an artist, or null on any failure. */
 export async function fetchArtistHype(
   name: string,
 ): Promise<SongstatsResult | null> {
-  // Use a dummy key for the Stoplight mock server (public, no auth required).
-  const apiKey = process.env.SONGSTATS_API_KEY ?? "mock";
+  const apiKey = process.env.SONGSTATS_API_KEY;
+  if (!apiKey) return null;
 
   const artistId = await findArtistId(name, apiKey);
   if (!artistId) return null;
