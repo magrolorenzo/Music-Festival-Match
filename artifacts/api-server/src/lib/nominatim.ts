@@ -1,5 +1,6 @@
 import type { Place } from "@workspace/api-zod";
 import { fetchJson } from "./http";
+import { withCache } from "./cache";
 
 // ============================================================================
 // OpenStreetMap Nominatim geocoder (keyless, server-side).
@@ -28,10 +29,15 @@ export async function searchPlaces(query: string): Promise<Place[]> {
   url.searchParams.set("limit", "5");
   url.searchParams.set("addressdetails", "0");
 
-  const hits = await fetchJson<NominatimHit[]>(
+  const hits = await withCache(
+    "nominatim",
     url.toString(),
-    { headers: { Accept: "application/json", "User-Agent": USER_AGENT } },
-    6000,
+    () =>
+      fetchJson<NominatimHit[]>(
+        url.toString(),
+        { headers: { Accept: "application/json", "User-Agent": USER_AGENT } },
+        6000,
+      ),
   );
 
   if (!Array.isArray(hits)) return [];

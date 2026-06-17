@@ -1,4 +1,5 @@
 import { fetchJson } from "./http";
+import { withCache } from "./cache";
 
 // ============================================================================
 // JamBase v3 events client.
@@ -203,15 +204,22 @@ export async function fetchJamBaseEvents(
   url.searchParams.set("eventDateTo", to);
   url.searchParams.set("perPage", "50");
 
-  const payload = await fetchJson<any>(
-    url.toString(),
-    {
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-    },
-    8000,
+  const cacheKey = url.toString();
+
+  const payload = await withCache(
+    "jambase",
+    cacheKey,
+    () =>
+      fetchJson<any>(
+        url.toString(),
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${apiKey}`,
+          },
+        },
+        8000,
+      ),
   );
 
   const list = Array.isArray(payload?.events)

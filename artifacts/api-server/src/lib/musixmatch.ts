@@ -1,4 +1,5 @@
 import { fetchJson } from "./http";
+import { withCache } from "./cache";
 import { mapMoods } from "./taxonomy";
 import type { MoodKey } from "@workspace/api-zod";
 
@@ -42,7 +43,11 @@ async function matchTrackIdBySpotify(
   const url = new URL(`${MUSIXMATCH_BASE}/track.get`);
   url.searchParams.set("track_spotify_id", spotifyId);
   url.searchParams.set("apikey", apiKey);
-  const data = await fetchJson<any>(url.toString());
+  const data = await withCache(
+    "musixmatch",
+    url.toString(),
+    () => fetchJson<any>(url.toString()),
+  );
   const id = data?.message?.body?.track?.track_id;
   return typeof id === "number" ? id : null;
 }
@@ -57,7 +62,11 @@ async function matchTrackId(
   url.searchParams.set("q_artist", artist);
   url.searchParams.set("q_track", track);
   url.searchParams.set("apikey", apiKey);
-  const data = await fetchJson<any>(url.toString());
+  const data = await withCache(
+    "musixmatch",
+    url.toString(),
+    () => fetchJson<any>(url.toString()),
+  );
   const id = data?.message?.body?.track?.track_id;
   return typeof id === "number" ? id : null;
 }
@@ -69,7 +78,11 @@ async function fetchLyrics(
   const url = new URL(`${MUSIXMATCH_BASE}/track.lyrics.get`);
   url.searchParams.set("track_id", String(trackId));
   url.searchParams.set("apikey", apiKey);
-  const data = await fetchJson<any>(url.toString());
+  const data = await withCache(
+    "musixmatch",
+    url.toString(),
+    () => fetchJson<any>(url.toString()),
+  );
   const lyrics = data?.message?.body?.lyrics;
   const body = typeof lyrics?.lyrics_body === "string" ? lyrics.lyrics_body : "";
   if (!body) return null;
@@ -90,7 +103,11 @@ async function fetchMoodLabels(
     const url = new URL(`${MUSIXMATCH_BASE}/track.lyrics.mood.get`);
     url.searchParams.set("track_id", String(trackId));
     url.searchParams.set("apikey", apiKey);
-    const data = await fetchJson<any>(url.toString());
+    const data = await withCache(
+      "musixmatch",
+      url.toString(),
+      () => fetchJson<any>(url.toString()),
+    );
     const moodList = data?.message?.body?.mood_list ?? data?.message?.body?.moods;
     if (!Array.isArray(moodList)) return [];
     return moodList
