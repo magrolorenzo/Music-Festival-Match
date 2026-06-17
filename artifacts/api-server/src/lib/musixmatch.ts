@@ -4,17 +4,180 @@ import { mapMoods } from "./taxonomy";
 import type { MoodKey } from "@workspace/api-zod";
 
 // ============================================================================
-// Musixmatch lyric + mood client.
+// Musixmatch client.
 //
-// matcher.track.get  -> resolve a track id for an (artist, track) pair
-// track.lyrics.get   -> a short, legal lyric snippet + tracking url
-// track.lyrics.mood.get (enterprise) -> emotion/mood labels
+// New primary flow (per-artist enrichment):
+//   track.search              → top 3 tracks by rating for an artist
+//   track.lyrics.analysis.get → moods + theme quote (enterprise endpoint,
+//                               only called when has_lyrics === 1)
 //
-// Mood is best-effort: when the mood endpoint is unavailable we still return a
-// quote, just with an "unknown" mood profile rather than a guessed one.
+// Legacy flow (kept for future reuse, not called by current enrichment):
+//   matcher.track.get / track.lyrics.get / track.lyrics.mood.get
 // ============================================================================
 
 const MUSIXMATCH_BASE = "https://api.musixmatch.com/ws/1.1";
+
+// ---------------------------------------------------------------------------
+// Artist name normalisation
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalises an artist name for use as a cache key:
+ *   lowercase, accents/apostrophes/special chars → "+", spaces → "+".
+ * Example: "Dov'è Liana" → "dov+e+liana"
+ */
+export function normalizeArtistName(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "+")
+    .replace(/['\u2019\u2018\u02bc]/g, "+")
+    .replace(/\s+/g, "+")
+    .replace(/[^a-z0-9+]/g, "+")
+    .replace(/\++/g, "+")
+    .replace(/^\+|\+$/g, "");
+}
+
+/**
+ * Normalises an artist name for use as a Musixmatch q_artist query string:
+ *   lowercase, accents stripped, apostrophes stripped, spaces preserved.
+ * Example: "Dov'è Liana" → "dove liana"
+ */
+function normalizeForQuery(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/['\u2019\u2018\u02bc]/g, "")
+    .trim();
+}
+
+// ---------------------------------------------------------------------------
+// New primary flow: track.search → track.lyrics.analysis.get
+// ---------------------------------------------------------------------------
+
+export interface ArtistTrack {
+  trackId: number;
+  trackName: string;
+  trackRating: number;
+  spotifyId: string | null;
+  albumName: string;
+  hasLyrics: boolean;
+  quote: string | null;
+  moods: string[];
+}
+
+async function searchTracks(
+  queryName: string,
+  apiKey: string,
+): Promise<any[]> {
+  const url = new URL(`${MUSIXMATCH_BASE}/track.search`);
+  url.searchParams.set("q_artist", queryName);
+  url.searchParams.set("page_size", "3");
+  url.searchParams.set("s_track_rating", "desc");
+  url.searchParams.set("apikey", apiKey);
+
+  const data = await withCache(
+    "musixmatch",
+    url.toString(),
+    () => fetchJson<any>(url.toString()),
+  );
+  return data?.message?.body?.track_list ?? [];
+}
+
+async function fetchLyricsAnalysis(
+  trackId: number,
+  apiKey: string,
+): Promise<{ quote: string | null; moods: string[] }> {
+  try {
+    const url = new URL(`${MUSIXMATCH_BASE}/track.lyrics.analysis.get`);
+    url.searchParams.set("track_id", String(trackId));
+    url.searchParams.set("apikey", apiKey);
+
+    const data = await withCache(
+      "musixmatch",
+      url.toString(),
+      () => fetchJson<any>(url.toString()),
+    );
+
+    const analysis = data?.message?.body?.analysis;
+    if (!analysis) return { quote: null, moods: [] };
+
+    const mainMoods: string[] = Array.isArray(analysis?.moods?.main_moods)
+      ? analysis.moods.main_moods.filter(
+          (m: unknown): m is string => typeof m === "string",
+        )
+      : [];
+
+    const firstQuote: string | null =
+      analysis?.themes?.main_themes?.[0]?.quotes?.[0] ?? null;
+
+    return { quote: firstQuote, moods: mainMoods };
+  } catch {
+    return { quote: null, moods: [] };
+  }
+}
+
+/**
+ * Fetches the top 3 tracks for an artist from Musixmatch, with lyrics
+ * analysis (moods + theme quote) for tracks that have lyrics.
+ */
+export async function fetchArtistTracks(name: string): Promise<ArtistTrack[]> {
+  const apiKey = process.env.MUSIXMATCH_API_KEY;
+  if (!apiKey) return [];
+
+  const queryName = normalizeForQuery(name);
+  const trackList = await searchTracks(queryName, apiKey).catch(() => []);
+
+  const tracks: ArtistTrack[] = [];
+
+  for (const entry of trackList) {
+    const track = entry?.track;
+    if (!track) continue;
+
+    const trackId = track.track_id;
+    if (typeof trackId !== "number") continue;
+
+    const trackName =
+      typeof track.track_name === "string" ? track.track_name : "";
+    const trackRating =
+      typeof track.track_rating === "number" ? track.track_rating : 0;
+    const spotifyId =
+      typeof track.track_spotify_id === "string" &&
+      track.track_spotify_id.length > 0
+        ? track.track_spotify_id
+        : null;
+    const albumName =
+      typeof track.album_name === "string" ? track.album_name : "";
+    const hasLyrics = track.has_lyrics === 1;
+
+    let quote: string | null = null;
+    let moods: string[] = [];
+
+    if (hasLyrics) {
+      const analysis = await fetchLyricsAnalysis(trackId, apiKey);
+      quote = analysis.quote;
+      moods = analysis.moods;
+    }
+
+    tracks.push({
+      trackId,
+      trackName,
+      trackRating,
+      spotifyId,
+      albumName,
+      hasLyrics,
+      quote,
+      moods,
+    });
+  }
+
+  return tracks;
+}
+
+// ---------------------------------------------------------------------------
+// Legacy flow — kept in backend for future reuse, not called by enrichment
+// ---------------------------------------------------------------------------
 
 export interface TrackQuote {
   trackName: string;
@@ -27,15 +190,12 @@ function snippet(lyrics: string): string {
   const lines = lyrics
     .split("\n")
     .map((l) => l.trim())
-    .filter((l) => l.length > 0 && !/\*+/.test(l) && !/lyrics? provided/i.test(l));
+    .filter(
+      (l) => l.length > 0 && !/\*+/.test(l) && !/lyrics? provided/i.test(l),
+    );
   return lines.slice(0, 2).join(" / ");
 }
 
-/**
- * Resolves a Musixmatch track id from a Spotify track id. This is the preferred
- * path: the Spotify id comes from Songstats, giving a deterministic handoff that
- * avoids the mismatch risk of fuzzy artist/track text matching.
- */
 async function matchTrackIdBySpotify(
   spotifyId: string,
   apiKey: string,
@@ -43,16 +203,13 @@ async function matchTrackIdBySpotify(
   const url = new URL(`${MUSIXMATCH_BASE}/track.get`);
   url.searchParams.set("track_spotify_id", spotifyId);
   url.searchParams.set("apikey", apiKey);
-  const data = await withCache(
-    "musixmatch",
-    url.toString(),
-    () => fetchJson<any>(url.toString()),
+  const data = await withCache("musixmatch", url.toString(), () =>
+    fetchJson<any>(url.toString()),
   );
   const id = data?.message?.body?.track?.track_id;
   return typeof id === "number" ? id : null;
 }
 
-/** Fallback resolver by fuzzy (artist, track) text when no Spotify id exists. */
 async function matchTrackId(
   artist: string,
   track: string,
@@ -62,29 +219,26 @@ async function matchTrackId(
   url.searchParams.set("q_artist", artist);
   url.searchParams.set("q_track", track);
   url.searchParams.set("apikey", apiKey);
-  const data = await withCache(
-    "musixmatch",
-    url.toString(),
-    () => fetchJson<any>(url.toString()),
+  const data = await withCache("musixmatch", url.toString(), () =>
+    fetchJson<any>(url.toString()),
   );
   const id = data?.message?.body?.track?.track_id;
   return typeof id === "number" ? id : null;
 }
 
-async function fetchLyrics(
+async function fetchLyricsBody(
   trackId: number,
   apiKey: string,
 ): Promise<{ body: string; url: string } | null> {
   const url = new URL(`${MUSIXMATCH_BASE}/track.lyrics.get`);
   url.searchParams.set("track_id", String(trackId));
   url.searchParams.set("apikey", apiKey);
-  const data = await withCache(
-    "musixmatch",
-    url.toString(),
-    () => fetchJson<any>(url.toString()),
+  const data = await withCache("musixmatch", url.toString(), () =>
+    fetchJson<any>(url.toString()),
   );
   const lyrics = data?.message?.body?.lyrics;
-  const body = typeof lyrics?.lyrics_body === "string" ? lyrics.lyrics_body : "";
+  const body =
+    typeof lyrics?.lyrics_body === "string" ? lyrics.lyrics_body : "";
   if (!body) return null;
   return {
     body,
@@ -103,12 +257,11 @@ async function fetchMoodLabels(
     const url = new URL(`${MUSIXMATCH_BASE}/track.lyrics.mood.get`);
     url.searchParams.set("track_id", String(trackId));
     url.searchParams.set("apikey", apiKey);
-    const data = await withCache(
-      "musixmatch",
-      url.toString(),
-      () => fetchJson<any>(url.toString()),
+    const data = await withCache("musixmatch", url.toString(), () =>
+      fetchJson<any>(url.toString()),
     );
-    const moodList = data?.message?.body?.mood_list ?? data?.message?.body?.moods;
+    const moodList =
+      data?.message?.body?.mood_list ?? data?.message?.body?.moods;
     if (!Array.isArray(moodList)) return [];
     return moodList
       .map((m: any) => m?.label ?? m?.mood ?? m?.name)
@@ -122,11 +275,6 @@ export function hasMusixmatchKey(): boolean {
   return Boolean(process.env.MUSIXMATCH_API_KEY);
 }
 
-/**
- * Fetches a mood-tagged lyric quote for a track, or null on failure. Resolves
- * the Musixmatch track id from the Spotify id when available (deterministic),
- * and only falls back to fuzzy (artist, track) text matching otherwise.
- */
 export async function fetchTrackQuote(
   artist: string,
   track: string,
@@ -142,7 +290,7 @@ export async function fetchTrackQuote(
   if (!trackId) return null;
 
   const [lyrics, moodLabels] = await Promise.all([
-    fetchLyrics(trackId, apiKey),
+    fetchLyricsBody(trackId, apiKey),
     fetchMoodLabels(trackId, apiKey),
   ]);
   if (!lyrics) return null;

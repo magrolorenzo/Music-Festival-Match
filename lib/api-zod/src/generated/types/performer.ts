@@ -7,8 +7,7 @@
  */
 import type { CyaniteAnalysis } from './cyaniteAnalysis';
 import type { MusixmatchQuote } from './musixmatchQuote';
-import type { RecommendedSong } from './recommendedSong';
-import type { SongstatsTrend } from './songstatsTrend';
+import type { Track } from './track';
 
 export interface Performer {
   id: string;
@@ -17,7 +16,8 @@ export interface Performer {
   image: string | null;
   isHeadliner: boolean;
   cyanite: CyaniteAnalysis;
-  songstats: SongstatsTrend;
-  recommendedSongs: RecommendedSong[];
+  /** Top tracks from Musixmatch (up to 3). */
+  tracks: Track[];
+  /** One quote per track that has lyrics (from analysis). */
   quotes: MusixmatchQuote[];
 }

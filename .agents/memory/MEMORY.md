@@ -1,9 +1,10 @@
 - [react-day-picker date serialization](livepulse-date-tz.md) — calendar gives LOCAL Date objects; never round-trip through UTC/toISOString or days shift off-by-one.
 - [LivePulse When date filter](livepulse-when-filter.md) — two separate From/To fields, each a single-month popover; To disabled before From; From-after-To advances To. User rejected range/two-step layouts.
 - [JamBase v3 events API](jambase-v3.md) — Bearer auth (jbd_ keys); eventDateFrom must be ≥ tomorrow or HTTP 400; clamp the from-date.
-- [Songstats + Musixmatch chain](songstats-musixmatch.md) — artists/tracks 404s (use catalog); tracks/stats with_links gives Spotify id; Musixmatch mood endpoint 403 on key.
+- [Musixmatch enrichment flow](musixmatch-enrichment-flow.md) — track.search (top 3 by rating) → track.lyrics.analysis.get (enterprise, if has_lyrics=1); cached in api_cache as "musixmatch-enrichment" / "artist:{normalizedName}"; Songstats removed from flow but backend kept.
 - [Cached enrichment mood normalization](cached-enrichment-mood-normalization.md) — re-run mapMoods/coerceMood over DB-cached moods before the response schema; casting `as MoodKey` let stray "energetic" 500 /api/search.
 - [LivePulse map re-fly on hover](livepulse-map-refly.md) — MapController flyToBounds must key on primitive lat/lng/radius, not the searchCenter object (recreated each render → re-flies on hover).
 - [LivePulse map clustering](livepulse-map-clustering.md) — results map groups venues per city below zoom ~12, splits on click/zoom; user rejected venue "Show more" paging — don't reintroduce.
 - [Musixmatch API docs](musixmatch-api-docs.md) — full API reference (111KB) saved from https://docs.musixmatch.com/llms-full.txt; covers all endpoints, parameters, status codes, and objects for lyric/track/artist/album lookup.
 - [Global API response cache](global-api-cache.md) — 30-day TTL PostgreSQL cache for all external calls (JamBase, Songstats, Musixmatch, Nominatim). Controlled by `ENABLE_API_CACHE` env var; `false` skips read/write entirely. Unique index on `(service_key, cache_key).`
+- [JamBase genreSlug server-side filter](jambase-genreslug.md) — genres passed as pipe-joined genreSlug param; client-side filter kept as safety net. Genre→slug map in jambase.ts.

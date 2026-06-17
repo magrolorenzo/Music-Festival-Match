@@ -1,5 +1,6 @@
 import { fetchJson } from "./http";
 import { withCache } from "./cache";
+import type { GenreKey } from "@workspace/api-zod";
 
 // ============================================================================
 // JamBase v3 events client.
@@ -7,6 +8,9 @@ import { withCache } from "./cache";
 // GET https://api.data.jambase.com/v3/events with Bearer auth. Responses follow
 // schema.org JSON-LD, so every field is read defensively — partner payloads
 // vary and a missing field must never crash the search.
+//
+// Genres are passed as a pipe-joined genreSlug parameter for server-side
+// filtering when the user has selected one or more genre filters.
 // ============================================================================
 
 const JAMBASE_EVENTS_URL = "https://api.data.jambase.com/v3/events";
@@ -42,7 +46,27 @@ export interface JamBaseQuery {
   radiusKm: number;
   startDate: string;
   endDate: string;
+  genres?: GenreKey[];
 }
+
+const GENRE_TO_JAMBASE: Record<GenreKey, string> = {
+  blues: "blues",
+  classical: "classical",
+  "country-music": "country",
+  edm: "electronic",
+  folk: "folk",
+  "hip-hop-rap": "hip-hop",
+  indie: "indie",
+  jazz: "jazz",
+  kpop: "k-pop",
+  latin: "latin",
+  metal: "metal",
+  pop: "pop",
+  punk: "punk",
+  "rhythm-and-blues-soul": "r-b",
+  reggae: "reggae",
+  rock: "rock",
+};
 
 export function hasJamBaseKey(): boolean {
   return Boolean(process.env.JAMBASE_API_KEY);
@@ -71,12 +95,20 @@ function firstString(value: unknown): string | null {
   if (Array.isArray(value)) {
     for (const item of value) {
       if (typeof item === "string") return item;
-      if (item && typeof item === "object" && typeof (item as any).url === "string") {
+      if (
+        item &&
+        typeof item === "object" &&
+        typeof (item as any).url === "string"
+      ) {
         return (item as any).url;
       }
     }
   }
-  if (value && typeof value === "object" && typeof (value as any).url === "string") {
+  if (
+    value &&
+    typeof value === "object" &&
+    typeof (value as any).url === "string"
+  ) {
     return (value as any).url;
   }
   return null;
@@ -84,7 +116,6 @@ function firstString(value: unknown): string | null {
 
 function toISODate(value: unknown, fallback: string): string {
   if (typeof value !== "string" || !value) return fallback;
-  // schema.org dates can be full datetimes; keep the calendar day only.
   return value.slice(0, 10);
 }
 
@@ -148,7 +179,9 @@ function mapEvent(raw: any, index: number): RawEvent | null {
   if (!startDate) return null;
 
   const typeField = raw["@type"] ?? raw.type ?? "";
-  const typeText = (Array.isArray(typeField) ? typeField.join(" ") : String(typeField)).toLowerCase();
+  const typeText = (
+    Array.isArray(typeField) ? typeField.join(" ") : String(typeField)
+  ).toLowerCase();
   const isFestival =
     typeText.includes("festival") || name.toLowerCase().includes("festival");
 
@@ -184,8 +217,9 @@ function mapEvent(raw: any, index: number): RawEvent | null {
 }
 
 /**
- * Fetches events from JamBase v3 in the geo + date window. Throws on missing
- * key or transport failure so the caller can fall back to mock data.
+ * Fetches events from JamBase v3 in the geo + date window. When genres are
+ * provided, passes them as a pipe-joined genreSlug for server-side filtering.
+ * Throws on missing key or transport failure.
  */
 export async function fetchJamBaseEvents(
   query: JamBaseQuery,
@@ -203,6 +237,14 @@ export async function fetchJamBaseEvents(
   url.searchParams.set("eventDateFrom", from);
   url.searchParams.set("eventDateTo", to);
   url.searchParams.set("perPage", "50");
+
+  if (query.genres && query.genres.length > 0) {
+    const slugs = query.genres
+      .map((g) => GENRE_TO_JAMBASE[g])
+      .filter(Boolean)
+      .join("|");
+    if (slugs) url.searchParams.set("genreSlug", slugs);
+  }
 
   const cacheKey = url.toString();
 

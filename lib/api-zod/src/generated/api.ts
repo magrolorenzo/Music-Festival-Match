@@ -39,7 +39,7 @@ export const SearchPlacesResponse = zod.array(SearchPlacesResponseItem)
 
 
 /**
- * Runs the full live pipeline server-side: JamBase v3 events in the geo + date window, genre filtered, then per-headliner enrichment (Songstats hype + Musixmatch mood) with DB-cached TTL. Returns an empty list when the live pipeline is unavailable.
+ * Runs the full live pipeline server-side: JamBase v3 events in the geo + date window, genre filtered server-side via genreSlug, then per-performer enrichment (Musixmatch track search + lyrics analysis) with DB-cached TTL. Returns an empty list when the live pipeline is unavailable.
 
  * @summary Search live events
  */
@@ -85,22 +85,18 @@ export const SearchEventsResponse = zod.object({
   "audioEnergy": zod.number(),
   "moodKeys": zod.array(zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature']))
 }),
-  "songstats": zod.object({
-  "popularityTrend": zod.string(),
-  "monthlyListeners": zod.number(),
-  "popularityScore": zod.number()
-}),
-  "recommendedSongs": zod.array(zod.object({
+  "tracks": zod.array(zod.object({
+  "trackId": zod.number().describe('Musixmatch track ID.'),
   "trackName": zod.string(),
-  "popularity": zod.number(),
-  "moodKeys": zod.array(zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature']))
-})),
+  "trackRating": zod.number().describe('Musixmatch popularity rating for this track.'),
+  "spotifyId": zod.string().nullable().describe('Spotify track ID (for future playback integration).'),
+  "albumName": zod.string()
+})).describe('Top tracks from Musixmatch (up to 3).'),
   "quotes": zod.array(zod.object({
   "trackName": zod.string(),
-  "mood": zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature']),
-  "lyrics_body": zod.string(),
-  "script_tracking_url": zod.string()
-}))
+  "moods": zod.array(zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature'])).describe('Mood keys derived from lyrics analysis for this track.'),
+  "quote": zod.string().describe('First available theme quote from lyrics analysis.')
+})).describe('One quote per track that has lyrics (from analysis).')
 })),
   "genreKeys": zod.array(zod.enum(['blues', 'classical', 'country-music', 'edm', 'folk', 'hip-hop-rap', 'indie', 'jazz', 'kpop', 'latin', 'metal', 'pop', 'punk', 'rhythm-and-blues-soul', 'reggae', 'rock'])),
   "moodKeys": zod.array(zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature']))

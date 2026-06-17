@@ -25,10 +25,10 @@ const WEIGHTS = {
 };
 
 function eventPeakPopularity(event: LiveEvent): number {
-  return event.performers.reduce(
-    (max, p) => Math.max(max, p.songstats.popularityScore),
-    0,
-  );
+  return event.performers.reduce((max, p) => {
+    const rating = p.tracks[0]?.trackRating ?? 0;
+    return Math.max(max, rating);
+  }, 0);
 }
 
 /** Performers contributing to the active genre/mood filters, best-first. */
@@ -45,7 +45,7 @@ function rankMatchingPerformers(
       p.cyanite.moodKeys.includes(m),
     ).length;
     const relevance =
-      genreHits * 2 + moodHits * 2 + p.songstats.popularityScore / 100;
+      genreHits * 2 + moodHits * 2 + (p.tracks[0]?.trackRating ?? 0) / 100;
     return { p, relevance, anyHit: genreHits > 0 || moodHits > 0 };
   });
 

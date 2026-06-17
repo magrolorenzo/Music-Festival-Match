@@ -1,0 +1,106 @@
+# Change Specification
+
+> **Note:** Songstats API calls and related content (trends, popularity, listener stats) are temporarily removed from this flow. Songstats services remain available in the backend for potential future reuse.
+
+## Overview
+The app searches for concerts by filtering location, dates, and genre. For each performer in every event , retrieve the top 3 tracks from Musixmatch with lyric analysis (quotes and moods).
+
+---
+
+## Flow
+
+### 1. Concert Search (JamBase)
+
+**User input:**
+- location, date of Start, date of End
+- genre(s) (optional)
+
+**JamBase `/events` — Filter parameters:**
+- `genreSlug` — use pipe operator (|) to group multiple selected genres
+  - Example: `genreSlug=pop|rock|indie` (if user selected these 3 genres)
+  - If no genre selected: omit the parameter
+
+**JamBase `/events` response contains:**
+- Array `events[]` of concerts
+- For each event:
+  - Event metadata (name, startDate, location, venue)
+  - Array `performer[]` of all performers (headliners + supporting acts)
+  - Each performer has: `name`, `genre[]` array, `x-isHeadliner` (boolean)
+
+---
+
+### 2. Performer Enrichment (Musixmatch)
+
+For **each performer** in every event (headliners and supporting acts). Deduplicate by artist name.
+
+#### Step 2a: Normalize artist name
+```
+input: "Dov'è Liana"
+output: "dov+e+liana"
+
+Rules:
+- lowercase
+- replace spaces with +
+- replace apostrophes and special characters (é, è, á, ', etc) with +
+- example: "The Strokes" → "the+strokes"
+- example: "Dov'è Liana" → "dov+e+liana" (apostrophe becomes +)
+```
+
+#### Step 2b: Track Search with Musixmatch
+**Call Musixmatch `/track.search` with the normalized artist name.**
+
+**Response `/track.search`:**
+- Contains `body.track_list[]` array (max 3 tracks sorted by rating)
+
+**Data to extract from each track:**
+- `track.track_id`
+- `track.track_name`
+- `track.track_rating`
+- `track.track_spotify_id`
+- `track.has_lyrics` (0 or 1, boolean)
+- `track.album_name`
+
+#### Step 2c: Track Lyrics Analysis (Conditional)
+**ONLY IF** `track.has_lyrics === 1`:
+
+**Call Musixmatch `/track.lyrics.analysis.get` with `track_id`.**
+
+**Response `/track.lyrics.analysis.get`:**
+- Contains `body.analysis` with moods and themes
+
+**Data to extract:**
+- `analysis.moods.main_moods[]` — array of strings (e.g. ["angst", "empowerment", "anger", ...])
+- `analysis.themes.main_themes[0].quotes[0]` — first available quote (e.g. "Our lives are changing lanes")
+
+#### Step 2d: Fallback for No-Lyrics
+If `track.has_lyrics === 0`:
+- Do NOT call `/track.lyrics.analysis.get`
+- Save `track.track_spotify_id` for player
+- No mood, no quote
+
+---
+
+## Data to Save
+
+**Per performer:**
+- Performer name
+- Array of 3 tracks (or fewer if Musixmatch error)
+
+**Per track:**
+- `track_id`, `track_name`, `track_rating`, `track_spotify_id`, `album_name`
+- If `has_lyrics === 1` and analysis succeeded:
+  - `quote` (single string, first available quote)
+  - `moods` (array of strings)
+- If `has_lyrics === 0`:
+  - `track_spotify_id` available for player
+
+---
+
+## Cache Strategy
+
+**Key:** `artist:{normalizedName}`  
+**TTL:** 30 days
+
+**Cache content:**
+- Complete results from `/track.search` and `/track.lyrics.analysis.get` for that performer
+- Deduplicates subsequent queries for the same artist

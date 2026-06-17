@@ -6,7 +6,12 @@ import type {
   RegionKey,
   SearchInput,
 } from "@workspace/api-zod";
-import { fetchJamBaseEvents, hasJamBaseKey, type RawEvent, type RawPerformer } from "./jambase";
+import {
+  fetchJamBaseEvents,
+  hasJamBaseKey,
+  type RawEvent,
+  type RawPerformer,
+} from "./jambase";
 import { mapGenres, mapMoods } from "./taxonomy";
 import { enrichArtist, PLACEHOLDER_ENRICHMENT } from "./enrichment";
 import { mapWithConcurrency } from "./http";
@@ -15,13 +20,13 @@ import { logger } from "./logger";
 // ============================================================================
 // Search orchestrator.
 //
-//   JamBase v3 events  ->  genre filter  ->  per-headliner enrichment
-//   (Songstats hype + Musixmatch mood, DB-cached)  ->  assembled LiveEvent[].
+//   JamBase v3 events (server-side genre filter via genreSlug)
+//   → per-performer Musixmatch enrichment (track.search + lyrics.analysis)
+//   → assembled LiveEvent[].
 //
-// Fan-out is bounded: only headliners are enriched, only the top events are
-// processed, and all artist enrichments share a single concurrency pool. The
-// pipeline is live-only: a missing JamBase key or any failure yields an empty
-// result, so the UI shows a clear "no events" state rather than mock data.
+// Fan-out is bounded: only the top events are processed, and all artist
+// enrichments share a single concurrency pool. The pipeline is live-only:
+// a missing JamBase key or any failure yields an empty result.
 // ============================================================================
 
 const MAX_EVENTS = 30;
@@ -51,12 +56,6 @@ function selectPerformers(event: RawEvent): RawPerformer[] {
   return event.performers.slice(0, MAX_PERFORMERS_PER_EVENT);
 }
 
-// Normalizes a single cached mood string to a valid MoodKey, defaulting to
-// "party" when the label no longer maps to any current taxonomy entry.
-function coerceMood(raw: string): MoodKey {
-  return mapMoods([raw])[0] ?? "party";
-}
-
 function performerId(eventId: string, name: string): string {
   return `${eventId}-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`.slice(
     0,
@@ -66,21 +65,24 @@ function performerId(eventId: string, name: string): string {
 
 /** Builds the live pipeline result, enriching all performers up to the cap. */
 async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
+  const genres = (input.genres ?? []) as GenreKey[];
+
   const raw = await fetchJamBaseEvents({
     latitude: input.latitude,
     longitude: input.longitude,
     radiusKm: input.radiusKm,
     startDate: input.startDate,
     endDate: input.endDate,
+    genres,
   });
 
-  const genres = (input.genres ?? []) as GenreKey[];
+  // Keep client-side genre filter as a safety net: JamBase genreSlug broadens
+  // the search but performer-level genre arrays are more accurate.
   const filtered = raw
     .filter((e) => eventMatchesGenres(e, genres))
     .slice(0, MAX_EVENTS);
 
-  // Collect the unique set of performer names to enrich, so a shared concurrency
-  // pool dedupes work and caps sockets across the whole result set.
+  // Collect unique performer names to enrich (deduped across all events).
   const enrichTargets = new Map<string, RawPerformer>();
   const eventPerformers = new Map<string, RawPerformer[]>();
   for (const event of filtered) {
@@ -109,12 +111,10 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
       .map((p) => {
         const genreKeys = mapGenres(p.genres);
         const enriched = enrichedNames.has(p.name)
-          ? byName.get(p.name) ?? PLACEHOLDER_ENRICHMENT
+          ? (byName.get(p.name) ?? PLACEHOLDER_ENRICHMENT)
           : PLACEHOLDER_ENRICHMENT;
-        // Cached enrichment may predate the current taxonomy, so re-normalize
-        // every mood string through mapMoods before it hits the response schema
-        // (stray labels like "energetic" would otherwise fail Zod validation).
-        const moodKeys = mapMoods(enriched.moodKeys);
+
+        const moodKeys = enriched.moodKeys as MoodKey[];
 
         return {
           id: performerId(event.id, p.name),
@@ -128,15 +128,20 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
             audioEnergy: 0.5,
             moodKeys,
           },
-          songstats: enriched.songstats,
-          recommendedSongs: enriched.recommendedSongs.map((s) => ({
-            ...s,
-            moodKeys: mapMoods(s.moodKeys),
+          tracks: enriched.tracks.map((t) => ({
+            trackId: t.trackId,
+            trackName: t.trackName,
+            trackRating: t.trackRating,
+            spotifyId: t.spotifyId,
+            albumName: t.albumName,
           })),
-          quotes: enriched.quotes.map((q) => ({
-            ...q,
-            mood: coerceMood(q.mood),
-          })),
+          quotes: enriched.tracks
+            .filter((t) => t.quote !== null)
+            .map((t) => ({
+              trackName: t.trackName,
+              moods: mapMoods(t.moods),
+              quote: t.quote!,
+            })),
         } satisfies Performer;
       });
 
@@ -163,8 +168,6 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
 
 /**
  * Top-level search: runs the live pipeline when a JamBase key is present.
- * A missing key or any pipeline failure yields an empty result, so the UI
- * surfaces a clear "no events" state rather than illustrative mock data.
  */
 export async function runSearch(input: SearchInput): Promise<SearchOutput> {
   if (!hasJamBaseKey()) {

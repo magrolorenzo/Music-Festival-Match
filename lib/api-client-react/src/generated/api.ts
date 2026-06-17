@@ -213,7 +213,7 @@ export const getSearchEventsUrl = () => {
 }
 
 /**
- * Runs the full live pipeline server-side: JamBase v3 events in the geo + date window, genre filtered, then per-headliner enrichment (Songstats hype + Musixmatch mood) with DB-cached TTL. Returns an empty list when the live pipeline is unavailable.
+ * Runs the full live pipeline server-side: JamBase v3 events in the geo + date window, genre filtered server-side via genreSlug, then per-performer enrichment (Musixmatch track search + lyrics analysis) with DB-cached TTL. Returns an empty list when the live pipeline is unavailable.
 
  * @summary Search live events
  */

@@ -1,13 +1,5 @@
 // ============================================================================
 // LivePulse client-side shared helpers.
-//
-// The live pipeline runs entirely server-side in api-server (see
-// services/search.ts, which calls the generated /api/search client). This
-// module retains only the pure helpers reused across the UI:
-//   - radiusToKm / haversineKm (geo math)
-//   - pickArtistQuote (best lyric quote for a performer + mood)
-//
-// All third-party keys live as server secrets; the frontend holds no API keys.
 // ============================================================================
 
 import type { Performer, RadiusUnit, MusixmatchQuote, MoodKey } from "./types";
@@ -37,8 +29,8 @@ export function haversineKm(
 }
 
 /**
- * Picks the single best quote to show for an artist given the selected mood:
- * a quote that matches the mood, else the quote from the most popular track.
+ * Picks the single best quote to show for an artist given the selected mood.
+ * Prefers a quote whose moods include the preferred mood; falls back to first.
  */
 export function pickArtistQuote(
   performer: Performer,
@@ -46,17 +38,10 @@ export function pickArtistQuote(
 ): MusixmatchQuote | null {
   if (performer.quotes.length === 0) return null;
   if (preferredMood) {
-    const moodMatch = performer.quotes.find((q) => q.mood === preferredMood);
+    const moodMatch = performer.quotes.find((q) =>
+      q.moods.includes(preferredMood),
+    );
     if (moodMatch) return moodMatch;
-  }
-  // Fall back to the quote tied to the artist's most popular recommended song,
-  // else the first available quote.
-  const topSong = [...performer.recommendedSongs].sort(
-    (a, b) => b.popularity - a.popularity,
-  )[0];
-  if (topSong) {
-    const tied = performer.quotes.find((q) => q.trackName === topSong.trackName);
-    if (tied) return tied;
   }
   return performer.quotes[0];
 }

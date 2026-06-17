@@ -102,23 +102,26 @@ export interface CyaniteAnalysis {
   moodKeys: MoodKey[];
 }
 
-export interface SongstatsTrend {
-  popularityTrend: string;
-  monthlyListeners: number;
-  popularityScore: number;
+export interface Track {
+  /** Musixmatch track ID. */
+  trackId: number;
+  trackName: string;
+  /** Musixmatch popularity rating for this track. */
+  trackRating: number;
+  /**
+     * Spotify track ID (for future playback integration).
+     * @nullable
+     */
+  spotifyId: string | null;
+  albumName: string;
 }
 
 export interface MusixmatchQuote {
   trackName: string;
-  mood: MoodKey;
-  lyrics_body: string;
-  script_tracking_url: string;
-}
-
-export interface RecommendedSong {
-  trackName: string;
-  popularity: number;
-  moodKeys: MoodKey[];
+  /** Mood keys derived from lyrics analysis for this track. */
+  moods: MoodKey[];
+  /** First available theme quote from lyrics analysis. */
+  quote: string;
 }
 
 export interface Performer {
@@ -128,8 +131,9 @@ export interface Performer {
   image: string | null;
   isHeadliner: boolean;
   cyanite: CyaniteAnalysis;
-  songstats: SongstatsTrend;
-  recommendedSongs: RecommendedSong[];
+  /** Top tracks from Musixmatch (up to 3). */
+  tracks: Track[];
+  /** One quote per track that has lyrics (from analysis). */
   quotes: MusixmatchQuote[];
 }
 

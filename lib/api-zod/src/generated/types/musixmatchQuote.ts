@@ -9,7 +9,8 @@ import type { MoodKey } from './moodKey';
 
 export interface MusixmatchQuote {
   trackName: string;
-  mood: MoodKey;
-  lyrics_body: string;
-  script_tracking_url: string;
+  /** Mood keys derived from lyrics analysis for this track. */
+  moods: MoodKey[];
+  /** First available theme quote from lyrics analysis. */
+  quote: string;
 }

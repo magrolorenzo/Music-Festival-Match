@@ -60,9 +60,9 @@ paths:
       summary: Search live events
       description: >
         Runs the full live pipeline server-side: JamBase v3 events in the geo +
-        date window, genre filtered, then per-headliner enrichment (Songstats
-        hype + Musixmatch mood) with DB-cached TTL. Returns an empty list when
-        the live pipeline is unavailable.
+        date window, genre filtered server-side via genreSlug, then per-performer
+        enrichment (Musixmatch track search + lyrics analysis) with DB-cached TTL.
+        Returns an empty list when the live pipeline is unavailable.
       requestBody:
         required: true
         content:
@@ -194,44 +194,41 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/MoodKey"
-    SongstatsTrend:
+    Track:
       type: object
-      required: [popularityTrend, monthlyListeners, popularityScore]
+      required: [trackId, trackName, trackRating, spotifyId, albumName]
       properties:
-        popularityTrend:
+        trackId:
+          type: integer
+          description: Musixmatch track ID.
+        trackName:
           type: string
-        monthlyListeners:
+        trackRating:
           type: integer
-        popularityScore:
-          type: integer
+          description: Musixmatch popularity rating for this track.
+        spotifyId:
+          type: ["string", "null"]
+          description: Spotify track ID (for future playback integration).
+        albumName:
+          type: string
     MusixmatchQuote:
       type: object
-      required: [trackName, mood, lyrics_body, script_tracking_url]
+      required: [trackName, moods, quote]
       properties:
         trackName:
           type: string
-        mood:
-          $ref: "#/components/schemas/MoodKey"
-        lyrics_body:
-          type: string
-        script_tracking_url:
-          type: string
-    RecommendedSong:
-      type: object
-      required: [trackName, popularity, moodKeys]
-      properties:
-        trackName:
-          type: string
-        popularity:
-          type: integer
-        moodKeys:
+        moods:
           type: array
           items:
             $ref: "#/components/schemas/MoodKey"
+          description: Mood keys derived from lyrics analysis for this track.
+        quote:
+          type: string
+          description: First available theme quote from lyrics analysis.
     Performer:
       type: object
       required:
-        [id, name, image, isHeadliner, cyanite, songstats, recommendedSongs, quotes]
+        [id, name, image, isHeadliner, cyanite, tracks, quotes]
       properties:
         id:
           type: string
@@ -243,14 +240,14 @@ components:
           type: boolean
         cyanite:
           $ref: "#/components/schemas/CyaniteAnalysis"
-        songstats:
-          $ref: "#/components/schemas/SongstatsTrend"
-        recommendedSongs:
+        tracks:
           type: array
+          description: Top tracks from Musixmatch (up to 3).
           items:
-            $ref: "#/components/schemas/RecommendedSong"
+            $ref: "#/components/schemas/Track"
         quotes:
           type: array
+          description: One quote per track that has lyrics (from analysis).
           items:
             $ref: "#/components/schemas/MusixmatchQuote"
     LiveEvent:

@@ -1,14 +1,9 @@
 // ============================================================================
 // LivePulse domain types
 //
-// These types are intentionally shaped around the combined payloads of the
-// three partner APIs the app is designed to consume later:
-//   - JamBase   (event / venue / performer data)  https://data.jambase.com/api/reference
-//   - Cyanite   (genre + acoustic mood analysis)   https://api-docs.cyanite.ai/docs/create-integration
-//   - Musixmatch (track / lyric quote data)         https://docs.musixmatch.com/overview
-//
-// Right now everything is read from a local mock JSON file. When live keys are
-// available, only the transport in `api.ts` changes — these shapes stay stable.
+// These types are shaped around the combined payloads of the partner APIs:
+//   - JamBase   (event / venue / performer data)
+//   - Musixmatch (track search + lyrics analysis)
 // ============================================================================
 
 export type RegionKey = "europe" | "north-america";
@@ -58,12 +53,9 @@ export type RadiusUnit = "km" | "mi";
 
 /**
  * A free-text place the user searched, resolved to coordinates by the geocoder.
- * Maps to JamBase's geoLatitude / geoLongitude query parameters when live.
  */
 export interface GeoLocation {
-  /** The raw text the user typed, e.g. "Verona, Italy" or "Europe". */
   query: string;
-  /** Human-readable name returned by the geocoder. */
   label: string;
   latitude: number;
   longitude: number;
@@ -80,56 +72,46 @@ export interface JamBaseLocation {
   longitude: number;
 }
 
-/** Cyanite-shaped music analysis attached to a performer. */
+/** Genre + mood analysis attached to a performer. */
 export interface CyaniteAnalysis {
-  /** Cyanite `musicGenres` field, e.g. ["Electronic", "House"]. */
   musicGenres: string[];
-  /** Normalized genre keys mapping to the app's filters. */
   genreKeys: GenreKey[];
-  /** Cyanite `audioValence` 0..1 (low = sad/dark, high = happy/energetic). */
   audioValence: number;
-  /** Cyanite acoustic energy 0..1. */
   audioEnergy: number;
-  /** Cyanite-derived emotional/mood profile keys mapping to the app's filters. */
+  /** Mood keys aggregated from Musixmatch lyrics analysis across all tracks. */
   moodKeys: MoodKey[];
 }
 
-/** Songstats-shaped popularity snapshot. */
-export interface SongstatsTrend {
-  /** e.g. "+24%". */
-  popularityTrend: string;
-  monthlyListeners: number;
-  /** Streaming/popularity score 0..100. */
-  popularityScore: number;
+/** A Musixmatch top track for a performer. */
+export interface Track {
+  trackId: number;
+  trackName: string;
+  /** Musixmatch popularity rating. */
+  trackRating: number;
+  /** Spotify track ID — stored for future playback integration. */
+  spotifyId: string | null;
+  albumName: string;
 }
 
-/** Musixmatch-shaped track quote. */
+/** A Musixmatch quote with moods derived from lyrics analysis. */
 export interface MusixmatchQuote {
   trackName: string;
-  /** Mood this quote best expresses (used to pick the right line per filter). */
-  mood: MoodKey;
-  /** Short lyric-style snippet (original placeholder text, not real lyrics). */
-  lyrics_body: string;
-  script_tracking_url: string;
+  /** Mood keys derived from lyrics analysis for this track. */
+  moods: MoodKey[];
+  /** First available theme quote from lyrics analysis. */
+  quote: string;
 }
 
-/** A recommended track for an artist (Musixmatch / Songstats blend). */
-export interface RecommendedSong {
-  trackName: string;
-  popularity: number;
-  moodKeys: MoodKey[];
-}
-
-/** A performer on an event (JamBase `performers[]` enriched with partner data). */
+/** A performer on an event (JamBase `performers[]` enriched with Musixmatch data). */
 export interface Performer {
   id: string;
   name: string;
-  /** Optional artist portrait; UI shows a placeholder when missing. */
   image: string | null;
   isHeadliner: boolean;
   cyanite: CyaniteAnalysis;
-  songstats: SongstatsTrend;
-  recommendedSongs: RecommendedSong[];
+  /** Top tracks from Musixmatch (up to 3). */
+  tracks: Track[];
+  /** One quote per track that has lyrics, from lyrics analysis. */
   quotes: MusixmatchQuote[];
 }
 
@@ -139,55 +121,39 @@ export interface LiveEvent {
   kind: EventKind;
   name: string;
   description: string;
-  startDate: string; // ISO date
-  endDate: string; // ISO date
-  /** Optional festival hero image; UI shows a placeholder when missing. */
+  startDate: string;
+  endDate: string;
   image: string | null;
   region: RegionKey;
   location: JamBaseLocation;
   geoRadiusKm: number;
   performers: Performer[];
-  /** Aggregated genre keys across the lineup (for fast filtering). */
   genreKeys: GenreKey[];
-  /** Aggregated mood keys across the lineup. */
   moodKeys: MoodKey[];
 }
 
-// ----- Search / matching -----------------------------------------------------
-
 export interface SearchFilters {
-  /** Free-text resolved location; null means search everywhere (global). */
   location: GeoLocation | null;
-  /** Search radius around the location. Ignored when location is null. */
   radius: number;
-  /** Unit the radius value is expressed in. */
   radiusUnit: RadiusUnit;
-  /** Selected genres; an empty list means "any genre". */
   genres: GenreKey[];
-  /** Selected moods; an empty list means "any mood". */
   moods: MoodKey[];
-  /** Inclusive ISO start date of the search window. */
   startDate: string;
-  /** Inclusive ISO end date of the search window. */
   endDate: string;
 }
 
-/** A single reason an event matched the filters. */
 export interface MatchReason {
   type: "genre" | "mood" | "location" | "period";
   key: string;
   label: string;
 }
 
-/** An event paired with its score against the active filters. */
 export interface MatchResult {
   event: LiveEvent;
   score: number;
-  /** Whether the event matched every active filter dimension. */
   isExactMatch: boolean;
   reasons: MatchReason[];
   matchedGenreKeys: GenreKey[];
   matchedMoodKeys: MoodKey[];
-  /** Performers that contributed to the genre/mood match, best-first. */
   matchingPerformers: Performer[];
 }
