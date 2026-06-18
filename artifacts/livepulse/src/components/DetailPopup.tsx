@@ -138,9 +138,9 @@ function PerformerCard({
       {quotes.length > 0 ? (
         <div className="relative bg-gradient-to-br from-primary/10 to-transparent p-6 rounded-xl border border-primary/20">
           <Quote className="absolute top-4 left-4 w-8 h-8 text-primary/20" />
-          <div className="pl-6 flex flex-col gap-4">
+          <div className="pl-6 flex flex-col gap-1">
             {quotes.map((q, i) => (
-              <p key={i} className="text-xl font-serif italic leading-relaxed text-white/90">
+              <p key={i} className="text-base md:text-xl font-serif italic leading-relaxed text-white/90">
                 "{q.quote}"
               </p>
             ))}
