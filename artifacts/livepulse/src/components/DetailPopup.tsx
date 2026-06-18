@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { formatEventDate } from "@/lib/dates";
 import { initialsFor, placeholderGradient } from "@/lib/images";
-import { pickArtistQuote } from "@/services/api";
+import { pickArtistQuotes, splitQuote } from "@/services/api";
 import type { MatchResult, SearchFilters, Performer, MoodKey } from "@/services/types";
 import {
   moodHue,
@@ -9,6 +9,8 @@ import {
   moodGroupGradient,
   moodLabel,
   moodEmoji,
+  genreLabel,
+  genreEmoji,
 } from "@/lib/taxonomy";
 import { MapPin, Calendar, X, ExternalLink, Music, Quote, Disc3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -37,8 +39,9 @@ function PerformerCard({
   preferredMood?: MoodKey;
 }) {
   const image = performer.image;
-  const quote = pickArtistQuote(performer, preferredMood);
+  const quotes = pickArtistQuotes(performer, preferredMood);
   const moods = performer.cyanite.moodKeys;
+  const genres = performer.cyanite.genreKeys;
 
   return (
     <div className="w-full flex flex-col gap-6 bg-white/5 rounded-2xl p-6 border border-white/10 h-full relative">
@@ -52,7 +55,7 @@ function PerformerCard({
         </Badge>
       )}
 
-      {/* Artist image + mood badges */}
+      {/* Artist image + genre + mood badges */}
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-xl overflow-hidden bg-muted relative">
           {image ? (
@@ -71,53 +74,85 @@ function PerformerCard({
           )}
         </div>
 
-        {/* Mood badges — same style as EventCard, with match highlighting */}
-        {moods.length > 0 && (
-          <div className="flex-1 flex flex-col justify-center gap-2">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Moods
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {moods.map((mood) => {
-                const isMatch = selectedMoods.includes(mood);
-                return (
+        <div className="flex-1 flex flex-col gap-3 justify-center">
+          {/* Genre badges */}
+          {genres.length > 0 && (
+            <div className="flex flex-col gap-1">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Genres
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {genres.map((genre) => (
                   <span
-                    key={mood}
-                    style={
-                      isMatch
-                        ? {
-                            background: moodGroupGradient([mood], 0.32),
-                            borderColor: moodAccent(moodHue(mood), 0.6),
-                            color: "#fff",
-                            boxShadow: `0 0 12px ${moodAccent(moodHue(mood), 0.35)}`,
-                          }
-                        : undefined
-                    }
-                    className={`text-xs px-2 py-1 rounded border ${
-                      isMatch
-                        ? "font-semibold"
-                        : "bg-white/5 text-white/70 border-white/5"
-                    }`}
+                    key={genre}
+                    className="text-xs px-2 py-1 rounded border bg-white/5 text-white/70 border-white/5"
                   >
-                    {moodEmoji(mood)} {moodLabel(mood)}
+                    {genreEmoji(genre)} {genreLabel(genre)}
                   </span>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Mood badges — same style as EventCard, with match highlighting */}
+          {moods.length > 0 && (
+            <div className="flex flex-col gap-1">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Moods
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {moods.map((mood) => {
+                  const isMatch = selectedMoods.includes(mood);
+                  return (
+                    <span
+                      key={mood}
+                      style={
+                        isMatch
+                          ? {
+                              background: moodGroupGradient([mood], 0.32),
+                              borderColor: moodAccent(moodHue(mood), 0.6),
+                              color: "#fff",
+                              boxShadow: `0 0 12px ${moodAccent(moodHue(mood), 0.35)}`,
+                            }
+                          : undefined
+                      }
+                      className={`text-xs px-2 py-1 rounded border ${
+                        isMatch
+                          ? "font-semibold"
+                          : "bg-white/5 text-white/70 border-white/5"
+                      }`}
+                    >
+                      {moodEmoji(mood)} {moodLabel(mood)}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Quote box */}
-      {quote && (
+      {/* Quote box — 2 quotes in 2 columns, or placeholder */}
+      {quotes.length > 0 ? (
         <div className="relative bg-gradient-to-br from-primary/10 to-transparent p-6 rounded-xl border border-primary/20">
           <Quote className="absolute top-4 left-4 w-8 h-8 text-primary/20" />
-          <p className="text-xl font-serif italic leading-relaxed pl-6 text-white/90">
-            "{quote.quote}"
-          </p>
-          <div className="pl-6 mt-4 flex items-center gap-2 text-sm text-primary font-medium">
-            <Music className="w-4 h-4" /> {quote.trackName}
+          <div className="pl-6 flex flex-col gap-4">
+            {quotes.map((q, i) => (
+              <p key={i} className="text-xl font-serif italic leading-relaxed text-white/90">
+                "{q.quote}"
+              </p>
+            ))}
           </div>
+          <div className="pl-6 mt-4 flex items-center gap-2 text-sm text-primary font-medium">
+            <Music className="w-4 h-4" /> {quotes[0].trackName}
+          </div>
+        </div>
+      ) : (
+        <div className="relative bg-gradient-to-br from-primary/10 to-transparent p-6 rounded-xl border border-primary/20 min-h-[120px] flex items-center justify-center">
+          <Quote className="absolute top-4 left-4 w-8 h-8 text-primary/20" />
+          <p className="text-sm text-white/40 italic">
+            No lyrics available for this artist
+          </p>
         </div>
       )}
 

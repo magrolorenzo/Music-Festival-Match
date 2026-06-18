@@ -9,7 +9,7 @@ import {
   moodLabel,
   moodEmoji,
 } from "@/lib/taxonomy";
-import type { MatchResult, SearchFilters, MoodKey, GenreKey } from "@/services/types";
+import type { MatchResult, MoodKey, GenreKey } from "@/services/types";
 import { MapPin, Calendar, Sparkles, Music } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,7 +21,6 @@ import {
 
 interface EventCardProps {
   result: MatchResult;
-  filters: SearchFilters;
   isSelected: boolean;
   onClick: () => void;
   onHoverStart: () => void;
@@ -30,13 +29,12 @@ interface EventCardProps {
 
 export default function EventCard({
   result,
-  filters,
   isSelected,
   onClick,
   onHoverStart,
   onHoverEnd,
 }: EventCardProps) {
-  const { event, isExactMatch } = result;
+  const { event } = result;
   const image = event.image;
 
   const headliners = event.performers.filter((p) => p.isHeadliner).map((p) => p.name);
@@ -100,7 +98,7 @@ export default function EventCard({
           </TooltipProvider>
         </div>
 
-        {isExactMatch && (
+        {result.matchedMoodKeys.length > 0 && (
           <div className="absolute top-3 right-3">
             <Badge
               variant="default"
@@ -122,7 +120,7 @@ export default function EventCard({
           </div>
         )}
 
-        <div className="flex items-center text-sm text-muted-foreground gap-4">
+        <div className="flex flex-col text-sm text-muted-foreground gap-1">
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
             <span>{formatEventDate(event.startDate, event.endDate)}</span>
@@ -168,10 +166,11 @@ export default function EventCard({
         )}
 
         {event.moodKeys.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground self-center mr-1">
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               Moods
             </span>
+            <div className="flex flex-wrap gap-1">
             {event.moodKeys.map((key) => {
               const isMoodMatch = result.matchedMoodKeys.includes(key as MoodKey);
               return (
@@ -197,6 +196,7 @@ export default function EventCard({
                 </span>
               );
             })}
+            </div>
           </div>
         )}
       </div>

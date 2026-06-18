@@ -83,7 +83,6 @@ export default function Results({ response, onReset }: { response: SearchRespons
                 >
                   <EventCard
                     result={result}
-                    filters={response.filters}
                     isSelected={selectedEventId === result.event.id}
                     onClick={() => setSelectedEventId(result.event.id)}
                     onHoverStart={() => setHoveredEventId(result.event.id)}
