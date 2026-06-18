@@ -319,7 +319,7 @@ export default function DetailPopup({
                   setApi={setApi}
                   className="w-full h-full [&>div:first-child]:overflow-visible"
                 >
-                  <CarouselContent className="h-full -ml-0 [&>div]:overflow-visible">
+                  <CarouselContent className="h-full -ml-0 gap-2">
                     {displayPerformers.map((performer, i) => (
                       <CarouselItem
                         key={performer.id}
