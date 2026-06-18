@@ -49,14 +49,12 @@ function PerformerCard({
     <div className="w-full flex flex-col gap-6 bg-white/5 rounded-2xl p-6 border border-white/10 h-full relative">
       {/* Artist name */}
       <h4 className="text-3xl font-bold pr-20">{performer.name}</h4>
-
       {/* Headliner badge */}
       {performer.isHeadliner && (
         <Badge className="absolute top-6 right-6 bg-primary/20 text-primary hover:bg-primary/30 border-none z-10">
           Headliner
         </Badge>
       )}
-
       {/* Artist image + genre + mood badges */}
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-xl overflow-hidden bg-muted relative">
@@ -133,12 +131,11 @@ function PerformerCard({
           )}
         </div>
       </div>
-
       {/* Quote box — 2 quotes in 2 columns, or placeholder */}
       {quotes.length > 0 ? (
-        <div className="relative bg-gradient-to-br from-primary/10 to-transparent p-6 rounded-xl border border-primary/20">
+        <div className="relative bg-gradient-to-br from-primary/10 to-transparent p-6 rounded-xl border border-primary/20 pl-[24px] pr-[24px] pt-[12px] pb-[12px]">
           <Quote className="absolute top-4 left-4 w-8 h-8 text-primary/20" />
-          <div className="pl-6 flex flex-col gap-1">
+          <div className="pl-6 flex flex-col gap-[1px]">
             {quotes.map((q, i) => (
               <p key={i} className="text-base md:text-xl font-serif italic leading-relaxed text-white/90">
                 "{q.quote}"
@@ -157,7 +154,6 @@ function PerformerCard({
           </p>
         </div>
       )}
-
       {/* Top tracks list */}
       {performer.tracks.length > 0 && (
         <div className="space-y-3">
