@@ -323,7 +323,7 @@ export default function DetailPopup({
                     {displayPerformers.map((performer, i) => (
                       <CarouselItem
                         key={performer.id}
-                        className="basis-[calc(100%-20px)] md:basis-[calc(100%-40px)] h-full flex pl-0 pr-0 cursor-pointer"
+                        className="basis-[calc(100%-20px)] md:basis-[calc(100%-40px)] flex pl-0 pr-0 cursor-pointer"
                         onClick={() => api?.scrollTo(i)}
                       >
                         <PerformerCard

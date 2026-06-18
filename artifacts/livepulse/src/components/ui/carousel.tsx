@@ -159,8 +159,9 @@ const CarouselContent = React.forwardRef<
     <div ref={carouselRef} className="h-full">
       <div
         ref={ref}
+        data-component-name="CarouselContent"
         className={cn(
-          "flex h-full",
+          "flex items-stretch h-full",
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
           className
         )}
@@ -180,6 +181,7 @@ const CarouselItem = React.forwardRef<
   return (
     <div
       ref={ref}
+      data-component-name="CarouselItem"
       role="group"
       aria-roledescription="slide"
       className={cn(
