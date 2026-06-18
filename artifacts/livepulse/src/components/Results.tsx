@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import type { SearchResponse } from "@/services/search";
 import type { MatchResult } from "@/services/types";
 import EventCard from "./EventCard";
@@ -13,6 +13,58 @@ export default function Results({ response, onReset }: { response: SearchRespons
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [hoveredEventId, setHoveredEventId] = useState<string | null>(null);
   const selectedEvent = response.results.find(r => r.event.id === selectedEventId) || null;
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef({
+    isDragging: false,
+    startY: 0,
+    scrollTop: 0,
+    hasMoved: false,
+  });
+
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    // Only enable drag-to-scroll for mouse; touch uses native scroll
+    if (e.pointerType !== "mouse") return;
+    const el = scrollRef.current;
+    if (!el) return;
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+    dragState.current = {
+      isDragging: true,
+      startY: e.clientY,
+      scrollTop: el.scrollTop,
+      hasMoved: false,
+    };
+  }, []);
+
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
+    const state = dragState.current;
+    const el = scrollRef.current;
+    if (!state.isDragging || !el) return;
+    const dy = e.clientY - state.startY;
+    if (!state.hasMoved && Math.abs(dy) > 5) {
+      state.hasMoved = true;
+    }
+    if (state.hasMoved) {
+      e.preventDefault();
+      el.scrollTop = state.scrollTop - dy;
+    }
+  }, []);
+
+  const onPointerUp = useCallback((e: React.PointerEvent) => {
+    const state = dragState.current;
+    if (state.isDragging && !state.hasMoved) {
+      // If it was a short click without movement, allow the event to propagate
+      // (e.g. clicking an EventCard). The card's onClick will still fire.
+    }
+    dragState.current.isDragging = false;
+    dragState.current.hasMoved = false;
+    (e.target as Element).releasePointerCapture?.(e.pointerId);
+  }, []);
+
+  const onPointerLeave = useCallback(() => {
+    dragState.current.isDragging = false;
+    dragState.current.hasMoved = false;
+  }, []);
 
   // Sidebar + map share the same set, ordered by event start date (soonest
   // first). Scoring is untouched; only the display order changes.
@@ -46,7 +98,14 @@ export default function Results({ response, onReset }: { response: SearchRespons
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto livepulse-scroll">
+        <div
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto livepulse-scroll cursor-grab active:cursor-grabbing select-none"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerLeave={onPointerLeave}
+        >
           <div className="p-4 space-y-4">
             {orderedResults.length === 0 ? (
               <div

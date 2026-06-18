@@ -3,7 +3,12 @@ import { useState, useEffect } from "react";
 import { formatEventDate } from "@/lib/dates";
 import { initialsFor, placeholderGradient } from "@/lib/images";
 import { pickArtistQuotes, splitQuote } from "@/services/api";
-import type { MatchResult, SearchFilters, Performer, MoodKey } from "@/services/types";
+import type {
+  MatchResult,
+  SearchFilters,
+  Performer,
+  MoodKey,
+} from "@/services/types";
 import {
   moodHue,
   moodAccent,
@@ -13,7 +18,15 @@ import {
   genreLabel,
   genreEmoji,
 } from "@/lib/taxonomy";
-import { MapPin, Calendar, X, ExternalLink, Music, Quote, Disc3 } from "lucide-react";
+import {
+  MapPin,
+  Calendar,
+  X,
+  ExternalLink,
+  Music,
+  Quote,
+  Disc3,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -137,7 +150,10 @@ function PerformerCard({
           <Quote className="absolute top-4 left-4 w-8 h-8 text-primary/20" />
           <div className="pl-6 flex flex-col gap-[1px]">
             {quotes.map((q, i) => (
-              <p key={i} className="text-base md:text-xl font-serif italic leading-relaxed text-white/90">
+              <p
+                key={i}
+                className="text-base md:text-xl font-serif italic leading-relaxed text-white/90"
+              >
                 "{q.quote}"
               </p>
             ))}
@@ -171,13 +187,25 @@ function PerformerCard({
                 </span>
                 <Disc3 className="w-4 h-4 text-muted-foreground shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{track.trackName}</p>
+                  <p className="font-medium text-sm truncate">
+                    {track.trackName}
+                  </p>
                   {track.albumName && (
                     <p className="text-xs text-muted-foreground truncate">
                       {track.albumName}
                     </p>
                   )}
                 </div>
+                {track.spotifyId && (
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary font-medium"
+                    href={`https://open.spotify.com/track/${track.spotifyId}`}
+                  >
+                    <img src="/spotify-logo.png" alt="Spotify" className="w-5 h-5" />
+                  </a>
+                )}
               </div>
             ))}
           </div>
@@ -209,7 +237,9 @@ export default function DetailPopup({
     const handleSelect = () => setActiveIndex(api.selectedScrollSnap());
     api.on("select", handleSelect);
     handleSelect();
-    return () => { api.off("select", handleSelect); };
+    return () => {
+      api.off("select", handleSelect);
+    };
   }, [api]);
 
   return (
@@ -311,7 +341,7 @@ export default function DetailPopup({
                 />
               ) : (
                 <Carousel
-                  opts={{ align: "center" }}
+                  opts={{ align: "start" }}
                   setApi={setApi}
                   className="w-full h-full"
                 >
@@ -319,8 +349,17 @@ export default function DetailPopup({
                     {displayPerformers.map((performer, i) => (
                       <CarouselItem
                         key={performer.id}
-                        className="basis-[calc(100%-20px)] md:basis-[calc(100%-40px)] flex pl-0 pr-0 cursor-pointer"
+                        className="basis-[calc(100%-18px)] md:basis-[calc(100%-28px)] flex pl-0 pr-0 cursor-pointer"
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`View ${performer.name}`}
                         onClick={() => api?.scrollTo(i)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            api?.scrollTo(i);
+                          }
+                        }}
                       >
                         <PerformerCard
                           performer={performer}
