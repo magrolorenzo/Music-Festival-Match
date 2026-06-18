@@ -129,8 +129,7 @@ export async function fetchArtistTracks(name: string): Promise<ArtistTrack[]> {
   const apiKey = process.env.MUSIXMATCH_API_KEY;
   if (!apiKey) return [];
 
-  const queryName = normalizeForQuery(name);
-  const trackList = await searchTracks(queryName, apiKey).catch(() => []);
+  const trackList = await searchTracks(name, apiKey).catch(() => []);
 
   const tracks: ArtistTrack[] = [];
 
