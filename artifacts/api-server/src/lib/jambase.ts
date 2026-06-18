@@ -260,7 +260,7 @@ export async function fetchJamBaseEvents(
             Authorization: `Bearer ${apiKey}`,
           },
         },
-        8000,
+        15000,
       ),
   );
 
