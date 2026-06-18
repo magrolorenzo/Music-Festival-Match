@@ -1,5 +1,4 @@
 import { formatEventDate } from "@/lib/dates";
-import { matchStrength } from "@/services/matching";
 import { initialsFor, placeholderGradient } from "@/lib/images";
 import {
   moodHue,
@@ -10,8 +9,8 @@ import {
   moodLabel,
   moodEmoji,
 } from "@/lib/taxonomy";
-import type { MatchResult, SearchFilters, MoodKey } from "@/services/types";
-import { MapPin, Calendar, Star, Sparkles, Music } from "lucide-react";
+import type { MatchResult, SearchFilters, MoodKey, GenreKey } from "@/services/types";
+import { MapPin, Calendar, Sparkles, Music } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
@@ -37,8 +36,7 @@ export default function EventCard({
   onHoverStart,
   onHoverEnd,
 }: EventCardProps) {
-  const { event, isExactMatch, score } = result;
-  const { total } = matchStrength(result, filters);
+  const { event, isExactMatch } = result;
   const image = event.image;
 
   const headliners = event.performers.filter((p) => p.isHeadliner).map((p) => p.name);
@@ -102,7 +100,7 @@ export default function EventCard({
           </TooltipProvider>
         </div>
 
-        {isExactMatch && total > 0 && (
+        {isExactMatch && (
           <div className="absolute top-3 right-3">
             <Badge
               variant="default"
@@ -112,24 +110,6 @@ export default function EventCard({
             </Badge>
           </div>
         )}
-
-        <TooltipProvider delayDuration={150}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div
-                data-testid={`score-${event.id}`}
-                className="absolute bottom-3 right-3 text-xs font-bold px-2 py-1 rounded bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1 text-primary cursor-help"
-              >
-                <Star className="w-3 h-3 fill-primary" />
-                <span>Match {score}</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="left" className="max-w-[200px] text-center">
-              Match score — how well this event fits your selected genres and
-              moods, weighted by the lineup's popularity.
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
       </div>
 
       <div className="p-4 flex flex-col gap-2">
@@ -155,14 +135,43 @@ export default function EventCard({
 
         {(event.genreKeys.length > 0 || event.moodKeys.length > 0) && (
           <div className="mt-2 flex flex-wrap gap-1">
-            {event.genreKeys.map((key) => (
-              <span
-                key={`g-${key}`}
-                className="text-xs px-2 py-1 rounded border bg-white/5 text-white/70 border-white/5"
-              >
-                {genreEmoji(key)} {genreLabel(key)}
-              </span>
-            ))}
+            {event.genreKeys.map((key) => {
+              const isGenreMatch = result.matchedGenreKeys.includes(key as GenreKey);
+              return (
+                <span
+                  key={`g-${key}`}
+                  style={
+                    isGenreMatch
+                      ? {
+                          background: moodGroupGradient([key as unknown as MoodKey], 0.32),
+                          borderColor: moodAccent(moodHue(key as unknown as MoodKey), 0.6),
+                          color: "#fff",
+                          boxShadow: `0 0 12px ${moodAccent(moodHue(key as unknown as MoodKey), 0.35)}`,
+                        }
+                      : undefined
+                  }
+                  className={`text-xs px-2 py-1 rounded border ${
+                    isGenreMatch
+                      ? "font-semibold"
+                      : "bg-white/5 text-white/70 border-white/5"
+                  }`}
+                >
+                  {genreEmoji(key)} {genreLabel(key)}
+                </span>
+              );
+            })}
+          </div>
+        )}
+
+        {(event.genreKeys.length > 0 && event.moodKeys.length > 0) && (
+          <div className="w-full h-px bg-white/5 my-1" />
+        )}
+
+        {event.moodKeys.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground self-center mr-1">
+              Moods
+            </span>
             {event.moodKeys.map((key) => {
               const isMoodMatch = result.matchedMoodKeys.includes(key as MoodKey);
               return (

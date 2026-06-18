@@ -3,6 +3,13 @@ import { formatEventDate } from "@/lib/dates";
 import { initialsFor, placeholderGradient } from "@/lib/images";
 import { pickArtistQuote } from "@/services/api";
 import type { MatchResult, SearchFilters, Performer, MoodKey } from "@/services/types";
+import {
+  moodHue,
+  moodAccent,
+  moodGroupGradient,
+  moodLabel,
+  moodEmoji,
+} from "@/lib/taxonomy";
 import { MapPin, Calendar, X, ExternalLink, Music, Quote, Disc3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,18 +27,13 @@ interface DetailPopupProps {
   onClose: () => void;
 }
 
-function moodLabel(key: MoodKey): string {
-  return key
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-}
-
 function PerformerCard({
   performer,
+  selectedMoods,
   preferredMood,
 }: {
   performer: Performer;
+  selectedMoods: MoodKey[];
   preferredMood?: MoodKey;
 }) {
   const image = performer.image;
@@ -50,7 +52,7 @@ function PerformerCard({
         </Badge>
       )}
 
-      {/* Artist image */}
+      {/* Artist image + mood badges */}
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-xl overflow-hidden bg-muted relative">
           {image ? (
@@ -69,22 +71,38 @@ function PerformerCard({
           )}
         </div>
 
-        {/* Mood badges */}
+        {/* Mood badges — same style as EventCard, with match highlighting */}
         {moods.length > 0 && (
           <div className="flex-1 flex flex-col justify-center gap-2">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Vibes
+              Moods
             </p>
             <div className="flex flex-wrap gap-2">
-              {moods.map((mood) => (
-                <Badge
-                  key={mood}
-                  variant="outline"
-                  className="text-xs border-white/15 text-white/70 bg-white/5"
-                >
-                  {moodLabel(mood)}
-                </Badge>
-              ))}
+              {moods.map((mood) => {
+                const isMatch = selectedMoods.includes(mood);
+                return (
+                  <span
+                    key={mood}
+                    style={
+                      isMatch
+                        ? {
+                            background: moodGroupGradient([mood], 0.32),
+                            borderColor: moodAccent(moodHue(mood), 0.6),
+                            color: "#fff",
+                            boxShadow: `0 0 12px ${moodAccent(moodHue(mood), 0.35)}`,
+                          }
+                        : undefined
+                    }
+                    className={`text-xs px-2 py-1 rounded border ${
+                      isMatch
+                        ? "font-semibold"
+                        : "bg-white/5 text-white/70 border-white/5"
+                    }`}
+                  >
+                    {moodEmoji(mood)} {moodLabel(mood)}
+                  </span>
+                );
+              })}
             </div>
           </div>
         )}
@@ -244,6 +262,7 @@ export default function DetailPopup({
               {displayPerformers.length === 1 ? (
                 <PerformerCard
                   performer={displayPerformers[0]}
+                  selectedMoods={filters.moods}
                   preferredMood={filters.moods[0]}
                 />
               ) : (
@@ -256,6 +275,7 @@ export default function DetailPopup({
                       >
                         <PerformerCard
                           performer={performer}
+                          selectedMoods={filters.moods}
                           preferredMood={filters.moods[0]}
                         />
                       </CarouselItem>
