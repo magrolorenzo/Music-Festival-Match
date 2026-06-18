@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import { formatEventDate } from "@/lib/dates";
 import { initialsFor, placeholderGradient } from "@/lib/images";
 import { pickArtistQuotes, splitQuote } from "@/services/api";
@@ -22,6 +23,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import type { CarouselApi } from "@/components/ui/carousel";
 
 interface DetailPopupProps {
   result: MatchResult;
@@ -203,6 +205,17 @@ export default function DetailPopup({
   );
   const displayPerformers = [...matchingPerformers, ...otherPerformers];
 
+  const [api, setApi] = useState<CarouselApi | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (!api) return;
+    const handleSelect = () => setActiveIndex(api.selectedScrollSnap());
+    api.on("select", handleSelect);
+    handleSelect();
+    return () => { api.off("select", handleSelect); };
+  }, [api]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10 pointer-events-none">
       <div
@@ -214,7 +227,7 @@ export default function DetailPopup({
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="w-full max-w-4xl max-h-full bg-[#0f0f0f] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col pointer-events-auto relative z-10"
+        className="w-full max-w-4xl max-h-full bg-[#0f0f0f] border border-white/10 rounded-3xl overflow-x-visible shadow-2xl flex flex-col pointer-events-auto relative z-10"
       >
         <div className="absolute top-4 right-4 z-20">
           <Button
@@ -301,12 +314,17 @@ export default function DetailPopup({
                   preferredMood={filters.moods[0]}
                 />
               ) : (
-                <Carousel opts={{ align: "center" }} className="w-full h-full">
-                  <CarouselContent className="h-full">
-                    {displayPerformers.map((performer) => (
+                <Carousel
+                  opts={{ align: "center" }}
+                  setApi={setApi}
+                  className="w-full h-full [&>div:first-child]:overflow-visible"
+                >
+                  <CarouselContent className="h-full -ml-0 [&>div]:overflow-visible">
+                    {displayPerformers.map((performer, i) => (
                       <CarouselItem
                         key={performer.id}
-                        className="basis-[90%] md:basis-[50%] h-full flex"
+                        className="basis-[calc(100%-20px)] md:basis-[calc(100%-40px)] h-full flex pl-0 pr-0 cursor-pointer"
+                        onClick={() => api?.scrollTo(i)}
                       >
                         <PerformerCard
                           performer={performer}
