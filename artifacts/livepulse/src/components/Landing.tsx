@@ -372,7 +372,7 @@ export default function Landing({
       <div className="z-10 max-w-2xl w-full flex flex-col items-center text-center gap-8 py-10">
         <div className="space-y-4">
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight">
-            Live<span className="text-primary">Pulse</span>
+            Jam<span className="text-primary">Match</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-md mx-auto">
             Pick your next festival by feeling, not scrolling. Choose a vibe and
