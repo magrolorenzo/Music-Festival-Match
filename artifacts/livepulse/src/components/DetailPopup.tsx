@@ -227,7 +227,7 @@ export default function DetailPopup({
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="w-full max-w-4xl max-h-full bg-[#0f0f0f] border border-white/10 rounded-3xl overflow-x-visible shadow-2xl flex flex-col pointer-events-auto relative z-10"
+        className="w-full max-w-4xl max-h-full bg-[#0f0f0f] border border-white/10 rounded-3xl shadow-2xl flex flex-col pointer-events-auto relative z-10"
       >
         <div className="absolute top-4 right-4 z-20">
           <Button
@@ -317,7 +317,7 @@ export default function DetailPopup({
                 <Carousel
                   opts={{ align: "center" }}
                   setApi={setApi}
-                  className="w-full h-full [&>div:first-child]:overflow-visible"
+                  className="w-full h-full"
                 >
                   <CarouselContent className="h-full -ml-0 gap-2">
                     {displayPerformers.map((performer, i) => (
