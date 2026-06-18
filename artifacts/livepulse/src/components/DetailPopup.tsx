@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { formatEventDate } from "@/lib/dates";
 import { initialsFor, placeholderGradient } from "@/lib/images";
 import { pickArtistQuotes, splitQuote } from "@/services/api";
+import spotifyLogo from "../assets/spotify-logo.png";
 import type {
   MatchResult,
   SearchFilters,
@@ -203,7 +204,7 @@ function PerformerCard({
                     className="text-xs text-primary font-medium"
                     href={`https://open.spotify.com/track/${track.spotifyId}`}
                   >
-                    <img src="/spotify-logo.png" alt="Spotify" className="w-5 h-5" />
+                    <img src={spotifyLogo} alt="Spotify" className="w-5 h-5" />
                   </a>
                 )}
               </div>
