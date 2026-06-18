@@ -39,16 +39,17 @@ export function normalizeArtistName(name: string): string {
 }
 
 /**
- * Normalises an artist name for use as a Musixmatch q_artist query string:
- *   lowercase, accents stripped, apostrophes stripped, spaces preserved.
- * Example: "Dov'è Liana" → "dove liana"
+ * Normalises an artist name for use as a Musixmatch q_track_artist query:
+ *   lowercase, accents stripped, apostrophes → space, spaces collapsed.
+ * Example: "Dov'è Liana" → "dov e liana"
  */
 function normalizeForQuery(name: string): string {
   return name
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/['\u2019\u2018\u02bc]/g, "")
+    .replace(/['\u2019\u2018\u02bc]/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -71,16 +72,18 @@ async function searchTracks(
   queryName: string,
   apiKey: string,
 ): Promise<any[]> {
-  const url = new URL(`${MUSIXMATCH_BASE}/track.search`);
-  url.searchParams.set("q_artist", queryName);
-  url.searchParams.set("page_size", "3");
-  url.searchParams.set("s_track_rating", "desc");
-  url.searchParams.set("apikey", apiKey);
+  const qs = new URLSearchParams();
+  qs.append("apikey", apiKey);
+  qs.append("q_track_artist", queryName);
+  qs.append("s_track_rating", "desc");
+  qs.append("s_artist_rating", "desc");
+  qs.append("page_size", "3");
+  const url = `${MUSIXMATCH_BASE}/track.search?${qs.toString()}`;
 
   const data = await withCache(
     "musixmatch",
-    url.toString(),
-    () => fetchJson<any>(url.toString()),
+    url,
+    () => fetchJson<any>(url),
   );
   return data?.message?.body?.track_list ?? [];
 }
