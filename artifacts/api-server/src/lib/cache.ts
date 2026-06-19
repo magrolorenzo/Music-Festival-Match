@@ -10,8 +10,7 @@ import { logger } from "./logger";
 // for 30 days and served from the DB while the row is still fresh.
 // ============================================================================
 
-export const CACHE_ENABLED =
-  process.env.ENABLE_API_CACHE !== "false";
+export const CACHE_ENABLED = false;
 
 const TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 

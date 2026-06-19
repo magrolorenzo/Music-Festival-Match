@@ -148,7 +148,7 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
     const genreKeys = unique(performers.flatMap((p) => p.cyanite.genreKeys));
     const moodKeys = unique(performers.flatMap((p) => p.cyanite.moodKeys));
 
-    return {
+    const resultEvent = {
       id: event.id,
       kind: event.isFestival ? "festival" : "concert",
       name: event.name,
@@ -164,6 +164,13 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
       moodKeys,
       ticketUrl: event.ticketUrl,
     } satisfies LiveEvent;
+
+    // DEBUG
+    if (event.name.includes("Weather Report")) {
+      console.log("🎫 TICKET URL IN SEARCH.TS:", resultEvent.ticketUrl);
+    }
+
+    return resultEvent;
   });
 }
 
