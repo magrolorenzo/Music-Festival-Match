@@ -165,9 +165,9 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
       ticketUrl: event.ticketUrl,
     } satisfies LiveEvent;
 
-    // DEBUG
-    if (event.name.includes("Weather Report")) {
-      console.log("🎫 TICKET URL IN SEARCH.TS:", resultEvent.ticketUrl);
+    // DEBUG: Stampa ticketUrl
+    if (event.name.includes("Mac DeMarco")) {
+      console.log("🎫 FINAL ticketUrl in search.ts:", resultEvent.ticketUrl);
     }
 
     return resultEvent;
