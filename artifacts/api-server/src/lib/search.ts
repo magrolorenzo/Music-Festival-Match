@@ -162,6 +162,7 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
       performers,
       genreKeys,
       moodKeys,
+      ticketUrl: event.ticketUrl,
     } satisfies LiveEvent;
   });
 }
