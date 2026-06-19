@@ -266,6 +266,7 @@ components:
         - performers
         - genreKeys
         - moodKeys
+        - ticketUrl
       properties:
         id:
           type: string
