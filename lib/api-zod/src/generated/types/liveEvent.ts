@@ -27,4 +27,5 @@ export interface LiveEvent {
   performers: Performer[];
   genreKeys: GenreKey[];
   moodKeys: MoodKey[];
+  ticketUrl: string | null;
 }

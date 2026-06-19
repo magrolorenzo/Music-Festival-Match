@@ -185,6 +185,11 @@ function mapEvent(raw: any, index: number): RawEvent | null {
   const isFestival =
     typeText.includes("festival") || name.toLowerCase().includes("festival");
 
+  const offers = Array.isArray(raw.offers) ? raw.offers : [];
+  const ticketUrl = offers.length > 0 && typeof offers[0]?.url === "string"
+      ? offers[0].url
+      : null;
+
   return {
     id: eventIdentifier(raw, index),
     name,
@@ -213,6 +218,7 @@ function mapEvent(raw: any, index: number): RawEvent | null {
       longitude,
     },
     performers: mapPerformers(raw),
+    ticketUrl,
   };
 }
 

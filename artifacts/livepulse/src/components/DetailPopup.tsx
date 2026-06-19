@@ -378,14 +378,24 @@ export default function DetailPopup({
               )}
             </div>
 
-            <div className="flex justify-center pt-8 border-t border-white/5">
-              <Button
-                size="lg"
-                className="rounded-full px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-[0_0_20px_rgba(255,69,0,0.3)]"
-              >
-                Get Tickets <ExternalLink className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
+            {event.ticketUrl && (
+                <div className="flex justify-center pt-8 border-t border-white/5">
+                  <Button
+                      asChild
+                      size="lg"
+                      className="rounded-full px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-[0_0_20px_rgba(255,69,0,0.3)]"
+                  >
+                    <a
+                        href={event.ticketUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                      Get Tickets <ExternalLink className="w-4 h-4 ml-2" />
+                    </a>
+                  </Button>
+                </div>
+            )}
+
           </div>
         </div>
       </motion.div>
