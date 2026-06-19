@@ -38,6 +38,7 @@ export interface RawEvent {
     longitude: number;
   };
   performers: RawPerformer[];
+  ticketUrl: string | null;
 }
 
 export interface JamBaseQuery {
