@@ -130,6 +130,7 @@ export interface LiveEvent {
   performers: Performer[];
   genreKeys: GenreKey[];
   moodKeys: MoodKey[];
+  ticketUrl: string;
 }
 
 export interface SearchFilters {
