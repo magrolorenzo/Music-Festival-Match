@@ -99,7 +99,8 @@ export const SearchEventsResponse = zod.object({
 })).describe('One quote per track that has lyrics (from analysis).')
 })),
   "genreKeys": zod.array(zod.enum(['blues', 'classical', 'country-music', 'edm', 'folk', 'hip-hop-rap', 'indie', 'jazz', 'kpop', 'latin', 'metal', 'pop', 'punk', 'rhythm-and-blues-soul', 'reggae', 'rock'])),
-  "moodKeys": zod.array(zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature']))
+  "moodKeys": zod.array(zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature'])),
+  "ticketUrl": zod.string().nullable().describe('URL to purchase tickets for this event.')
 }))
 })
 

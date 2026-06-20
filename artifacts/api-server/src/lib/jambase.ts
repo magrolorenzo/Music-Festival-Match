@@ -186,16 +186,12 @@ function mapEvent(raw: any, index: number): RawEvent | null {
   const isFestival =
     typeText.includes("festival") || name.toLowerCase().includes("festival");
 
-  // DEBUG: Controlla se offers esiste
+  // The first offer is JamBase's primary ticketing link (ticketingLinkPrimary).
   const offers = Array.isArray(raw.offers) ? raw.offers : [];
-  const ticketUrl = offers.length > 0 && typeof offers[0]?.url === "string"
+  const ticketUrl =
+    offers.length > 0 && typeof offers[0]?.url === "string"
       ? offers[0].url
       : null;
-
-  console.log(`[EVENT: ${name}] offers count: ${offers.length}, ticketUrl: ${ticketUrl}`);
-  if (offers.length > 0) {
-    console.log(`[OFFERS DATA] `, JSON.stringify(offers, null, 2));
-  }
 
   return {
     id: eventIdentifier(raw, index),

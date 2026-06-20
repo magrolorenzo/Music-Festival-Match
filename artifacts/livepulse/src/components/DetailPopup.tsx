@@ -223,12 +223,6 @@ export default function DetailPopup({
 }: DetailPopupProps) {
   const { event, reasons, matchingPerformers } = result;
   const image = event.image;
-// DEBUG: Stampa l'intero evento se non c'è ticketUrl
-  if (!event.ticketUrl) {
-    console.log("❌ NO TICKET URL - Full Event Object:", JSON.stringify(event, null, 2));
-  } else {
-    console.log("✅ TICKET URL FOUND:", event.ticketUrl);
-  }
   const performerIds = new Set(matchingPerformers.map((p) => p.id));
   const otherPerformers = event.performers.filter(
     (p) => !performerIds.has(p.id),

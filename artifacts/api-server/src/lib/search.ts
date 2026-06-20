@@ -148,7 +148,7 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
     const genreKeys = unique(performers.flatMap((p) => p.cyanite.genreKeys));
     const moodKeys = unique(performers.flatMap((p) => p.cyanite.moodKeys));
 
-    const resultEvent = {
+    return {
       id: event.id,
       kind: event.isFestival ? "festival" : "concert",
       name: event.name,
@@ -164,13 +164,6 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
       moodKeys,
       ticketUrl: event.ticketUrl,
     } satisfies LiveEvent;
-
-    // DEBUG: Stampa ticketUrl
-    if (event.name.includes("Mac DeMarco")) {
-      console.log("🎫 FINAL ticketUrl in search.ts:", resultEvent.ticketUrl);
-    }
-
-    return resultEvent;
   });
 }
 

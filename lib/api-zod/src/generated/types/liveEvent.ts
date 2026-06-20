@@ -27,5 +27,9 @@ export interface LiveEvent {
   performers: Performer[];
   genreKeys: GenreKey[];
   moodKeys: MoodKey[];
+  /**
+     * URL to purchase tickets for this event.
+     * @nullable
+     */
   ticketUrl: string | null;
 }
