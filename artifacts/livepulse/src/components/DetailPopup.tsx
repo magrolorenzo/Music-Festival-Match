@@ -261,7 +261,7 @@ export default function DetailPopup({
           </Button>
         </div>
 
-        <div className="flex-1 min-h-0 overflow-y-auto livepulse-scroll">
+        <div className="flex-1 min-h-0 overflow-y-auto livepulse-scroll rounded-3xl">
           {/* Hero */}
           <div className="h-64 md:h-80 relative overflow-hidden bg-muted">
             {image ? (
