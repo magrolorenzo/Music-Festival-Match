@@ -143,18 +143,17 @@ function PerformerCard({
       {quotes.length > 0 ? (
         <div className="relative bg-gradient-to-br from-primary/10 to-transparent p-6 rounded-xl border border-primary/20 pl-[24px] pr-[24px] pt-[12px] pb-[12px]">
           <Quote className="absolute top-4 left-4 w-8 h-8 text-primary/20" />
-          <div className="pl-6 flex flex-col gap-[1px]">
+          <div className="pl-6 flex flex-col gap-4">
             {quotes.map((q, i) => (
-              <p
-                key={i}
-                className="text-base md:text-xl font-serif italic leading-relaxed text-white/90"
-              >
-                "{q.quote}"
-              </p>
+              <div key={i} className="flex flex-col gap-1">
+                <p className="text-base md:text-xl font-serif italic leading-relaxed text-white/90">
+                  "{q.quote}"
+                </p>
+                <div className="flex items-center gap-2 text-sm text-primary font-medium">
+                  <Music className="w-4 h-4" /> {q.trackName}
+                </div>
+              </div>
             ))}
-          </div>
-          <div className="pl-6 mt-4 flex items-center gap-2 text-sm text-primary font-medium">
-            <Music className="w-4 h-4" /> {quotes[0].trackName}
           </div>
         </div>
       ) : (

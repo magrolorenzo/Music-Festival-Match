@@ -98,7 +98,7 @@ export interface MusixmatchQuote {
   trackName: string;
   /** Mood keys derived from lyrics analysis for this track. */
   moods: MoodKey[];
-  /** First available theme quote from lyrics analysis. */
+  /** The top theme's quotes from lyrics analysis, joined with ", ". */
   quote: string;
 }
 

@@ -8,7 +8,7 @@ description: How per-artist enrichment works after the Songstats removal — tra
    - Normalize name for API query: lowercase, strip accents/apostrophes, keep spaces.
    - Call `track.search?q_artist={name}&page_size=3&s_track_rating=desc` → top 3 tracks.
    - For each track where `has_lyrics === 1`, call `track.lyrics.analysis.get?track_id={id}`.
-   - Extract: `analysis.moods.main_moods[]` (string array) and `analysis.themes.main_themes[0].quotes[0]` (first quote string).
+   - Extract: `analysis.moods.main_moods[]` (string array) and `analysis.themes.main_themes[0].quotes[]` — all excerpts of the top theme joined with ", " into one quote string (single excerpt passes through unchanged).
    - Each API call is URL-cached via `withCache("musixmatch", url, fn)`.
 
 2. `enrichArtist(name)` in `enrichment.ts`:

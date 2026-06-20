@@ -112,10 +112,23 @@ async function fetchLyricsAnalysis(
         )
       : [];
 
-    const firstQuote: string | null =
-      analysis?.themes?.main_themes?.[0]?.quotes?.[0] ?? null;
+    // The top theme's `quotes` is an array of one or more lyric excerpts.
+    // Join them all (", ") into a single quote rather than keeping only the
+    // first; a single excerpt passes through unchanged.
+    const themeQuotes = analysis?.themes?.main_themes?.[0]?.quotes;
+    const quoteParts: string[] = Array.isArray(themeQuotes)
+      ? themeQuotes
+          .flat(Infinity)
+          .filter(
+            (q: unknown): q is string =>
+              typeof q === "string" && q.trim().length > 0,
+          )
+          .map((q: string) => q.trim())
+      : [];
+    const quote: string | null =
+      quoteParts.length > 0 ? quoteParts.join(", ") : null;
 
-    return { quote: firstQuote, moods: mainMoods };
+    return { quote, moods: mainMoods };
   } catch {
     return { quote: null, moods: [] };
   }
