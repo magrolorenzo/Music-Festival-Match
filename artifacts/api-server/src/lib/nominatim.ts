@@ -42,6 +42,12 @@ export async function searchPlaces(query: string): Promise<Place[]> {
 
   if (!Array.isArray(hits)) return [];
 
+  // Nominatim often returns several OSM objects for one place (e.g. the city
+  // node and its boundary relation) that share an identical display_name but
+  // differ slightly in coordinates. Dedupe by label so the user doesn't see the
+  // same place listed twice, keeping the first (most relevant) match.
+  const seen = new Set<string>();
+
   return hits
     .map((hit) => ({
       query: trimmed,
@@ -55,5 +61,11 @@ export async function searchPlaces(query: string): Promise<Place[]> {
         Number.isFinite(p.latitude) &&
         Number.isFinite(p.longitude),
     )
+    .filter((p) => {
+      const key = p.label.trim().toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
     .slice(0, 5);
 }
