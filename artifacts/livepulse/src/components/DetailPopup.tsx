@@ -359,6 +359,17 @@ export default function DetailPopup({
                   </div>
                 </Carousel>
               )}
+
+              {event.otherPerformerNames.length > 0 && (
+                <div className="pt-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                    Also on the lineup
+                  </p>
+                  <p className="text-sm text-white/60 leading-relaxed">
+                    {event.otherPerformerNames.join(", ")}
+                  </p>
+                </div>
+              )}
             </div>
 
             {event.ticketUrl && (

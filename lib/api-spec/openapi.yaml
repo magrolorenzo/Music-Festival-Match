@@ -264,6 +264,7 @@ components:
         - location
         - geoRadiusKm
         - performers
+        - otherPerformerNames
         - genreKeys
         - moodKeys
         - ticketUrl
@@ -292,6 +293,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Performer"
+        otherPerformerNames:
+          type: array
+          description: >-
+            Names of additional lineup performers beyond the enriched
+            `performers`, shown as a plain list.
+          items:
+            type: string
         genreKeys:
           type: array
           items:

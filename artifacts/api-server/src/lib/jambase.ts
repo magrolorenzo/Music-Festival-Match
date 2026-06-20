@@ -20,6 +20,8 @@ export interface RawPerformer {
   genres: string[];
   image: string | null;
   isHeadliner: boolean;
+  /** JamBase `x-performanceRank` (per-day billing order); large when missing. */
+  performanceRank: number;
 }
 
 export interface RawEvent {
@@ -154,11 +156,16 @@ function mapPerformers(raw: any): RawPerformer[] {
       const isHeadliner = Boolean(
         p?.["x-isHeadliner"] ?? p?.isHeadliner ?? p?.headliner,
       );
+      const rankRaw = num(p?.["x-performanceRank"]);
+      const performanceRank = Number.isFinite(rankRaw)
+        ? rankRaw
+        : Number.MAX_SAFE_INTEGER;
       return {
         name,
         genres,
         image: firstString(p?.image),
         isHeadliner,
+        performanceRank,
       } satisfies RawPerformer;
     })
     .filter((p: RawPerformer | null): p is RawPerformer => p !== null);

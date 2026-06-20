@@ -30,7 +30,7 @@ import { logger } from "./logger";
 // ============================================================================
 
 const MAX_EVENTS = 30;
-const MAX_PERFORMERS_PER_EVENT = 5;
+const MAX_PERFORMERS_PER_EVENT = 6;
 const ENRICH_CONCURRENCY = 5;
 
 export interface SearchOutput {
@@ -52,8 +52,15 @@ function eventMatchesGenres(event: RawEvent, genres: GenreKey[]): boolean {
   );
 }
 
-function selectPerformers(event: RawEvent): RawPerformer[] {
-  return event.performers.slice(0, MAX_PERFORMERS_PER_EVENT);
+/**
+ * Orders performers for display: headliners first, then by JamBase
+ * `x-performanceRank` ascending. Stable, so ties keep the original order.
+ */
+function sortPerformers(performers: RawPerformer[]): RawPerformer[] {
+  return [...performers].sort((a, b) => {
+    if (a.isHeadliner !== b.isHeadliner) return a.isHeadliner ? -1 : 1;
+    return a.performanceRank - b.performanceRank;
+  });
 }
 
 function performerId(eventId: string, name: string): string {
@@ -82,13 +89,14 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
     .filter((e) => eventMatchesGenres(e, genres))
     .slice(0, MAX_EVENTS);
 
-  // Collect unique performer names to enrich (deduped across all events).
+  // Sort each lineup (headliners first, then performanceRank) and split into the
+  // top N shown as enriched cards and the rest shown as plain names.
   const enrichTargets = new Map<string, RawPerformer>();
-  const eventPerformers = new Map<string, RawPerformer[]>();
+  const eventLineup = new Map<string, RawPerformer[]>();
   for (const event of filtered) {
-    const performers = selectPerformers(event);
-    eventPerformers.set(event.id, performers);
-    for (const p of performers) {
+    const sorted = sortPerformers(event.performers);
+    eventLineup.set(event.id, sorted);
+    for (const p of sorted.slice(0, MAX_PERFORMERS_PER_EVENT)) {
       if (!enrichTargets.has(p.name)) enrichTargets.set(p.name, p);
     }
   }
@@ -102,17 +110,15 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
   const byName = new Map(names.map((n, i) => [n, enrichments[i]]));
 
   return filtered.map((event) => {
-    const enrichedNames = new Set(
-      (eventPerformers.get(event.id) ?? []).map((p) => p.name),
-    );
+    const lineup = eventLineup.get(event.id) ?? [];
+    const shown = lineup.slice(0, MAX_PERFORMERS_PER_EVENT);
+    const otherPerformerNames = lineup
+      .slice(MAX_PERFORMERS_PER_EVENT)
+      .map((p) => p.name);
 
-    const performers: Performer[] = event.performers
-      .slice(0, 12)
-      .map((p) => {
+    const performers: Performer[] = shown.map((p) => {
         const genreKeys = mapGenres(p.genres);
-        const enriched = enrichedNames.has(p.name)
-          ? (byName.get(p.name) ?? PLACEHOLDER_ENRICHMENT)
-          : PLACEHOLDER_ENRICHMENT;
+        const enriched = byName.get(p.name) ?? PLACEHOLDER_ENRICHMENT;
 
         const moodKeys = enriched.moodKeys as MoodKey[];
 
@@ -160,6 +166,7 @@ async function buildLive(input: SearchInput): Promise<LiveEvent[]> {
       location: event.location,
       geoRadiusKm: event.isFestival ? 25 : 5,
       performers,
+      otherPerformerNames,
       genreKeys,
       moodKeys,
       ticketUrl: event.ticketUrl,

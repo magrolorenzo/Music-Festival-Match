@@ -25,6 +25,8 @@ export interface LiveEvent {
   location: JamBaseLocation;
   geoRadiusKm: number;
   performers: Performer[];
+  /** Names of additional lineup performers beyond the enriched `performers`, shown as a plain list. */
+  otherPerformerNames: string[];
   genreKeys: GenreKey[];
   moodKeys: MoodKey[];
   /**
