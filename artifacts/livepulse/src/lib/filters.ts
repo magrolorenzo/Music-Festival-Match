@@ -15,7 +15,7 @@ export const DEFAULT_LOCATION: GeoLocation = {
   longitude: 11.3426,
 };
 
-export const DEFAULT_RADIUS = 50;
+export const DEFAULT_RADIUS = 25;
 export const DEFAULT_RADIUS_UNIT = "km" as const;
 
 /** The default set of search filters the app opens with. */

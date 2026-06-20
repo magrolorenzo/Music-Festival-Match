@@ -37,8 +37,8 @@ interface LandingProps {
 }
 
 const RADIUS_MIN = 25;
-const RADIUS_MAX = 500;
-const RADIUS_STEP = 10;
+const RADIUS_MAX = 100;
+const RADIUS_STEP = 5;
 const SUGGEST_DEBOUNCE_MS = 300;
 
 function clampRadius(value: number): number {

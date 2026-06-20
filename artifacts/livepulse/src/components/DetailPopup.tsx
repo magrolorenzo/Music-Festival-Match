@@ -9,16 +9,15 @@ import type {
   SearchFilters,
   Performer,
   MoodKey,
+  GenreKey,
 } from "@/services/types";
 import {
-  moodHue,
-  moodAccent,
-  moodGroupGradient,
   moodLabel,
   moodEmoji,
   genreLabel,
   genreEmoji,
 } from "@/lib/taxonomy";
+import { matchedFirst, MATCH_BADGE, PLAIN_BADGE } from "@/lib/match-style";
 import {
   MapPin,
   Calendar,
@@ -48,16 +47,18 @@ interface DetailPopupProps {
 function PerformerCard({
   performer,
   selectedMoods,
+  selectedGenres,
   preferredMood,
 }: {
   performer: Performer;
   selectedMoods: MoodKey[];
+  selectedGenres: GenreKey[];
   preferredMood?: MoodKey;
 }) {
   const image = performer.image;
   const quotes = pickArtistQuotes(performer, preferredMood);
-  const moods = performer.cyanite.moodKeys;
-  const genres = performer.cyanite.genreKeys;
+  const moods = matchedFirst(performer.cyanite.moodKeys, selectedMoods);
+  const genres = matchedFirst(performer.cyanite.genreKeys, selectedGenres);
 
   return (
     <div className="w-full flex flex-col gap-6 bg-white/5 rounded-2xl p-6 border border-white/10 h-full relative">
@@ -96,14 +97,19 @@ function PerformerCard({
                 Genres
               </p>
               <div className="flex flex-wrap gap-2">
-                {genres.map((genre) => (
-                  <span
-                    key={genre}
-                    className="text-xs px-2 py-1 rounded border bg-white/5 text-white/70 border-white/5"
-                  >
-                    {genreEmoji(genre)} {genreLabel(genre)}
-                  </span>
-                ))}
+                {genres.map((genre) => {
+                  const isMatch = selectedGenres.includes(genre);
+                  return (
+                    <span
+                      key={genre}
+                      className={`text-xs px-2 py-1 rounded border ${
+                        isMatch ? MATCH_BADGE : PLAIN_BADGE
+                      }`}
+                    >
+                      {genreEmoji(genre)} {genreLabel(genre)}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -120,20 +126,8 @@ function PerformerCard({
                   return (
                     <span
                       key={mood}
-                      style={
-                        isMatch
-                          ? {
-                              background: moodGroupGradient([mood], 0.32),
-                              borderColor: moodAccent(moodHue(mood), 0.6),
-                              color: "#fff",
-                              boxShadow: `0 0 12px ${moodAccent(moodHue(mood), 0.35)}`,
-                            }
-                          : undefined
-                      }
                       className={`text-xs px-2 py-1 rounded border ${
-                        isMatch
-                          ? "font-semibold"
-                          : "bg-white/5 text-white/70 border-white/5"
+                        isMatch ? MATCH_BADGE : PLAIN_BADGE
                       }`}
                     >
                       {moodEmoji(mood)} {moodLabel(mood)}
@@ -287,17 +281,6 @@ export default function DetailPopup({
             <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f]/60 to-transparent" />
 
             <div className="absolute bottom-0 left-0 p-6 md:p-10 w-full flex flex-col gap-4">
-              <div className="flex flex-wrap gap-2">
-                {reasons.map((r, i) => (
-                  <Badge
-                    key={i}
-                    variant="outline"
-                    className="bg-primary/20 text-primary border-primary/30 text-sm font-semibold py-1 px-3"
-                  >
-                    {r.label}
-                  </Badge>
-                ))}
-              </div>
               <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
                 {event.name}
               </h2>
@@ -337,6 +320,7 @@ export default function DetailPopup({
                 <PerformerCard
                   performer={displayPerformers[0]}
                   selectedMoods={filters.moods}
+                  selectedGenres={filters.genres}
                   preferredMood={filters.moods[0]}
                 />
               ) : (
@@ -364,6 +348,7 @@ export default function DetailPopup({
                         <PerformerCard
                           performer={performer}
                           selectedMoods={filters.moods}
+                          selectedGenres={filters.genres}
                           preferredMood={filters.moods[0]}
                         />
                       </CarouselItem>

@@ -1,14 +1,12 @@
 import { formatEventDate } from "@/lib/dates";
 import { initialsFor, placeholderGradient } from "@/lib/images";
 import {
-  moodHue,
-  moodAccent,
-  moodGroupGradient,
   genreLabel,
   genreEmoji,
   moodLabel,
   moodEmoji,
 } from "@/lib/taxonomy";
+import { matchedFirst, MATCH_BADGE, PLAIN_BADGE } from "@/lib/match-style";
 import type { MatchResult, MoodKey, GenreKey } from "@/services/types";
 import { MapPin, Calendar, Sparkles, Music } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -133,25 +131,13 @@ export default function EventCard({
 
         {(event.genreKeys.length > 0 || event.moodKeys.length > 0) && (
           <div className="mt-2 flex flex-wrap gap-1">
-            {event.genreKeys.map((key) => {
+            {matchedFirst(event.genreKeys, result.matchedGenreKeys).map((key) => {
               const isGenreMatch = result.matchedGenreKeys.includes(key as GenreKey);
               return (
                 <span
                   key={`g-${key}`}
-                  style={
-                    isGenreMatch
-                      ? {
-                          background: moodGroupGradient([key as unknown as MoodKey], 0.32),
-                          borderColor: moodAccent(moodHue(key as unknown as MoodKey), 0.6),
-                          color: "#fff",
-                          boxShadow: `0 0 12px ${moodAccent(moodHue(key as unknown as MoodKey), 0.35)}`,
-                        }
-                      : undefined
-                  }
                   className={`text-xs px-2 py-1 rounded border ${
-                    isGenreMatch
-                      ? "font-semibold"
-                      : "bg-white/5 text-white/70 border-white/5"
+                    isGenreMatch ? MATCH_BADGE : PLAIN_BADGE
                   }`}
                 >
                   {genreEmoji(key)} {genreLabel(key)}
@@ -171,25 +157,13 @@ export default function EventCard({
               Moods
             </span>
             <div className="flex flex-wrap gap-1">
-            {event.moodKeys.map((key) => {
+            {matchedFirst(event.moodKeys, result.matchedMoodKeys).map((key) => {
               const isMoodMatch = result.matchedMoodKeys.includes(key as MoodKey);
               return (
                 <span
                   key={`m-${key}`}
-                  style={
-                    isMoodMatch
-                      ? {
-                          background: moodGroupGradient([key as MoodKey], 0.32),
-                          borderColor: moodAccent(moodHue(key as MoodKey), 0.6),
-                          color: "#fff",
-                          boxShadow: `0 0 12px ${moodAccent(moodHue(key as MoodKey), 0.35)}`,
-                        }
-                      : undefined
-                  }
                   className={`text-xs px-2 py-1 rounded border ${
-                    isMoodMatch
-                      ? "font-semibold"
-                      : "bg-white/5 text-white/70 border-white/5"
+                    isMoodMatch ? MATCH_BADGE : PLAIN_BADGE
                   }`}
                 >
                   {moodEmoji(key)} {moodLabel(key)}
