@@ -9,13 +9,16 @@
 export type RegionKey = "europe" | "north-america";
 
 export type GenreKey =
+  | "bluegrass"
   | "blues"
+  | "christian"
   | "classical"
   | "country-music"
   | "edm"
   | "folk"
   | "hip-hop-rap"
   | "indie"
+  | "jamband"
   | "jazz"
   | "kpop"
   | "latin"
@@ -24,7 +27,8 @@ export type GenreKey =
   | "punk"
   | "rhythm-and-blues-soul"
   | "reggae"
-  | "rock";
+  | "rock"
+  | "tribute";
 
 export type MoodKey =
   | "love"

@@ -101,13 +101,16 @@ components:
     GenreKey:
       type: string
       enum:
+        - bluegrass
         - blues
+        - christian
         - classical
         - country-music
         - edm
         - folk
         - hip-hop-rap
         - indie
+        - jamband
         - jazz
         - kpop
         - latin
@@ -117,6 +120,7 @@ components:
         - rhythm-and-blues-soul
         - reggae
         - rock
+        - tribute
     MoodKey:
       type: string
       enum:

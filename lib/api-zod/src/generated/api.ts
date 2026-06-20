@@ -52,7 +52,7 @@ export const SearchEventsBody = zod.object({
   "radiusKm": zod.number().min(1),
   "startDate": zod.string().describe('Inclusive ISO date (YYYY-MM-DD).'),
   "endDate": zod.string().describe('Inclusive ISO date (YYYY-MM-DD).'),
-  "genres": zod.array(zod.enum(['blues', 'classical', 'country-music', 'edm', 'folk', 'hip-hop-rap', 'indie', 'jazz', 'kpop', 'latin', 'metal', 'pop', 'punk', 'rhythm-and-blues-soul', 'reggae', 'rock'])).describe('Selected genre keys; an empty list means \"any genre\".')
+  "genres": zod.array(zod.enum(['bluegrass', 'blues', 'christian', 'classical', 'country-music', 'edm', 'folk', 'hip-hop-rap', 'indie', 'jamband', 'jazz', 'kpop', 'latin', 'metal', 'pop', 'punk', 'rhythm-and-blues-soul', 'reggae', 'rock', 'tribute'])).describe('Selected genre keys; an empty list means \"any genre\".')
 })
 
 export const SearchEventsResponse = zod.object({
@@ -80,7 +80,7 @@ export const SearchEventsResponse = zod.object({
   "isHeadliner": zod.boolean(),
   "cyanite": zod.object({
   "musicGenres": zod.array(zod.string()),
-  "genreKeys": zod.array(zod.enum(['blues', 'classical', 'country-music', 'edm', 'folk', 'hip-hop-rap', 'indie', 'jazz', 'kpop', 'latin', 'metal', 'pop', 'punk', 'rhythm-and-blues-soul', 'reggae', 'rock'])),
+  "genreKeys": zod.array(zod.enum(['bluegrass', 'blues', 'christian', 'classical', 'country-music', 'edm', 'folk', 'hip-hop-rap', 'indie', 'jamband', 'jazz', 'kpop', 'latin', 'metal', 'pop', 'punk', 'rhythm-and-blues-soul', 'reggae', 'rock', 'tribute'])),
   "audioValence": zod.number(),
   "audioEnergy": zod.number(),
   "moodKeys": zod.array(zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature']))
@@ -99,7 +99,7 @@ export const SearchEventsResponse = zod.object({
 })).describe('One quote per track that has lyrics (from analysis).')
 })),
   "otherPerformerNames": zod.array(zod.string()).describe('Names of additional lineup performers beyond the enriched `performers`, shown as a plain list.'),
-  "genreKeys": zod.array(zod.enum(['blues', 'classical', 'country-music', 'edm', 'folk', 'hip-hop-rap', 'indie', 'jazz', 'kpop', 'latin', 'metal', 'pop', 'punk', 'rhythm-and-blues-soul', 'reggae', 'rock'])),
+  "genreKeys": zod.array(zod.enum(['bluegrass', 'blues', 'christian', 'classical', 'country-music', 'edm', 'folk', 'hip-hop-rap', 'indie', 'jamband', 'jazz', 'kpop', 'latin', 'metal', 'pop', 'punk', 'rhythm-and-blues-soul', 'reggae', 'rock', 'tribute'])),
   "moodKeys": zod.array(zod.enum(['love', 'heartbreak', 'joy', 'empowerment', 'angst', 'reflection', 'inspiration', 'nostalgia', 'despair', 'celebration', 'anger', 'peace', 'solitude', 'adventure', 'social-commentary', 'hope', 'spirituality', 'freedom', 'party', 'nature'])),
   "ticketUrl": zod.string().nullable().describe('URL to purchase tickets for this event.')
 }))

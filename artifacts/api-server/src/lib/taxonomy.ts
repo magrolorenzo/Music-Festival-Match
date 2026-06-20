@@ -4,7 +4,7 @@ import type { GenreKey, MoodKey } from "@workspace/api-zod";
 // Server-side taxonomy mapping.
 //
 // Partner APIs return free-form genre strings and lyric mood/emotion labels.
-// We normalize those onto the 16 genre keys and 20 mood keys the LivePulse
+// We normalize those onto the 20 genre keys and 20 mood keys the LivePulse
 // matching engine understands. Anything unrecognized is simply dropped, never
 // guessed, so the filters stay trustworthy.
 //
@@ -86,7 +86,11 @@ const GENRE_RULES: Array<{ key: GenreKey; patterns: string[] }> = [
   },
   {
     key: "country-music",
-    patterns: ["country", "americana", "bluegrass", "honky-tonk"],
+    patterns: ["country", "americana", "honky-tonk"],
+  },
+  {
+    key: "bluegrass",
+    patterns: ["bluegrass"],
   },
   {
     key: "folk",
@@ -107,6 +111,18 @@ const GENRE_RULES: Array<{ key: GenreKey; patterns: string[] }> = [
   {
     key: "reggae",
     patterns: ["reggae", "ska", "dancehall", "dub"],
+  },
+  {
+    key: "christian",
+    patterns: ["christian", "gospel", "worship", "ccm", "praise"],
+  },
+  {
+    key: "jamband",
+    patterns: ["jam band", "jamband", "jam-band"],
+  },
+  {
+    key: "tribute",
+    patterns: ["tribute", "cover band"],
   },
 ];
 

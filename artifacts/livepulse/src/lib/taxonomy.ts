@@ -50,6 +50,10 @@ export const GENRES: GenreDef[] = [
     hue: "300 55% 58%",
   },
   { key: "reggae", label: "Reggae", emoji: "🌴", hue: "140 65% 45%" },
+  { key: "bluegrass", label: "Bluegrass", emoji: "🌾", hue: "85 55% 48%" },
+  { key: "christian", label: "Christian", emoji: "✝️", hue: "50 35% 68%" },
+  { key: "jamband", label: "Jamband", emoji: "🌈", hue: "165 55% 50%" },
+  { key: "tribute", label: "Tribute", emoji: "🎭", hue: "280 40% 60%" },
 ];
 
 export const MOODS: MoodDef[] = [

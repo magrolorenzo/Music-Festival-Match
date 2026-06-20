@@ -53,22 +53,26 @@ export interface JamBaseQuery {
 }
 
 const GENRE_TO_JAMBASE: Record<GenreKey, string> = {
+  bluegrass: "bluegrass",
   blues: "blues",
+  christian: "christian",
   classical: "classical",
-  "country-music": "country",
-  edm: "electronic",
+  "country-music": "country-music",
+  edm: "edm",
   folk: "folk",
-  "hip-hop-rap": "hip-hop",
+  "hip-hop-rap": "hip-hop-rap",
   indie: "indie",
+  jamband: "jamband",
   jazz: "jazz",
-  kpop: "k-pop",
+  kpop: "kpop",
   latin: "latin",
   metal: "metal",
   pop: "pop",
   punk: "punk",
-  "rhythm-and-blues-soul": "r-b",
+  "rhythm-and-blues-soul": "rhythm-and-blues-soul",
   reggae: "reggae",
   rock: "rock",
+  tribute: "tribute",
 };
 
 export function hasJamBaseKey(): boolean {
